@@ -32,4 +32,8 @@ public class Year {
 	@NotNull
 	@Pattern(regexp = "^[0-9]{4}$", message = "Ievdiet pareizu gada skaitli")
 	private int yearNumber;
+	
+	public Year(Integer yearNumber) {
+		setYearNumber(yearNumber);
+	}
 }
