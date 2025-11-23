@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -41,10 +43,18 @@ public class Employee {
 	@Size(max = 20, min = 2)
 	private String surname;
 	
-	//TODO: būs jāsavieno
-	//private int idDepartment;
+	@ManyToOne
+	@JoinColumn(name = "idDepartment")
+	private ViracDepartment idDepartment;
 	
 	@Column(name = "adress")
 	@NotNull
 	private String position;
+	
+	public Employee(String name, String surname,ViracDepartment idDepartment, String position) {
+		setName(name);
+		setSurname(surname);
+		setIdDepartment(idDepartment);
+		setPosition(position);
+	}
 }
