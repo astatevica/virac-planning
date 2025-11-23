@@ -2,8 +2,16 @@ package lv.venta.virac.model;
 
 import java.util.Date;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +25,10 @@ import lombok.ToString;
 @Entity
 public class ProjectManagement {
 	
+	@Id
+	@Column(name = "idProjectManag")
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Setter(value = AccessLevel.NONE)
 	private int idProjectManag;
 	
 	//TODO: connect
@@ -25,7 +37,13 @@ public class ProjectManagement {
 	//TODO: connect
 	private int idProject;
 	
+	@NotNull
+	@Column(name = "startDate")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date startDate;
 	
+	@NotNull
+	@Column(name = "endDate")
+	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date endDate;
 }
