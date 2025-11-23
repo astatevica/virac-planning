@@ -9,6 +9,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -31,11 +34,13 @@ public class ProjectManagement {
 	@Setter(value = AccessLevel.NONE)
 	private int idProjectManag;
 	
-	//TODO: connect
-	private int idEmployee;
+	@OneToMany
+	@JoinColumn(name = "idEmployee")
+	private Employee idEmployee;
 	
-	//TODO: connect
-	private int idProject;
+	@OneToOne
+	@JoinColumn(name = "idProject")
+	private Project idProject;
 	
 	@NotNull
 	@Column(name = "startDate")
@@ -46,4 +51,11 @@ public class ProjectManagement {
 	@Column(name = "endDate")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date endDate;
+	
+	public ProjectManagement(Employee idEmployee, Project idProject, Date startDate, Date endDate) {
+		setIdEmployee(idEmployee);
+		setIdProject(idProject);
+		setStartDate(startDate);
+		setEndDate(endDate);
+	}
 }
