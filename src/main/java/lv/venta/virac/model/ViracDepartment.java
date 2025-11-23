@@ -34,4 +34,8 @@ public class ViracDepartment {
 	@Pattern(regexp = "[A-ZĒŪĪĻĶĢŠĀŽČŅa-zēūīļķģšāžčņ' ]+", message = "Tikai burti un atstarpes ir atlautas")
 	@Size(max = 20, min = 2)
 	private String name;
+	
+	public ViracDepartment(String name){
+		setName(name);
+	}
 }
