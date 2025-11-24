@@ -43,4 +43,11 @@ public class Course {
 	@Column(name = "semester")
 	@NotNull
 	private String faculty;
+	
+	public Course(String name, int ectsCredits, String semester, String faculty) {
+		setName(name);
+		setEctsCredits(ectsCredits);
+		setSemester(semester);
+		setFaculty(faculty);
+	}
 }
