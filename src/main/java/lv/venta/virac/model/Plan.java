@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -27,11 +29,13 @@ public class Plan {
 	@Setter(value = AccessLevel.NONE)
 	private int idPlan;
 	
-	//TODO:connect
-	private int idEmployee;
+	@OneToMany
+	@JoinColumn(name = "idEmployee")
+	private Employee idEmployee;
 	
-	//TODO:connect
-	private int idYear;
+	@OneToMany
+	@JoinColumn(name = "idYear")
+	private Year idYear;
 	
 	@Column(name = "numOfProjects")
 	private int numOfProjects;
@@ -110,4 +114,33 @@ public class Plan {
 	@Column(name = "otherJobsEnd")
 	@Size(max = 200, min = 2)
 	private String otherJobsEnd;
+	
+	public Plan(Employee idEmployee, Year idYear, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd,
+			String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
+			String adminWork, String adminWorkEnd, String projApplicSub, String projApplicSubEnd, String skillsDevelopment, 
+			String skillsDevelopmentEnd,String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd) {
+		setIdEmployee(idEmployee);
+		setIdYear(idYear);
+		setNumOfProjects(numOfProjects);
+		setNumOfArticles(numOfArticles);
+		setPartInConf(partInConf);
+		setPartInConfEnd(partInConfEnd);
+		setComAbConf(comAbConf);
+		setComAbConfEnd(comAbConfEnd);
+		setNumOfCourses(numOfCourses);
+		setNumOfStudWork(numOfStudWork);
+		setPromoOfResearch(promoOfResearch);
+		setPromoOfResearchEnd(promoOfResearchEnd);
+		setAdminWork(adminWork);
+		setAdminWorkEnd(adminWorkEnd);
+		setProjApplicSub(projApplicSub);
+		setProjApplicSubEnd(projApplicSubEnd);
+		setSkillsDevelopment(skillsDevelopment);
+		setSkillsDevelopmentEnd(skillsDevelopmentEnd);
+		setParticipationInSeminars(participationInSeminars);
+		setParticipationInSeminarsEnd(participationInSeminarsEnd);
+		setOtherJobs(otherJobs);
+		setOtherJobsEnd(otherJobsEnd);
+		
+	}
 }
