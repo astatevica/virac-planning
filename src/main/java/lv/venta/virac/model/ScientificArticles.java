@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -40,6 +42,13 @@ public class ScientificArticles {
 	@Size(max = 20, min = 2)
 	private String coAuthors;
 	
-	//TODO: connect
-	private int idJournal;
+	@OneToMany
+	@JoinColumn(name = "idJournal")
+	private Journal idJournal;
+	
+	public ScientificArticles(String name, String coAuthors, Journal idJournal) {
+		setName(name);
+		setCoAuthors(coAuthors);
+		setIdJournal(idJournal);
+	}
 }
