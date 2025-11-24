@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,12 +27,20 @@ public class CoursePlan {
 	@Setter(value = AccessLevel.NONE)
 	private int idCoursePlan;
 	
-	//TODO: connect
-	private int idPlan;
+	@OneToMany
+	@JoinColumn(name = "idPlan")
+	private Plan idPlan;
 	
-	//TODO: connect
-	private int idCourse;
+	@OneToMany
+	@JoinColumn(name = "idCourse")
+	private Course idCourse;
 	
 	@Column(name = "workDone")
 	private String workDone;
+	
+	public CoursePlan(Plan idPlan, Course idCourse, String workDone) {
+		setIdPlan(idPlan);
+		setIdCourse(idCourse);
+		setWorkDone(workDone);
+	}
 }
