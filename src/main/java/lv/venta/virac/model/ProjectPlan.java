@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,11 +30,13 @@ public class ProjectPlan {
 	@Setter(value = AccessLevel.NONE)
 	private int idProjectPlan;
 	
-	//TODO:connect
-	private int idPlan;
+	@OneToMany
+	@JoinColumn(name = "idPlan")
+	private Plan idPlan;
 	
-	//TODO:connect
-	private int idProject;
+	@OneToMany
+	@JoinColumn(name = "idProject")
+	private Project idProject;
 	
 	@Column(name = "name")
 	@NotNull
@@ -43,4 +47,11 @@ public class ProjectPlan {
 	@NotNull
 	@Size(max = 200, min = 2)
 	private String workDone;
+	
+	public ProjectPlan(Plan idPlan, Project idProject, String tasks, String workDone) {
+		setIdPlan(idPlan);
+		setIdProject(idProject);
+		setTasks(tasks);
+		setWorkDone(workDone);
+	}
 }
