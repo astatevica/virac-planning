@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lv.venta.virac.model.enums.Degree;
 
 @Setter
 @Getter
@@ -45,6 +46,14 @@ public class StudentWork {
 	@Size(max = 20, min = 2)
 	private String studentSurname;
 	
-	//TODO: make enum
-	//private enum degree;
+	@NotNull
+	@Column(name = "Degree")
+	private Degree degree;
+	
+	public StudentWork(String name, String studentName, String studentSurname, Degree degree) {
+		setName(name);
+		setStudentName(studentName);
+		setStudentSurname(studentSurname);
+		setDegree(degree);
+	}
 }
