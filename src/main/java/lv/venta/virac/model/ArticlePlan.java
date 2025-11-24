@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,22 +20,31 @@ import lombok.ToString;
 @Table(name = "articlePlanTable")
 @ToString
 @Entity
-public class ArticlePlan {
+public class ArticlePlan{
 	@Id
 	@Column(name = "idArticlePlan")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Setter(value = AccessLevel.NONE)
 	private int idArticlePlan;
 	
-	//TODO: connect
-	private int idPlan;
+	@OneToMany
+	@JoinColumn(name = "idPlan")
+	private Plan idPlan;
 	
-	//TODO: connect
-	private int idArticle;
+	@OneToMany
+	@JoinColumn(name = "idArticle")
+	private ScientificArticles idArticle;
 	
 	@Column(name = "articleComments")
 	private String articleComments;
 	
 	@Column(name = "publicationLink")
 	private String publicationLink;
+	
+	public ArticlePlan(Plan idPlan, ScientificArticles idArticle, String articleComments, String publicationLink) {
+		setIdPlan(idPlan);
+		setIdArticle(idArticle);
+		setArticleComments(articleComments);
+		setPublicationLink(publicationLink);
+	}
 }
