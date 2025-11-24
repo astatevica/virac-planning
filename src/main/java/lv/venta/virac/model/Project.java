@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -41,8 +43,9 @@ public class Project {
 	@NotNull
 	private int number;
 	
-	//TODO: connect
-	private int idProjectManag;
+	@OneToOne
+	@JoinColumn(name = "idProjectManag")
+	private ProjectManagement idProjectManag;
 	
 	@NotNull
 	@Column(name = "startDate")
@@ -58,4 +61,13 @@ public class Project {
 	@NotNull
 	@Size(max = 10, min = 2)
 	private String acronym;
+	
+	public Project(String name, int number, ProjectManagement idProjectManag, Date startDate, Date endDate, String acronym){
+		setName(name);
+		setNumber(number);
+		setIdProjectManag(idProjectManag);
+		setStartDate(startDate);
+		setEndDate(endDate);
+		setAcronym(acronym);
+	}
 }
