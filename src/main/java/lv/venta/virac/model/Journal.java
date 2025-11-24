@@ -32,4 +32,8 @@ public class Journal {
 	@NotNull
 	@Size(max = 20, min = 2)
 	private String name;
+	
+	public Journal(String name) {
+		setName(name);
+	}
 }
