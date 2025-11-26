@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -61,6 +62,10 @@ public class Project {
 	@NotNull
 	@Size(max = 10, min = 2)
 	private String acronym;
+	
+	@OneToMany(mappedBy = "project")
+	@ToString.Exclude
+	private ProjectPlan projectPlan;
 	
 	public Project(String name, int number, ProjectManagement projectManagement, Date startDate, Date endDate, String acronym){
 		setName(name);
