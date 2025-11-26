@@ -41,6 +41,10 @@ public class Plan {
 	@Column(name = "numOfProjects")
 	private int numOfProjects;
 	
+	@OneToMany(mappedBy = "plan")
+	@ToString.Exclude
+	private ProjectPlan projectPlan;
+	
 	@Column(name = "numOfArticles")
 	private int numOfArticles;
 	
