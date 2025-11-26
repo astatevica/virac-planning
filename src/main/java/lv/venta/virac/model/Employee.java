@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -50,6 +51,10 @@ public class Employee {
 	@Column(name = "adress")
 	@NotNull
 	private String position;
+	
+	@OneToMany(mappedBy = "projectManagement")
+	@ToString.Exclude
+	private ProjectManagement projectManagement;
 	
 	public Employee(String name, String surname,ViracDepartment viracDepartment, String position) {
 		setName(name);

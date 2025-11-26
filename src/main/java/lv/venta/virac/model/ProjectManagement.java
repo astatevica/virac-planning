@@ -36,7 +36,7 @@ public class ProjectManagement {
 	
 	@OneToMany
 	@JoinColumn(name = "idEmployee")
-	private Employee idEmployee;
+	private Employee employee;
 	
 	@OneToOne
 	@JoinColumn(name = "idProject")
@@ -52,8 +52,8 @@ public class ProjectManagement {
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date endDate;
 	
-	public ProjectManagement(Employee idEmployee, Project idProject, Date startDate, Date endDate) {
-		setIdEmployee(idEmployee);
+	public ProjectManagement(Employee employee, Project idProject, Date startDate, Date endDate) {
+		setEmployee(employee);
 		setIdProject(idProject);
 		setStartDate(startDate);
 		setEndDate(endDate);
