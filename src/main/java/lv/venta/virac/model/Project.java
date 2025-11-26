@@ -44,9 +44,8 @@ public class Project {
 	private int number;
 	
 	@OneToOne
-	//Otrā pusē @Mapped by
 	@JoinColumn(name = "idProjectManag")
-	private ProjectManagement idProjectManag;
+	private ProjectManagement projectManagement;
 	
 	@NotNull
 	@Column(name = "startDate")
@@ -63,10 +62,10 @@ public class Project {
 	@Size(max = 10, min = 2)
 	private String acronym;
 	
-	public Project(String name, int number, ProjectManagement idProjectManag, Date startDate, Date endDate, String acronym){
+	public Project(String name, int number, ProjectManagement projectManagement, Date startDate, Date endDate, String acronym){
 		setName(name);
 		setNumber(number);
-		setIdProjectManag(idProjectManag);
+		setProjectManagement(projectManagement);
 		setStartDate(startDate);
 		setEndDate(endDate);
 		setAcronym(acronym);

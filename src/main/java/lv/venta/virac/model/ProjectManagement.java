@@ -52,6 +52,10 @@ public class ProjectManagement {
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date endDate;
 	
+	@OneToOne(mappedBy = "projectManagement")
+	@ToString.Exclude
+	private Project project;
+	
 	public ProjectManagement(Employee employee, Project idProject, Date startDate, Date endDate) {
 		setEmployee(employee);
 		setIdProject(idProject);
