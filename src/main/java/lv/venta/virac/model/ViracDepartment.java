@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -34,6 +35,11 @@ public class ViracDepartment {
 	@Pattern(regexp = "[A-ZĒŪĪĻĶĢŠĀŽČŅa-zēūīļķģšāžčņ' ]+", message = "Tikai burti un atstarpes ir atlautas")
 	@Size(max = 20, min = 2)
 	private String name;
+	
+	@OneToMany(mappedBy = "employee")
+	@ToString.Exclude
+	private Employee employee;
+	
 	
 	public ViracDepartment(String name){
 		setName(name);

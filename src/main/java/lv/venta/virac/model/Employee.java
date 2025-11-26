@@ -45,16 +45,16 @@ public class Employee {
 	
 	@ManyToOne
 	@JoinColumn(name = "idDepartment")
-	private ViracDepartment idDepartment;
+	private ViracDepartment viracDepartment;
 	
 	@Column(name = "adress")
 	@NotNull
 	private String position;
 	
-	public Employee(String name, String surname,ViracDepartment idDepartment, String position) {
+	public Employee(String name, String surname,ViracDepartment viracDepartment, String position) {
 		setName(name);
 		setSurname(surname);
-		setIdDepartment(idDepartment);
+		setViracDepartment(viracDepartment);
 		setPosition(position);
 	}
 }

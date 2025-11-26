@@ -44,6 +44,7 @@ public class Project {
 	private int number;
 	
 	@OneToOne
+	//Otrā pusē @Mapped by
 	@JoinColumn(name = "idProjectManag")
 	private ProjectManagement idProjectManag;
 	
