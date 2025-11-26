@@ -52,9 +52,13 @@ public class Employee {
 	@NotNull
 	private String position;
 	
-	@OneToMany(mappedBy = "projectManagement")
+	@OneToMany(mappedBy = "employee")
 	@ToString.Exclude
 	private ProjectManagement projectManagement;
+	
+	@OneToMany(mappedBy = "employee")
+	@ToString.Exclude
+	private Plan plan;
 	
 	public Employee(String name, String surname,ViracDepartment viracDepartment, String position) {
 		setName(name);

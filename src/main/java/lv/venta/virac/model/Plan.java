@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -29,9 +30,9 @@ public class Plan {
 	@Setter(value = AccessLevel.NONE)
 	private int idPlan;
 	
-	@OneToMany
+	@ManyToOne
 	@JoinColumn(name = "idEmployee")
-	private Employee idEmployee;
+	private Employee employee;
 	
 	@OneToMany
 	@JoinColumn(name = "idYear")
@@ -115,11 +116,11 @@ public class Plan {
 	@Size(max = 200, min = 2)
 	private String otherJobsEnd;
 	
-	public Plan(Employee idEmployee, Year idYear, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd,
+	public Plan(Employee employee, Year idYear, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd,
 			String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
 			String adminWork, String adminWorkEnd, String projApplicSub, String projApplicSubEnd, String skillsDevelopment, 
 			String skillsDevelopmentEnd,String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd) {
-		setIdEmployee(idEmployee);
+		setEmployee(employee);
 		setIdYear(idYear);
 		setNumOfProjects(numOfProjects);
 		setNumOfArticles(numOfArticles);

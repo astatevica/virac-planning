@@ -36,7 +36,7 @@ public class ViracDepartment {
 	@Size(max = 20, min = 2)
 	private String name;
 	
-	@OneToMany(mappedBy = "employee")
+	@OneToMany(mappedBy = "viracDepartment")
 	@ToString.Exclude
 	private Employee employee;
 	
