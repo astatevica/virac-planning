@@ -48,6 +48,10 @@ public class Plan {
 	@Column(name = "numOfArticles")
 	private int numOfArticles;
 	
+	@OneToMany(mappedBy = "plan")
+	@ToString.Exclude
+	private ArticlePlan articlePlan;
+	
 	@Column(name = "partInConf")
 	@Size(max = 200, min = 2)
 	private String partInConf;

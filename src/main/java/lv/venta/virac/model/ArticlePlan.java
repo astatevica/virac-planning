@@ -7,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,9 +27,9 @@ public class ArticlePlan{
 	@Setter(value = AccessLevel.NONE)
 	private int idArticlePlan;
 	
-	@OneToMany
+	@ManyToOne
 	@JoinColumn(name = "idPlan")
-	private Plan idPlan;
+	private Plan plan;
 	
 	@ManyToOne
 	@JoinColumn(name = "idArticle")
@@ -42,8 +41,8 @@ public class ArticlePlan{
 	@Column(name = "publicationLink")
 	private String publicationLink;
 	
-	public ArticlePlan(Plan idPlan, ScientificArticles scientificArticles, String articleComments, String publicationLink) {
-		setIdPlan(idPlan);
+	public ArticlePlan(Plan plan, ScientificArticles scientificArticles, String articleComments, String publicationLink) {
+		setPlan(plan);
 		setScientificArticles(scientificArticles);
 		setArticleComments(articleComments);
 		setPublicationLink(publicationLink);
