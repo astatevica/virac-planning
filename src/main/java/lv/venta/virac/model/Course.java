@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -43,6 +44,10 @@ public class Course {
 	@Column(name = "semester")
 	@NotNull
 	private String faculty;
+	
+	@OneToMany(mappedBy = "course")
+	@ToString.Exclude
+	private CoursePlan coursePlan;
 	
 	public Course(String name, int ectsCredits, String semester, String faculty) {
 		setName(name);
