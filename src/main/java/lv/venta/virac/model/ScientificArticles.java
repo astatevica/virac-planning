@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -42,13 +42,13 @@ public class ScientificArticles {
 	@Size(max = 20, min = 2)
 	private String coAuthors;
 	
-	@OneToMany
+	@ManyToOne
 	@JoinColumn(name = "idJournal")
-	private Journal idJournal;
+	private Journal journal;
 	
-	public ScientificArticles(String name, String coAuthors, Journal idJournal) {
+	public ScientificArticles(String name, String coAuthors, Journal journal) {
 		setName(name);
 		setCoAuthors(coAuthors);
-		setIdJournal(idJournal);
+		setJournal(journal);
 	}
 }

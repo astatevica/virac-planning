@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -32,6 +33,10 @@ public class Journal {
 	@NotNull
 	@Size(max = 20, min = 2)
 	private String name;
+	
+	@OneToMany(mappedBy = "journal")
+	@ToString.Exclude
+	private ScientificArticles scientificArticles;
 	
 	public Journal(String name) {
 		setName(name);
