@@ -1,4 +1,4 @@
-package repo;
+package lv.venta.virac.repo;
 
 import org.springframework.data.repository.CrudRepository;
 
