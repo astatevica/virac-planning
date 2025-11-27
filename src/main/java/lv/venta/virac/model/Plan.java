@@ -34,9 +34,9 @@ public class Plan {
 	@JoinColumn(name = "idEmployee")
 	private Employee employee;
 	
-	@OneToMany
+	@ManyToOne
 	@JoinColumn(name = "idYear")
-	private Year idYear;
+	private Year year;
 	
 	@Column(name = "numOfProjects")
 	private int numOfProjects;
@@ -120,12 +120,12 @@ public class Plan {
 	@Size(max = 200, min = 2)
 	private String otherJobsEnd;
 	
-	public Plan(Employee employee, Year idYear, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd,
+	public Plan(Employee employee, Year year, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd,
 			String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
 			String adminWork, String adminWorkEnd, String projApplicSub, String projApplicSubEnd, String skillsDevelopment, 
 			String skillsDevelopmentEnd,String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd) {
 		setEmployee(employee);
-		setIdYear(idYear);
+		setYear(year);
 		setNumOfProjects(numOfProjects);
 		setNumOfArticles(numOfArticles);
 		setPartInConf(partInConf);

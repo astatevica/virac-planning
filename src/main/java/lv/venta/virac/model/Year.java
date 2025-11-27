@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -32,6 +33,10 @@ public class Year {
 	@NotNull
 	@Pattern(regexp = "^[0-9]{4}$", message = "Ievdiet pareizu gada skaitli")
 	private int yearNumber;
+	
+	@OneToMany(mappedBy = "year")
+	@ToString.Exclude
+	private Plan plan;
 	
 	public Year(Integer yearNumber) {
 		setYearNumber(yearNumber);
