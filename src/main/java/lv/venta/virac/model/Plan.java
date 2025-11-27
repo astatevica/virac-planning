@@ -68,6 +68,10 @@ public class Plan {
 	@Column(name = "numOfCourses")
 	private int numOfCourses;
 	
+	@OneToMany(mappedBy = "plan")
+	@ToString.Exclude
+	private CoursePlan coursePlan;
+	
 	@Column(name = "numOfStudWork")
 	@NotNull
 	private int numOfStudWork;
