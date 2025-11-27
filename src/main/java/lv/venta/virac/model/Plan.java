@@ -72,6 +72,10 @@ public class Plan {
 	@NotNull
 	private int numOfStudWork;
 	
+	@OneToMany(mappedBy = "plan")
+	@ToString.Exclude
+	private WorkPlan workPlan;
+	
 	@Column(name = "promoOfResearch")
 	@Size(max = 200, min = 2)
 	private String promoOfResearch;
