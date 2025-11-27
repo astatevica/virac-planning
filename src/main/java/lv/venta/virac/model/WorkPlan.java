@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -27,9 +28,9 @@ public class WorkPlan {
 	@Setter(value = AccessLevel.NONE)
 	private int idWorkPlan;
 	
-	@OneToMany
+	@ManyToOne
 	@JoinColumn(name = "idStudWork")
-	private StudentWork idStudWork;
+	private StudentWork studentWork;
 	
 	@OneToMany
 	@JoinColumn(name = "idPlan")
@@ -38,8 +39,8 @@ public class WorkPlan {
 	@Column(name = "workDone")
 	private String workDone;
 	
-	public WorkPlan(StudentWork idStudWork,Plan idPlan,String workDone) {
-		setIdStudWork(idStudWork);
+	public WorkPlan(StudentWork studentWork,Plan idPlan,String workDone) {
+		setStudentWork(studentWork);
 		setIdPlan(idPlan);
 		setWorkDone(workDone);
 	}
