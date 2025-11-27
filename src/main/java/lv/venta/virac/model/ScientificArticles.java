@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -45,6 +46,10 @@ public class ScientificArticles {
 	@ManyToOne
 	@JoinColumn(name = "idJournal")
 	private Journal journal;
+	
+	@OneToMany(mappedBy = "scientificArticles")
+	@ToString.Exclude
+	private ArticlePlan articlePlan;
 	
 	public ScientificArticles(String name, String coAuthors, Journal journal) {
 		setName(name);
