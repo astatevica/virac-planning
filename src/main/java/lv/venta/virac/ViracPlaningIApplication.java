@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import lv.venta.virac.model.Year;
 import lv.venta.virac.repo.IArticlePlanRepo;
 import lv.venta.virac.repo.ICoursePlanRepo;
 import lv.venta.virac.repo.ICourseRepo;
@@ -40,13 +41,13 @@ public class ViracPlaningIApplication {
 			
 			@Override
 			public void run(String... args) throws Exception {
-//				Student s1 = new Student("Konstantīns", "Čmils");
-//				Student s2 = new Student("Guna", "Kravale");
-//				Student s3 = new Student("Sintija", "Ernštreite");
-//				
-//				studRepo.save(s1);
-//				studRepo.save(s2);
-//				studRepo.save(s3);
+				Year year1 = new Year(2023);
+				Year year2 = new Year(2024);
+				Year year3 = new Year(2025);
+				
+				yearRepo.save(year1);
+				yearRepo.save(year2);
+				yearRepo.save(year3);
 //				
 //				Professor p1 = new Professor("Karina", "Šķirmante", Degree.magistra);
 //				Professor p2 = new Professor("Kārlis", "Immers", Degree.magistra);
