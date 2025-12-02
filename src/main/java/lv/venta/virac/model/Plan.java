@@ -1,5 +1,7 @@
 package lv.venta.virac.model;
 
+import java.util.Collection;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -74,7 +76,7 @@ public class Plan {
 	
 	@OneToMany(mappedBy = "plan")
 	@ToString.Exclude
-	private CoursePlan coursePlan;
+	private Collection<CoursePlan> coursePlan;
 	
 	@Column(name = "numOfStudWork")
 	@NotNull
