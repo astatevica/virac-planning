@@ -40,7 +40,6 @@ public class ViracDepartment {
 	@ToString.Exclude
 	private Collection<Employee> employee;
 	
-	
 	public ViracDepartment(String name){
 		setName(name);
 	}

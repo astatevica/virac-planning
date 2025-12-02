@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.model.Year;
 import lv.venta.virac.repo.IArticlePlanRepo;
@@ -52,27 +53,20 @@ public class ViracPlaningIApplication {
 				
 				yearRepo.saveAll((Arrays.asList(year1, year2, year3)));
 		
-				//ViracDepartmentTable
+				//ViracDepartmentTable DONE
 				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology");
 				ViracDepartment dep2 = new ViracDepartment("Astronomy and Astrophysics");
 				ViracDepartment dep3 = new ViracDepartment("Engineering & Technical Operations group(ETO/ETOG)");
 				
 				viracDepRepo.saveAll((Arrays.asList(dep1, dep2, dep3)));
-//			
-//				Course c1 = new Course("Programmatūras Inženierija I", 6, p1);
-//				Course c2 = new Course("Datubāzes II", 3, p3);
-//				Course c3 = new Course("Web tehnoloģijas", 6, p2);
-//				
-//				courseRepo.saveAll(Arrays.asList(c1, c2, c3));
-//				
-//				Grade g1 = new Grade(6, s1, c1);//Konstantīns nopelnīja 6 ProgInz I
-//				Grade g2 = new Grade(9, s1, c2);//Konstantīns nopelnīja 9 Datubāzēs II
-//				Grade g3 = new Grade(3, s2, c1);//Guna nopelnīja 3 ProgInz I
-//				Grade g4 = new Grade(8, s2, c2);//Guna nopelnīja 8 Datubāzēs II
-//				Grade g5 = new Grade(10, s2, c3);//Guna nopelnīja 10 Webteh
-//				Grade g6 = new Grade(7, s3, c2);//Sintija nopelnīja 7 Datubāzēs II
-//				Grade g7 = new Grade(5, s3, c3);//Sintija nopelnīja 5 Webteh
-//				grRepo.saveAll(Arrays.asList(g1, g2, g3, g4, g5, g6, g7));
+				
+				//EmployeeTable DONE
+				Employee emp1 = new Employee("Karina", "Šķirmante", dep1 , "Pētnieks");
+				Employee emp2 = new Employee("Juris", "Kalvāns", dep2 , "Nodaļas vadītājs, Vadošais pētnieks");
+				Employee emp3 = new Employee("Māra", "Klausa", dep3 , "Tehniskais speciālists");
+				
+				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3)));
+				
 			}
 		};
 	}
