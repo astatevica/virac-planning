@@ -38,12 +38,12 @@ public class ProjectPlan {
 	@JoinColumn(name = "idProject")
 	private Project project;
 	
-	@Column(name = "name")
+	@Column(name = "tasks")
 	@NotNull
 	@Size(max = 200, min = 2)
 	private String tasks;
 	
-	@Column(name = "name")
+	@Column(name = "workDone")
 	@NotNull
 	@Size(max = 200, min = 2)
 	private String workDone;

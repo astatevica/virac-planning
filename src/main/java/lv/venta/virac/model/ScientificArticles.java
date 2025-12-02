@@ -39,7 +39,7 @@ public class ScientificArticles {
 	@Size(max = 50, min = 2)
 	private String name;
 	
-	@Column(name = "name")
+	@Column(name = "coAuthors")
 	@NotNull
 	@Pattern(regexp = "[A-ZĒŪĪĻĶĢŠĀŽČŅa-zēūīļķģšāžčņ' ,]+", message = "Tikai burti, komats un atstarpes ir atlautas")
 	@Size(max = 20, min = 2)

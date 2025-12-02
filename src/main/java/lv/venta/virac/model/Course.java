@@ -35,7 +35,7 @@ public class Course {
 	@Size(max = 50, min = 2)
 	private String name;
 	
-	@Column(name = "name")
+	@Column(name = "ectsCredits")
 	@NotNull
 	private int ectsCredits;
 	
@@ -43,7 +43,7 @@ public class Course {
 	@NotNull
 	private String semester;
 	
-	@Column(name = "semester")
+	@Column(name = "faculty")
 	@NotNull
 	private String faculty;
 	
