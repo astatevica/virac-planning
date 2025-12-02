@@ -45,14 +45,14 @@ public class Plan {
 	
 	@OneToMany(mappedBy = "plan")
 	@ToString.Exclude
-	private ProjectPlan projectPlan;
+	private Collection<ProjectPlan> projectPlan;
 	
 	@Column(name = "numOfArticles")
 	private int numOfArticles;
 	
 	@OneToMany(mappedBy = "plan")
 	@ToString.Exclude
-	private ArticlePlan articlePlan;
+	private Collection<ArticlePlan> articlePlan;
 	
 	@Column(name = "partInConf")
 	@Size(max = 200, min = 2)
@@ -84,7 +84,7 @@ public class Plan {
 	
 	@OneToMany(mappedBy = "plan")
 	@ToString.Exclude
-	private WorkPlan workPlan;
+	private Collection<WorkPlan> workPlan;
 	
 	@Column(name = "promoOfResearch")
 	@Size(max = 200, min = 2)

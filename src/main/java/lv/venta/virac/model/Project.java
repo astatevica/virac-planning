@@ -1,5 +1,6 @@
 package lv.venta.virac.model;
 
+import java.util.Collection;
 import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -65,7 +66,7 @@ public class Project {
 	
 	@OneToMany(mappedBy = "project")
 	@ToString.Exclude
-	private ProjectPlan projectPlan;
+	private Collection<ProjectPlan> projectPlan;
 	
 	public Project(String name, int number, ProjectManagement projectManagement, Date startDate, Date endDate, String acronym){
 		setName(name);

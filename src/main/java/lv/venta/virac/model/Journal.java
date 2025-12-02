@@ -1,5 +1,7 @@
 package lv.venta.virac.model;
 
+import java.util.Collection;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,7 +38,7 @@ public class Journal {
 	
 	@OneToMany(mappedBy = "journal")
 	@ToString.Exclude
-	private ScientificArticles scientificArticles;
+	private Collection<ScientificArticles>  scientificArticles;
 	
 	public Journal(String name) {
 		setName(name);

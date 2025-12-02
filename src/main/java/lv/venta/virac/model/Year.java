@@ -1,5 +1,7 @@
 package lv.venta.virac.model;
 
+import java.util.Collection;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,7 +38,7 @@ public class Year {
 	
 	@OneToMany(mappedBy = "year")
 	@ToString.Exclude
-	private Plan plan;
+	private Collection<Plan> plan;
 	
 	public Year(Integer yearNumber) {
 		setYearNumber(yearNumber);
