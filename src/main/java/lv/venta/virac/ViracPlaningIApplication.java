@@ -1,10 +1,13 @@
 package lv.venta.virac;
 
+import java.util.Arrays;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.model.Year;
 import lv.venta.virac.repo.IArticlePlanRepo;
 import lv.venta.virac.repo.ICoursePlanRepo;
@@ -41,26 +44,20 @@ public class ViracPlaningIApplication {
 			
 			@Override
 			public void run(String... args) throws Exception {
+				
+				//YearTable DONE
 				Year year1 = new Year(2023);
 				Year year2 = new Year(2024);
 				Year year3 = new Year(2025);
 				
-				yearRepo.save(year1);
-				yearRepo.save(year2);
-				yearRepo.save(year3);
-//				
-//				Professor p1 = new Professor("Karina", "Šķirmante", Degree.magistra);
-//				Professor p2 = new Professor("Kārlis", "Immers", Degree.magistra);
-//				Professor p3 = new Professor("Vija", "Vagale", Degree.doktora);
-//				
-//				//garais pieraksts
-//				/*
-//				profRepo.save(p1);
-//				profRepo.save(p2);
-//				profRepo.save(p3);
-//				*/
-//				//īsais pieraksts
-//				profRepo.saveAll((Arrays.asList(p1, p2, p3)));
+				yearRepo.saveAll((Arrays.asList(year1, year2, year3)));
+		
+				//ViracDepartmentTable
+				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology");
+				ViracDepartment dep2 = new ViracDepartment("Astronomy and Astrophysics");
+				ViracDepartment dep3 = new ViracDepartment("Engineering & Technical Operations group(ETO/ETOG)");
+				
+				viracDepRepo.saveAll((Arrays.asList(dep1, dep2, dep3)));
 //			
 //				Course c1 = new Course("Programmatūras Inženierija I", 6, p1);
 //				Course c2 = new Course("Datubāzes II", 3, p3);
