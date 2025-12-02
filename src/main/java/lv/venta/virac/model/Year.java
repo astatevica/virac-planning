@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +32,7 @@ public class Year {
 	
 	@Column(name = "yearNumber")
 	@NotNull
-	@Pattern(regexp = "^[0-9]{4}$", message = "Ievdiet pareizu gada skaitli")
+	//@Pattern(regexp = "^[0-9]{4}$", message = "Ievdiet pareizu gada skaitli")
 	private int yearNumber;
 	
 	@OneToMany(mappedBy = "year")

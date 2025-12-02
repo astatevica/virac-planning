@@ -2,6 +2,8 @@ package lv.venta.virac.repo;
 
 import org.springframework.data.repository.CrudRepository;
 
-public interface IProjectRepo extends CrudRepository<Process, Integer>{
+import lv.venta.virac.model.Project;
+
+public interface IProjectRepo extends CrudRepository<Project, Integer>{
 
 }
