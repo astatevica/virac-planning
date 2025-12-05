@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import lv.venta.virac.model.Course;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.model.Year;
@@ -66,6 +67,16 @@ public class ViracPlaningIApplication {
 				Employee emp3 = new Employee("Māra", "Klausa", dep3 , "Tehniskais speciālists");
 				
 				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3)));
+				
+				//CourseTable DONE
+				Course c1 = new Course("Programmēšanas inženierija I", 4, "rudens", "ITF");
+				Course c2 = new Course("Programmēšanas inženierija II", 4, "pavasara", "ITF");
+				Course c3 = new Course("Datu bāzes I", 2, "rudens", "ITF");
+				
+				courseRepo.saveAll((Arrays.asList(c1,c2,c3)));
+				
+				
+				
 				
 			}
 		};
