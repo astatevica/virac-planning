@@ -13,8 +13,10 @@ import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Journal;
 import lv.venta.virac.model.ScientificArticles;
+import lv.venta.virac.model.StudentWork;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.model.Year;
+import lv.venta.virac.model.enums.Degree;
 import lv.venta.virac.repo.IArticlePlanRepo;
 import lv.venta.virac.repo.ICoursePlanRepo;
 import lv.venta.virac.repo.ICourseRepo;
@@ -102,11 +104,18 @@ public class ViracPlaningIApplication {
 
 				scientArtRepo.saveAll((Arrays.asList(scArt1,scArt2)));
 				
-				//ArticlePlanTable
+				//ArticlePlanTable (TO BE DONE)
 				ArticlePlan artPlan1 = new ArticlePlan(null, scArt2, "Izstrāde pabeigta 2024.gadā beigās", "https://arxiv.org/abs/2402.09082");
 				ArticlePlan artPlan2 = new ArticlePlan(null, scArt1, "Izstrāde pabeigta 2024.gada sākumā", "https://doi.org/10.1049/sfw2/5579438");
 				
 				artPlanRepo.saveAll(Arrays.asList(artPlan1,artPlan2));
+				
+				//TudentWorkTable
+				StudentWork stw1 = new StudentWork("VIRAC personāla plānošanas sistēmas izstrāde", "Annija", "Stateviča", Degree.pirma_cikla);
+				StudentWork stw2 = new StudentWork("Gaisabalons.lv klientu vadības sistēmas klientu reģistrācijas un automatizētas apziņošanas moduļa prototipa projektēšana un izstrāde",
+						"Viktors", "Lačinovs", Degree.bakalaurs);
+				
+				studWorkRepo.saveAll(Arrays.asList(stw1,stw2));
 				
 				
 				
