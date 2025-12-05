@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,16 +37,20 @@ public class ProjectManagement {
 	@JoinColumn(name = "idEmployee")
 	private Employee employee;
 	
+	//TODO: jāsataisa kolekcija ar employees
+//	@OneToMany
+//	@JoinColumn(name = "idEmployee")
+//	private Collection<Employee> employee;
+	
 	@OneToOne
 	@JoinColumn(name = "idProject")
 	private Project idProject;
 	
-	@NotNull
+	//TODO: problēmas ar formatējumu
 	@Column(name = "startDate")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date startDate;
 	
-	@NotNull
 	@Column(name = "endDate")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
 	private Date endDate;

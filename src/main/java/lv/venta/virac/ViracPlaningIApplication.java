@@ -1,6 +1,11 @@
 package lv.venta.virac;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,6 +17,7 @@ import lv.venta.virac.model.Course;
 import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Journal;
+import lv.venta.virac.model.ProjectManagement;
 import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.model.StudentWork;
 import lv.venta.virac.model.ViracDepartment;
@@ -125,7 +131,13 @@ public class ViracPlaningIApplication {
 				workPlanRepo.saveAll(Arrays.asList(wp1,wp2));
 				
 				//ProjectManagementTable
+				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+		        Date sd1 = sdf.parse("28/03/2024");
+		        Date ed1 = sdf.parse("03/10/2025");
 				
+				ProjectManagement projMan1 = new ProjectManagement(emp1, null, sd1, ed1);
+				
+				projMangRepo.save(projMan1);
 				
 				
 			}
