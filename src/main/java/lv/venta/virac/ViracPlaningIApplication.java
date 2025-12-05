@@ -11,6 +11,7 @@ import lv.venta.virac.model.Course;
 import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Journal;
+import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.model.Year;
 import lv.venta.virac.repo.IArticlePlanRepo;
@@ -90,6 +91,15 @@ public class ViracPlaningIApplication {
 				Journal journ3 = new Journal("ACM Computing Surveys");
 				
 				jourRepo.saveAll((Arrays.asList(journ1,journ2,journ3)));
+				
+				//ScientificArticles 
+				ScientificArticles scArt1 = new ScientificArticles("Impact of Co-Occurrences of Code Smells and Design Patterns on Internal Code Quality Attributes",
+						"Sania Imran, Irum Inayat, Maya Daneva", journ1);
+				
+				ScientificArticles scArt2 = new ScientificArticles("On detection latencies of network intrusion detectors – discussion and application", 
+						"Tommaso Puccetti & Andrea Ceccarelli ", journ2); 
+
+				scientArtRepo.saveAll((Arrays.asList(scArt1,scArt2)));
 				
 				
 				
