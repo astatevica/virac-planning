@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,7 @@ import lombok.ToString;
 @Setter
 @Getter
 @NoArgsConstructor
-@Table(name = "jouralTable")
+@Table(name = "journalTable")
 @ToString
 @Entity
 public class Journal {
@@ -33,7 +32,6 @@ public class Journal {
 	
 	@Column(name = "name")
 	@NotNull
-	@Size(max = 20, min = 2)
 	private String name;
 	
 	@OneToMany(mappedBy = "journal")

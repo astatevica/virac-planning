@@ -8,7 +8,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import lv.venta.virac.model.Course;
+import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Employee;
+import lv.venta.virac.model.Journal;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.model.Year;
 import lv.venta.virac.repo.IArticlePlanRepo;
@@ -74,6 +76,20 @@ public class ViracPlaningIApplication {
 				Course c3 = new Course("Datu bāzes I", 2, "rudens", "ITF");
 				
 				courseRepo.saveAll((Arrays.asList(c1,c2,c3)));
+				
+				//CoursePlanTable (TO BE DONE)
+				CoursePlan cp1 = new CoursePlan(null, c3, null);
+				CoursePlan cp2 = new CoursePlan(null, c1, null);
+				CoursePlan cp3 = new CoursePlan(null, c2, null);
+				
+				courPlanRepo.saveAll((Arrays.asList(cp1,cp2,cp3)));
+				
+				//JournalTable DONE
+				Journal journ1 = new Journal("IET Software");
+				Journal journ2 = new Journal("Empirical Software Engineering");
+				Journal journ3 = new Journal("ACM Computing Surveys");
+				
+				jourRepo.saveAll((Arrays.asList(journ1,journ2,journ3)));
 				
 				
 				

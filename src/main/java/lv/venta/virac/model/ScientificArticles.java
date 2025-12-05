@@ -23,13 +23,13 @@ import lombok.ToString;
 @Setter
 @Getter
 @NoArgsConstructor
-@Table(name = "scientifivArticlesTable")
+@Table(name = "scientificArticlesTable")
 @ToString
 @Entity
 public class ScientificArticles {
 	
 	@Id
-	@Column(name = "idEmployee")
+	@Column(name = "idArticle")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Setter(value = AccessLevel.NONE)
 	private int idArticle;
