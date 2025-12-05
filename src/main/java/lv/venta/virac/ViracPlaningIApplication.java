@@ -1,10 +1,7 @@
 package lv.venta.virac;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +14,7 @@ import lv.venta.virac.model.Course;
 import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Journal;
+import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectManagement;
 import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.model.StudentWork;
@@ -134,10 +132,18 @@ public class ViracPlaningIApplication {
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		        Date sd1 = sdf.parse("28/03/2024");
 		        Date ed1 = sdf.parse("03/10/2025");
+		        Date sd2 = sdf.parse("08/01/2024");
+		        Date ed2 = sdf.parse("13/11/2025");
 				
 				ProjectManagement projMan1 = new ProjectManagement(emp1, null, sd1, ed1);
 				
 				projMangRepo.save(projMan1);
+				
+				//ProjectTable
+				Project proj1 = new Project("Project 1", 54862, projMan1, sd1, ed1, "P1");
+				Project proj2 = new Project("Project 2", 43512, null, sd2, ed2, "P2");
+				
+				projRepo.saveAll(Arrays.asList(proj1,proj2));
 				
 				
 			}
