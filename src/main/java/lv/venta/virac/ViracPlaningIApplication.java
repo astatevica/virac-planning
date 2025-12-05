@@ -7,6 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import lv.venta.virac.model.ArticlePlan;
 import lv.venta.virac.model.Course;
 import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Employee;
@@ -92,7 +93,7 @@ public class ViracPlaningIApplication {
 				
 				jourRepo.saveAll((Arrays.asList(journ1,journ2,journ3)));
 				
-				//ScientificArticles 
+				//ScientificArticles DONE 
 				ScientificArticles scArt1 = new ScientificArticles("Impact of Co-Occurrences of Code Smells and Design Patterns on Internal Code Quality Attributes",
 						"Sania Imran, Irum Inayat, Maya Daneva", journ1);
 				
@@ -100,6 +101,12 @@ public class ViracPlaningIApplication {
 						"Tommaso Puccetti & Andrea Ceccarelli ", journ2); 
 
 				scientArtRepo.saveAll((Arrays.asList(scArt1,scArt2)));
+				
+				//ArticlePlanTable
+				ArticlePlan artPlan1 = new ArticlePlan(null, scArt2, "Izstrāde pabeigta 2024.gadā beigās", "https://arxiv.org/abs/2402.09082");
+				ArticlePlan artPlan2 = new ArticlePlan(null, scArt1, "Izstrāde pabeigta 2024.gada sākumā", "https://doi.org/10.1049/sfw2/5579438");
+				
+				artPlanRepo.saveAll(Arrays.asList(artPlan1,artPlan2));
 				
 				
 				
