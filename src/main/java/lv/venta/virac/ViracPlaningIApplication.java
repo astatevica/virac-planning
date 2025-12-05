@@ -15,6 +15,7 @@ import lv.venta.virac.model.Journal;
 import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.model.StudentWork;
 import lv.venta.virac.model.ViracDepartment;
+import lv.venta.virac.model.WorkPlan;
 import lv.venta.virac.model.Year;
 import lv.venta.virac.model.enums.Degree;
 import lv.venta.virac.repo.IArticlePlanRepo;
@@ -110,13 +111,20 @@ public class ViracPlaningIApplication {
 				
 				artPlanRepo.saveAll(Arrays.asList(artPlan1,artPlan2));
 				
-				//TudentWorkTable
+				//StudentWorkTable DONE
 				StudentWork stw1 = new StudentWork("VIRAC personāla plānošanas sistēmas izstrāde", "Annija", "Stateviča", Degree.pirma_cikla);
 				StudentWork stw2 = new StudentWork("Gaisabalons.lv klientu vadības sistēmas klientu reģistrācijas un automatizētas apziņošanas moduļa prototipa projektēšana un izstrāde",
 						"Viktors", "Lačinovs", Degree.bakalaurs);
 				
 				studWorkRepo.saveAll(Arrays.asList(stw1,stw2));
 				
+				//WorkPlanTable (TO BE DONE)
+				WorkPlan wp1 = new WorkPlan(stw1, null, null);
+				WorkPlan wp2 = new WorkPlan(stw2, null, "Aizstāvēts uz 9 ballēm");
+				
+				workPlanRepo.saveAll(Arrays.asList(wp1,wp2));
+				
+				//ProjectManagementTable
 				
 				
 				
