@@ -92,10 +92,10 @@ public class ViracPlaningIApplication {
 				
 				courseRepo.saveAll((Arrays.asList(c1,c2,c3)));
 				
-				//CoursePlanTable (TO BE DONE)
-				CoursePlan cp1 = new CoursePlan(null, c3, null);
+				//CoursePlanTable DONE
+				CoursePlan cp1 = new CoursePlan(plan1, c3, null);
 				CoursePlan cp2 = new CoursePlan(null, c1, null);
-				CoursePlan cp3 = new CoursePlan(null, c2, null);
+				CoursePlan cp3 = new CoursePlan(plan1, c2, "Novadīts veiksmīgi");
 				
 				courPlanRepo.saveAll((Arrays.asList(cp1,cp2,cp3)));
 				
