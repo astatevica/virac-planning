@@ -80,6 +80,11 @@ public class ViracPlaningIApplication {
 				
 				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3)));
 				
+				//PlanTable DONE
+				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
+				
+				planRepo.save(plan1);
+				
 				//CourseTable DONE
 				Course c1 = new Course("Programmēšanas inženierija I", 4, "rudens", "ITF");
 				Course c2 = new Course("Programmēšanas inženierija II", 4, "pavasara", "ITF");
@@ -111,8 +116,8 @@ public class ViracPlaningIApplication {
 				scientArtRepo.saveAll((Arrays.asList(scArt1,scArt2)));
 				
 				//ArticlePlanTable (TO BE DONE)
-				ArticlePlan artPlan1 = new ArticlePlan(null, scArt2, "Izstrāde pabeigta 2024.gadā beigās", "https://arxiv.org/abs/2402.09082");
-				ArticlePlan artPlan2 = new ArticlePlan(null, scArt1, "Izstrāde pabeigta 2024.gada sākumā", "https://doi.org/10.1049/sfw2/5579438");
+				ArticlePlan artPlan1 = new ArticlePlan(plan1, scArt2, "Izstrāde pabeigta 2024.gadā beigās", "https://arxiv.org/abs/2402.09082");
+				ArticlePlan artPlan2 = new ArticlePlan(plan1, scArt1, "Izstrāde pabeigta 2024.gada sākumā", "https://doi.org/10.1049/sfw2/5579438");
 				
 				artPlanRepo.saveAll(Arrays.asList(artPlan1,artPlan2));
 				
@@ -129,27 +134,22 @@ public class ViracPlaningIApplication {
 				
 				workPlanRepo.saveAll(Arrays.asList(wp1,wp2));
 				
-				//ProjectManagementTable
+				//ProjectManagementTable (TO BE DONE)
 				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		        Date sd1 = sdf.parse("28/03/2024");
 		        Date ed1 = sdf.parse("03/10/2025");
 		        Date sd2 = sdf.parse("08/01/2024");
 		        Date ed2 = sdf.parse("13/11/2025");
 				
-				ProjectManagement projMan1 = new ProjectManagement(emp1, null, sd1, ed1);
+				ProjectManagement projMan1 = new ProjectManagement(emp1,null, sd1, ed1);
 				
 				projMangRepo.save(projMan1);
 				
-				//ProjectTable (TO BE DONE)
+				//ProjectTable DONE
 				Project proj1 = new Project("Project 1", 54862, projMan1, sd1, ed1, "P1");
 				Project proj2 = new Project("Project 2", 43512, null, sd2, ed2, "P2");
 				
 				projRepo.saveAll(Arrays.asList(proj1,proj2));
-				
-				//PlanTable
-				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
-				
-				planRepo.save(plan1);
 				
 			}
 		};
