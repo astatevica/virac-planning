@@ -49,6 +49,7 @@ public class Project {
 	@JoinColumn(name = "idProjectManag")
 	private ProjectManagement projectManagement;
 	
+	//TODO:Formatējums jāizlabo, nestrādā
 	@NotNull
 	@Column(name = "startDate")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")

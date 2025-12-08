@@ -14,6 +14,7 @@ import lv.venta.virac.model.Course;
 import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Journal;
+import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectManagement;
 import lv.venta.virac.model.ScientificArticles;
@@ -139,12 +140,16 @@ public class ViracPlaningIApplication {
 				
 				projMangRepo.save(projMan1);
 				
-				//ProjectTable
+				//ProjectTable (TO BE DONE)
 				Project proj1 = new Project("Project 1", 54862, projMan1, sd1, ed1, "P1");
 				Project proj2 = new Project("Project 2", 43512, null, sd2, ed2, "P2");
 				
 				projRepo.saveAll(Arrays.asList(proj1,proj2));
 				
+				//PlanTable
+				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
+				
+				planRepo.save(plan1);
 				
 			}
 		};
