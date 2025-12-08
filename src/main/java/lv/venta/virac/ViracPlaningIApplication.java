@@ -115,7 +115,7 @@ public class ViracPlaningIApplication {
 
 				scientArtRepo.saveAll((Arrays.asList(scArt1,scArt2)));
 				
-				//ArticlePlanTable (TO BE DONE)
+				//ArticlePlanTable DONE
 				ArticlePlan artPlan1 = new ArticlePlan(plan1, scArt2, "Izstrāde pabeigta 2024.gadā beigās", "https://arxiv.org/abs/2402.09082");
 				ArticlePlan artPlan2 = new ArticlePlan(plan1, scArt1, "Izstrāde pabeigta 2024.gada sākumā", "https://doi.org/10.1049/sfw2/5579438");
 				
@@ -128,9 +128,9 @@ public class ViracPlaningIApplication {
 				
 				studWorkRepo.saveAll(Arrays.asList(stw1,stw2));
 				
-				//WorkPlanTable (TO BE DONE)
-				WorkPlan wp1 = new WorkPlan(stw1, null, null);
-				WorkPlan wp2 = new WorkPlan(stw2, null, "Aizstāvēts uz 9 ballēm");
+				//WorkPlanTable DONE
+				WorkPlan wp1 = new WorkPlan(stw1, plan1, null);
+				WorkPlan wp2 = new WorkPlan(stw2, plan1, "Aizstāvēts uz 9 ballēm");
 				
 				workPlanRepo.saveAll(Arrays.asList(wp1,wp2));
 				
