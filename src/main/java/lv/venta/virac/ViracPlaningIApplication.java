@@ -17,6 +17,7 @@ import lv.venta.virac.model.Journal;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectManagement;
+import lv.venta.virac.model.ProjectPlan;
 import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.model.StudentWork;
 import lv.venta.virac.model.ViracDepartment;
@@ -150,6 +151,12 @@ public class ViracPlaningIApplication {
 				Project proj2 = new Project("Project 2", 43512, null, sd2, ed2, "P2");
 				
 				projRepo.saveAll(Arrays.asList(proj1,proj2));
+				
+				//ProjectPlanTable
+				ProjectPlan projPlan1 = new ProjectPlan(plan1, proj1, "Task1, Task 2", null);
+				ProjectPlan projPlan2 = new ProjectPlan(plan1, proj2, null, "Done");
+				
+				projPlanRepo.saveAll(Arrays.asList(projPlan1,projPlan2));
 				
 			}
 		};

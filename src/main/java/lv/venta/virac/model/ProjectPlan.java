@@ -8,8 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -39,13 +37,13 @@ public class ProjectPlan {
 	private Project project;
 	
 	@Column(name = "tasks")
-	@NotNull
-	@Size(max = 200, min = 2)
+	//@NotNull
+	//@Size(max = 200, min = 2)
 	private String tasks;
 	
 	@Column(name = "workDone")
-	@NotNull
-	@Size(max = 200, min = 2)
+	//@NotNull
+	//@Size(max = 200, min = 2)
 	private String workDone;
 	
 	public ProjectPlan(Plan plan, Project project, String tasks, String workDone) {
