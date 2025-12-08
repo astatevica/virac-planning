@@ -42,10 +42,6 @@ public class ProjectManagement {
 //	@JoinColumn(name = "idEmployee")
 //	private Collection<Employee> employee;
 	
-	@OneToOne
-	@JoinColumn(name = "idProject")
-	private Project idProject;
-	
 	//TODO: problēmas ar formatējumu
 	@Column(name = "startDate")
 	@DateTimeFormat(pattern = "dd/MM/yyyy")
@@ -59,9 +55,8 @@ public class ProjectManagement {
 	@ToString.Exclude
 	private Project project;
 	
-	public ProjectManagement(Employee employee, Project idProject, Date startDate, Date endDate) {
+	public ProjectManagement(Employee employee, Date startDate, Date endDate) {
 		setEmployee(employee);
-		setIdProject(idProject);
 		setStartDate(startDate);
 		setEndDate(endDate);
 	}

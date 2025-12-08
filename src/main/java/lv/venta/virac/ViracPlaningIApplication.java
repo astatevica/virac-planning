@@ -142,7 +142,7 @@ public class ViracPlaningIApplication {
 		        Date sd2 = sdf.parse("08/01/2024");
 		        Date ed2 = sdf.parse("13/11/2025");
 				
-				ProjectManagement projMan1 = new ProjectManagement(emp1,null, sd1, ed1);
+				ProjectManagement projMan1 = new ProjectManagement(emp1, sd1, ed1);
 				
 				projMangRepo.save(projMan1);
 				
