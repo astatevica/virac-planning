@@ -1,8 +1,7 @@
 package lv.venta.virac;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -135,12 +134,11 @@ public class ViracPlaningIApplication {
 				
 				workPlanRepo.saveAll(Arrays.asList(wp1,wp2));
 				
-				//ProjectManagementTable (TO BE DONE)
-				SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-		        Date sd1 = sdf.parse("28/03/2024");
-		        Date ed1 = sdf.parse("03/10/2025");
-		        Date sd2 = sdf.parse("08/01/2024");
-		        Date ed2 = sdf.parse("13/11/2025");
+				//ProjectManagementTable DONE
+		        LocalDate sd1 = LocalDate.of(2024,03,28);
+		        LocalDate ed1 = LocalDate.of(2025,10,3);
+		        LocalDate sd2 = LocalDate.of(2024,01,6);
+		        LocalDate ed2 = LocalDate.of(2025,11,13);
 				
 				ProjectManagement projMan1 = new ProjectManagement(emp1, sd1, ed1);
 				

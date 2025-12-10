@@ -1,7 +1,7 @@
 package lv.venta.virac.model;
 
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.Date;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -52,13 +52,13 @@ public class Project {
 	//TODO:Formatējums jāizlabo, nestrādā
 	@NotNull
 	@Column(name = "startDate")
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private Date startDate;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	private LocalDate startDate;
 	
 	@NotNull
 	@Column(name = "endDate")
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private Date endDate;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	private LocalDate endDate;
 	
 	@Column(name = "acronym")
 	@NotNull
@@ -69,7 +69,7 @@ public class Project {
 	@ToString.Exclude
 	private Collection<ProjectPlan> projectPlan;
 	
-	public Project(String name, int number, ProjectManagement projectManagement, Date startDate, Date endDate, String acronym){
+	public Project(String name, int number, ProjectManagement projectManagement, LocalDate startDate, LocalDate endDate, String acronym){
 		setName(name);
 		setNumber(number);
 		setProjectManagement(projectManagement);

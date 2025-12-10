@@ -1,6 +1,6 @@
 package lv.venta.virac.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -42,20 +42,19 @@ public class ProjectManagement {
 //	@JoinColumn(name = "idEmployee")
 //	private Collection<Employee> employee;
 	
-	//TODO: problēmas ar formatējumu
 	@Column(name = "startDate")
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private Date startDate;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	private LocalDate startDate;
 	
 	@Column(name = "endDate")
-	@DateTimeFormat(pattern = "dd/MM/yyyy")
-	private Date endDate;
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	private LocalDate endDate;
 	
 	@OneToOne(mappedBy = "projectManagement")
 	@ToString.Exclude
 	private Project project;
 	
-	public ProjectManagement(Employee employee, Date startDate, Date endDate) {
+	public ProjectManagement(Employee employee, LocalDate startDate, LocalDate endDate) {
 		setEmployee(employee);
 		setStartDate(startDate);
 		setEndDate(endDate);
