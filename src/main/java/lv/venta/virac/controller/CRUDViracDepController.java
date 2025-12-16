@@ -16,23 +16,16 @@ import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.service.ICRUDViracDepService;
 
 @RestController
-@RequestMapping("/department")
+@RequestMapping("/api/department")
 public class CRUDViracDepController {
 	
 	@Autowired
 	private ICRUDViracDepService depService;
 	
 	//Retrieve all
-	@GetMapping("/show/all")
-	public String getShowAllDepartments(Model model) {
-		try {
-			ArrayList<ViracDepartment> allDepartments = depService.retrieveAll();
-			model.addAttribute("mydata",allDepartments);
-			return "departments-all-page"; 
-		} catch (Exception e) {
-			model.addAttribute("message", e.getMessage());
-			return "error-page";
-		}
+	@GetMapping
+	public ArrayList<ViracDepartment> getAllDepartments() throws Exception{
+		return depService.retrieveAll();
 	}
 	
 	//Retrieve by id
