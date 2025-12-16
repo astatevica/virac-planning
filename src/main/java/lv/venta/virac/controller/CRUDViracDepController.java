@@ -3,6 +3,7 @@ package lv.venta.virac.controller;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,30 +30,9 @@ public class CRUDViracDepController {
 	}
 	
 	//Retrieve by id
-	@GetMapping("/show/all/{id}")
-	public String getShowOneDepartment(@PathVariable("id") int id, Model model) {
-		try {
-			ViracDepartment department = depService.retrieveById(id);
-			model.addAttribute("mydata",department);
-			return "departments-all-page";
-		} catch (Exception e) {
-			model.addAttribute("message", e.getMessage());
-			return "error-page";
-		}
-	}
-	
-	//Delete by id
-	@GetMapping("/delete/{id}")
-	public String getDeleteOneDepartment(@PathVariable("id") int id, Model model){
-        try {
-            depService.deleteById(id);
-            ArrayList<ViracDepartment> allDepartments = depService.retrieveAll();
-            model.addAttribute("mydata", allDepartments);
-            return "departments-all-page";
-        } catch (Exception e) {
-            model.addAttribute("message", e.getMessage());
-            return "error-page";
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<ViracDepartment> getDepartmentById(@PathVariable int id) throws Exception {
+        return ResponseEntity.ok(depService.retrieveById(id));
     }
 	
 	//Create 
@@ -112,6 +92,20 @@ public class CRUDViracDepController {
 			}
 		}
 	}
+	
+	//Delete by id
+	@GetMapping("/delete/{id}")
+	public String getDeleteOneDepartment(@PathVariable("id") int id, Model model){
+        try {
+            depService.deleteById(id);
+            ArrayList<ViracDepartment> allDepartments = depService.retrieveAll();
+            model.addAttribute("mydata", allDepartments);
+            return "departments-all-page";
+        } catch (Exception e) {
+            model.addAttribute("message", e.getMessage());
+            return "error-page";
+        }
+    }
 
 	
 
