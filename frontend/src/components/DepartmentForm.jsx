@@ -14,7 +14,14 @@ const DepartmentForm = ({ onCreated }) => {
         setName("");
         onCreated();
       })
-      .catch(err => alert(err.response?.data || "Error"));
+      .catch(err => {
+        if (Array.isArray(err.response?.data)) {
+            alert(err.response.data[0].defaultMessage);
+        } else {
+            alert(err.response?.data || "Error occurred");
+        }
+});
+
   };
 
   return (
