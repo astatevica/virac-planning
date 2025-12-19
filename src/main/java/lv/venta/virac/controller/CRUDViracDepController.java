@@ -3,12 +3,14 @@ package lv.venta.virac.controller;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,59 +37,16 @@ public class CRUDViracDepController {
         return ResponseEntity.ok(depService.retrieveById(id));
     }
 	
-//	//Create 
-//	@GetMapping("/add")
-//    public String getAddDepartment(Model model) {
-//        model.addAttribute("department", new ViracDepartment());
-//        return "department-add-page";
-//    }
-//
-//
-//    @PostMapping("/add")
-//    public String postAddDepartment(@Valid ViracDepartment department, BindingResult result, Model model) {
-//        if(result.hasErrors()) {
-//            return "department-add-page";
-//        } else {
-//            try {
-//                depService.create(department.getName());
-//                return "redirect:/department/show/all";
-//            } catch (Exception e) {
-//                model.addAttribute("message", e.getMessage());
-//                return "error-page";
-//            }
-//        }
-//    }
-    
-//    @PostMapping
-//    public Product createProduct(@RequestBody Product product) {
-//        return productRepository.save(product);
-//    }
-//    
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product productDetails) {
-//        return productRepository.findById(id)
-//                .map(existingProduct -> {
-//                    existingProduct.setName(productDetails.getName());
-//                    existingProduct.setDescription(productDetails.getDescription());
-//                    existingProduct.setPrice(productDetails.getPrice());
-//                    return ResponseEntity.ok(productRepository.save(existingProduct));
-//                })
-//                .orElse(ResponseEntity.notFound().build());
-//    }
-    
-//    // 🔹 Create department
-//    @PostMapping
-//    public ResponseEntity<ViracDepartment> createDepartment(
-//            @Valid @RequestBody ViracDepartment department,
-//            BindingResult result) throws Exception {
-//
-//        if (result.hasErrors()) {
-//            return ResponseEntity.badRequest().build();
-//        }
-//
-//        depService.create(department.getName());
-//        return ResponseEntity.status(HttpStatus.CREATED).body(department);
-//    }
+	//Create 
+    @PostMapping
+    public ResponseEntity<ViracDepartment> createDepartment(@Valid @RequestBody ViracDepartment department,
+    		BindingResult result) throws Exception {
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+        depService.create(department.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(department);
+    }
     
     //Update by id
     @GetMapping("/update/{id}")
