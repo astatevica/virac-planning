@@ -1,38 +1,31 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DepartmentService from "../services/DepartmentService";
 
-const DepartmentForm = ({ onCreated }) => {
+const DepartmentForm = () => {
   const [name, setName] = useState("");
+  const navigate = useNavigate();
 
   const submit = (e) => {
     e.preventDefault();
 
-    if (!name.trim()) return;
-
     DepartmentService.create({ name })
-      .then(() => {
-        setName("");
-        onCreated();
-      })
-      .catch(err => {
-        if (Array.isArray(err.response?.data)) {
-            alert(err.response.data[0].defaultMessage);
-        } else {
-            alert(err.response?.data || "Error occurred");
-        }
-});
-
+      .then(() => navigate("/departments"))
+      .catch(err => alert(err.response?.data || "Error"));
   };
 
   return (
-    <form onSubmit={submit}>
-      <input
-        value={name}
-        onChange={e => setName(e.target.value)}
-        placeholder="Department name"
-      />
-      <button type="submit">Add</button>
-    </form>
+    <div>
+      <h2>Add Department</h2>
+      <form onSubmit={submit}>
+        <input
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder="Department name"
+        />
+        <button type="submit">Add</button>
+      </form>
+    </div>
   );
 };
 

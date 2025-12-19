@@ -1,30 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Navigation from "./components/Navigation";
 import DepartmentList from "./components/DepartmentList";
 import DepartmentForm from "./components/DepartmentForm";
-import DepartmentService from "./services/DepartmentService";
 
 function App() {
-  const [departments, setDepartments] = useState([]);
-
-  const loadDepartments = () => {
-    DepartmentService.getAll()
-      .then(res => setDepartments(res.data))
-      .catch(err => console.error(err));
-  };
-
-  useEffect(() => {
-    loadDepartments();
-  }, []);
-
   return (
-    <div>
-      <h1>Departments</h1>
-      <DepartmentForm onCreated={loadDepartments} />
-      <DepartmentList
-        departments={departments}
-        onDelete={loadDepartments}
-      />
-    </div>
+    <BrowserRouter>
+      <Navigation />
+
+      <div style={{ padding: "20px" }}>
+        <Routes>
+          <Route path="/" element={<h2>Welcome to VIRAC</h2>} />
+          <Route path="/departments" element={<DepartmentList />} />
+          <Route path="/departments/add" element={<DepartmentForm />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 
