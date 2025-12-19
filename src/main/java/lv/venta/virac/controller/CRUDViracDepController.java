@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,15 +20,14 @@ import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.service.ICRUDViracDepService;
 
 @RestController
-@RequestMapping("/api/department")
-@CrossOrigin(origins = "http://localhost:3000")
+@RequestMapping(value = "/api/department")
 public class CRUDViracDepController {
 	
 	@Autowired
 	private ICRUDViracDepService depService;
 	
 	//Retrieve all
-	@GetMapping
+	@GetMapping(value = "")
 	public ArrayList<ViracDepartment> getAllDepartments() throws Exception{
 		return depService.retrieveAll();
 	}
