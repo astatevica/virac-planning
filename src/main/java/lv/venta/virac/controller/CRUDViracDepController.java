@@ -7,9 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,52 +51,26 @@ public class CRUDViracDepController {
     }
     
     //Update by id
-    @GetMapping("/update/{id}")
-	public String getUpdateDepartmentById(@PathVariable(name="id") int id, Model model) {
-		try
-		{
-			ViracDepartment depForUpdating = depService.retrieveById(id);
-			model.addAttribute("department", depForUpdating);
-			return "update-department";
-		}
-		catch (Exception e) {
-			model.addAttribute("package", e.getMessage());
-			return "error-page";
-		}
-		
-	}
-	@PostMapping("/update/{id}")
-	public String postUpdateDepartmentById(@Valid ViracDepartment department, BindingResult result,
-			Model model, @PathVariable(name = "id") int id) {
-		if(result.hasErrors()) {
-			return "update-department";
-		}
-		else
-		{
-			try
-			{
-				depService.updateById(id, department.getName());
-				return "redirect:/department/show/all" + id;
-			}
-			catch (Exception e) {
-				model.addAttribute("package", e.getMessage());
-				return "error-page";
-			}
-		}
-	}
-	
-	//Delete by id
-	@GetMapping("/delete/{id}")
-	public String getDeleteOneDepartment(@PathVariable("id") int id, Model model){
-        try {
-            depService.deleteById(id);
-            ArrayList<ViracDepartment> allDepartments = depService.retrieveAll();
-            model.addAttribute("mydata", allDepartments);
-            return "departments-all-page";
-        } catch (Exception e) {
-            model.addAttribute("message", e.getMessage());
-            return "error-page";
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateDepartment(
+            @PathVariable int id,
+            @Valid @RequestBody ViracDepartment department,
+            BindingResult result) throws Exception {
+
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().build();
         }
+
+        depService.updateById(id, department.getName());
+        return ResponseEntity.ok().build();
+    }
+    
+    
+	//Delete by id	
+	@DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDepartment(@PathVariable int id) throws Exception {
+        depService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 
 	
