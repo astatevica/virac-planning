@@ -16,22 +16,33 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService {
     private IViracDepartmentRepo depRepo;
     
     @Override
-    public ArrayList<ViracDepartment> retrieveAll() throws Exception {
-       if(depRepo.count() == 0) throw new Exception("There are no customers");
+    public ArrayList<ViracDepartment> retrieveAll() throws NotContextException {
+       ArrayList<ViracDepartment> departmets = (ArrayList<ViracDepartment>) depRepo.findAll();
+       if (departmets.isEmpty()) throw new NotContextException("There is no department");
 
-        return (ArrayList<ViracDepartment>) depRepo.findAll();
+        return departmets;
     }
+    
+    //Something mby needed with pagable
 
     @Override
     public ViracDepartment retrieveById(int id) throws Exception {
-        return depRepo.findById(id)
-                .orElseThrow(() -> new Exception("Department not found with id: " + id));
+        if (id < 1) throw new Exception("Invalid ID");
+        ViracDepartment foundDepartment = depRepo.findById(id).get();
+        if (foundDepartment == null) throw new Exception("Department with the id: (" + id + ") does not exist!");
+        
+        return foundDepartment;
+        
     }
 
     @Override
     public void create(String name) throws Exception {
-        if (name == null || name.isBlank()) {
-            throw new Exception("Department name cannot be empty");
+        ArrayList<ViracDepartment> departmets = (ArrayList<ViracDepartment>) depRepo.findAll();
+        
+        for (ViracDepartment dep : departmets) {
+            if (dep.getName().equals(name)) {
+                throw new Exception("Department with title: " + dep.getName() + " already exists");
+            }
         }
 
         ViracDepartment department = new ViracDepartment();
@@ -41,16 +52,18 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService {
 
     @Override
     public void updateById(int id, String name) throws Exception {
-        ViracDepartment department = retrieveById(id);
+    	ViracDepartment department = retrieveById(id);
+    	if (department == null) throw new 
+    		Exception("Event with (id:" + id + ") does not exist");
+    	
         department.setName(name);
         depRepo.save(department);
     }
 
     @Override
     public void deleteById(int id) throws Exception {
-        if (!depRepo.existsById(id)) {
-            throw new Exception("Department not found with id: " + id);
-        }
-        depRepo.deleteById(id);
+    	ViracDepartment department = depRepo.findById(id).get();
+    	if (department == null) throw new Exception("Department with id:"+ id +" does not exist");
+        depRepo.delete(department);
     }
 }
