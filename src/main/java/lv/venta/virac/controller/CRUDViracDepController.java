@@ -36,7 +36,7 @@ public class CRUDViracDepController {
 	
 	//Retrieve by id
     @GetMapping("/{id}")
-    public ResponseEntity<ViracDepartment> getDepartmentById(@PathVariable int id) throws Exception {
+    public ResponseEntity<ViracDepartment> getDepartmentById(@PathVariable("id") int id) throws Exception {
         return ResponseEntity.ok(depService.retrieveById(id));
     }
 	
@@ -54,7 +54,7 @@ public class CRUDViracDepController {
     //Update by id
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateDepartment(
-            @PathVariable int id,
+            @PathVariable("id") int id,
             @Valid @RequestBody ViracDepartment department,
             BindingResult result) throws Exception {
 
@@ -69,7 +69,7 @@ public class CRUDViracDepController {
     
 	//Delete by id	
 	@DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDepartment(@PathVariable int id) throws Exception {
+    public ResponseEntity<Void> deleteDepartment(@PathVariable("id") int id) throws Exception {
         depService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
