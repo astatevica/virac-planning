@@ -1,36 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import DepartmentService from "../services/DepartmentService";
 
-const DepartmentList = () => {
-  const [departments, setDepartments] = useState([]);
-
-  useEffect(() => {
-    loadDepartments();
-  }, []);
-
-  const loadDepartments = () => {
-    DepartmentService.getAll()
-      .then(res => setDepartments(res.data))
-      .catch(err => console.error(err));
-  };
+const DepartmentList = ({ departments, onDelete }) => {
 
   const deleteDepartment = (id) => {
     DepartmentService.delete(id)
-      .then(() => loadDepartments());
+      .then(() => onDelete());
   };
 
   return (
-    <div>
-      <h2>Departments</h2>
-      <ul>
-        {departments.map(dep => (
-          <li key={dep.id}>
-            {dep.name}
-            <button onClick={() => deleteDepartment(dep.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul>
+      {departments.map(dep => (
+        <li key={dep.id}>
+          {dep.name}
+          <button onClick={() => deleteDepartment(dep.id)}>Delete</button>
+        </li>
+      ))}
+    </ul>
   );
 };
 

@@ -7,21 +7,22 @@ const DepartmentForm = ({ onCreated }) => {
   const submit = (e) => {
     e.preventDefault();
 
+    if (!name.trim()) return;
+
     DepartmentService.create({ name })
       .then(() => {
         setName("");
         onCreated();
       })
-      .catch(err => alert(err.response.data));
+      .catch(err => alert(err.response?.data || "Error"));
   };
 
   return (
     <form onSubmit={submit}>
       <input
-        type="text"
-        placeholder="Department name"
         value={name}
         onChange={e => setName(e.target.value)}
+        placeholder="Department name"
       />
       <button type="submit">Add</button>
     </form>
