@@ -1,16 +1,20 @@
 package lv.venta.virac.dto;
 
-public class DepartmentDTO {
-	
-	private int idDepartment;
+import jakarta.validation.constraints.NotBlank;
+
+public class DepartmentRequestDTO {
+
+    @NotBlank(message = "Department name cannot be empty")
     private String name;
 
-    public DepartmentDTO(int id, String name) {
-        this.idDepartment = id;
-        this.name = name;
+    // ✅ REQUIRED
+    public DepartmentRequestDTO() {}
+
+    public String getName() {
+        return name;
     }
 
-    public int getId() { return idDepartment; }
-    public String getName() { return name; }
-
+    public void setName(String name) {
+        this.name = name;
+    }
 }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,69 +18,67 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lv.venta.virac.dto.DepartmentDTO;
+import lv.venta.virac.dto.DepartmentRequestDTO;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.service.ICRUDViracDepService;
 
 @RestController
-@RequestMapping(value = "/api/department")
+@RequestMapping("/api/department")
+@CrossOrigin(origins = "http://localhost:3000")
 public class CRUDViracDepController {
-	
-	@Autowired
-	private ICRUDViracDepService depService;
-	
-	public CRUDViracDepController(ICRUDViracDepService depService) {
-	    this.depService = depService;
-	}
-	
-	//Retrieve all
-	@GetMapping(value = "")
-	public ResponseEntity<ArrayList<DepartmentDTO>> getAllDepartments() throws Exception{
-		
-		ArrayList<ViracDepartment> departments = depService.retrieveAll();
 
-		ArrayList<DepartmentDTO> response =
-                (ArrayList<DepartmentDTO>) departments.stream()
-		    .map(dep -> new DepartmentDTO(
-		        dep.getIdDepartment(),
-		        dep.getName()
-		    ))
-		    .toList();
+    private final ICRUDViracDepService depService;
 
-        return ResponseEntity.ok(response);
-	}
-	
-	//Retrieve by id
-    @GetMapping("/{id}")
-    public ResponseEntity<DepartmentDTO> getDepartmentById(@PathVariable("id") int id) throws Exception {
-    	
-    	ViracDepartment dep = depService.retrieveById(id);
+    public CRUDViracDepController(ICRUDViracDepService depService) {
+        this.depService = depService;
+    }
 
-        DepartmentDTO response =
-                new DepartmentDTO(
-                    dep.getIdDepartment(),
-                    dep.getName()
-                );
-    	
-    	
+    @GetMapping
+    public ResponseEntity<ArrayList<DepartmentDTO>> getAllDepartments() throws Exception {
+
+        ArrayList<ViracDepartment> departments = depService.retrieveAll();
+
+        ArrayList<DepartmentDTO> response =
+        	    new ArrayList<>(
+        	        departments.stream()
+        	            .map(dep -> new DepartmentDTO(
+        	                dep.getIdDepartment(),
+        	                dep.getName()
+        	            ))
+        	            .toList()
+        	    );
+
         return ResponseEntity.ok(response);
     }
-	
-	//Create 
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DepartmentDTO> getById(
+            @PathVariable("id") int id) throws Exception {
+
+        ViracDepartment dep = depService.retrieveById(id);
+        return ResponseEntity.ok(
+            new DepartmentDTO(dep.getIdDepartment(), dep.getName())
+        );
+    }
+
     @PostMapping
-    public ResponseEntity<ViracDepartment> createDepartment(@Valid @RequestBody DepartmentDTO dto,
-    		BindingResult result) throws Exception {
+    public ResponseEntity<Void> create(
+            @Valid @RequestBody DepartmentRequestDTO dto,
+            BindingResult result) throws Exception {
+
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
+
         depService.create(dto.getName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
-    
-    //Update by id
+
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateDepartment(
+    public ResponseEntity<Void> update(
             @PathVariable("id") int id,
-            @Valid @RequestBody DepartmentDTO dto,
+            @Valid @RequestBody DepartmentRequestDTO dto,
             BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
@@ -89,15 +88,10 @@ public class CRUDViracDepController {
         depService.updateById(id, dto.getName());
         return ResponseEntity.ok().build();
     }
-    
-    
-	//Delete by id	
-	@DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteDepartment(@PathVariable("id") int id) throws Exception {
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
         depService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-
-	
-
 }
