@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navigation from "./components/Navigation";
 import DepartmentList from "./components/DepartmentList";
-import DepartmentForm from "./components/DepartmentForm";
 
 function App() {
   return (
@@ -14,7 +13,6 @@ function App() {
         <Routes>
           <Route path="/" element={<h2>Welcome to VIRAC</h2>} />
           <Route path="/departments" element={<DepartmentList />} />
-          <Route path="/departments/add" element={<DepartmentForm />} />
         </Routes>
       </div>
     </BrowserRouter>

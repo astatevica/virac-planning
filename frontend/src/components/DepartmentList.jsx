@@ -3,6 +3,11 @@ import DepartmentService from "../services/DepartmentService";
 
 const DepartmentList = () => {
   const [departments, setDepartments] = useState([]);
+
+  // ADD
+  const [newName, setNewName] = useState("");
+
+  // UPDATE
   const [editId, setEditId] = useState(null);
   const [editName, setEditName] = useState("");
 
@@ -15,12 +20,29 @@ const DepartmentList = () => {
       .then(res => setDepartments(res.data));
   };
 
+  // CREATE
+  const addDepartment = () => {
+    if (!newName.trim()) {
+      alert("Department name cannot be empty");
+      return;
+    }
+
+    DepartmentService.create({ name: newName })
+      .then(() => {
+        setNewName("");
+        loadDepartments();
+      })
+      .catch(err => alert(err.response?.data || "Add failed"));
+  };
+
+  // DELETE
   const deleteDepartment = (id) => {
     DepartmentService.delete(id)
       .then(loadDepartments)
       .catch(err => alert(err.response?.data || "Delete failed"));
   };
 
+  // UPDATE
   const startEdit = (dep) => {
     setEditId(dep.id);
     setEditName(dep.name);
@@ -32,6 +54,11 @@ const DepartmentList = () => {
   };
 
   const saveEdit = () => {
+    if (!editName.trim()) {
+      alert("Name cannot be empty");
+      return;
+    }
+
     DepartmentService.update(editId, { name: editName })
       .then(() => {
         cancelEdit();
@@ -43,6 +70,18 @@ const DepartmentList = () => {
   return (
     <div>
       <h2>Departments</h2>
+
+      {/* ➕ ADD DEPARTMENT */}
+      <div style={{ marginBottom: "15px" }}>
+        <input
+          placeholder="New department name"
+          value={newName}
+          onChange={e => setNewName(e.target.value)}
+        />
+        <button onClick={addDepartment}>Add</button>
+      </div>
+
+      {/* 📄 LIST */}
       <ul>
         {departments.map(dep => (
           <li key={dep.id}>

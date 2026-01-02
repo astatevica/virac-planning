@@ -17,11 +17,6 @@ const Navigation = () => {
             Departments
           </NavLink>
         </li>
-        <li>
-          <NavLink to="/departments/add" style={styles.link}>
-            Add Department
-          </NavLink>
-        </li>
       </ul>
     </nav>
   );
