@@ -23,14 +23,18 @@ const DepartmentList = () => {
     <div>
       <h2>Departments</h2>
       <ul>
-        {departments.map(dep => (
-          <li key={dep.id}>
-            {dep.name}
-            <button onClick={() => deleteDepartment(dep.id)}>
-              Delete
-            </button>
-          </li>
-        ))}
+        {departments.map(dep => {
+          console.log("DEP OBJECT:", dep);
+
+          return (
+            <li key={dep.id}>
+              {dep.name}
+              <button onClick={() => deleteDepartment(dep.id)}>
+                Delete
+              </button>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
