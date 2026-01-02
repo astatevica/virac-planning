@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import lv.venta.virac.dto.DepartmentDTO;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.service.ICRUDViracDepService;
 
@@ -26,41 +27,66 @@ public class CRUDViracDepController {
 	@Autowired
 	private ICRUDViracDepService depService;
 	
+	public CRUDViracDepController(ICRUDViracDepService depService) {
+	    this.depService = depService;
+	}
+	
 	//Retrieve all
 	@GetMapping(value = "")
-	public ArrayList<ViracDepartment> getAllDepartments() throws Exception{
-		return depService.retrieveAll();
+	public ResponseEntity<ArrayList<DepartmentDTO>> getAllDepartments() throws Exception{
+		
+		ArrayList<ViracDepartment> departments = depService.retrieveAll();
+
+		ArrayList<DepartmentDTO> response =
+                (ArrayList<DepartmentDTO>) departments.stream()
+		    .map(dep -> new DepartmentDTO(
+		        dep.getIdDepartment(),
+		        dep.getName()
+		    ))
+		    .toList();
+
+        return ResponseEntity.ok(response);
 	}
 	
 	//Retrieve by id
     @GetMapping("/{id}")
-    public ResponseEntity<ViracDepartment> getDepartmentById(@PathVariable("id") int id) throws Exception {
-        return ResponseEntity.ok(depService.retrieveById(id));
+    public ResponseEntity<DepartmentDTO> getDepartmentById(@PathVariable("id") int id) throws Exception {
+    	
+    	ViracDepartment dep = depService.retrieveById(id);
+
+        DepartmentDTO response =
+                new DepartmentDTO(
+                    dep.getIdDepartment(),
+                    dep.getName()
+                );
+    	
+    	
+        return ResponseEntity.ok(response);
     }
 	
 	//Create 
     @PostMapping
-    public ResponseEntity<ViracDepartment> createDepartment(@Valid @RequestBody ViracDepartment department,
+    public ResponseEntity<ViracDepartment> createDepartment(@Valid @RequestBody DepartmentDTO dto,
     		BindingResult result) throws Exception {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
-        depService.create(department.getName());
-        return ResponseEntity.status(HttpStatus.CREATED).body(department);
+        depService.create(dto.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
     
     //Update by id
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateDepartment(
             @PathVariable("id") int id,
-            @Valid @RequestBody ViracDepartment department,
+            @Valid @RequestBody DepartmentDTO dto,
             BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        depService.updateById(id, department.getName());
+        depService.updateById(id, dto.getName());
         return ResponseEntity.ok().build();
     }
     

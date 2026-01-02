@@ -10,13 +10,13 @@ const DepartmentList = () => {
 
   const loadDepartments = () => {
     DepartmentService.getAll()
-      .then(res => setDepartments(res.data))
-      .catch(err => console.error(err));
+      .then(res => setDepartments(res.data));
   };
 
   const deleteDepartment = (id) => {
     DepartmentService.delete(id)
-      .then(() => loadDepartments());
+      .then(() => loadDepartments())
+      .catch(err => alert(err.response?.data || "Delete failed"));
   };
 
   return (
@@ -26,7 +26,9 @@ const DepartmentList = () => {
         {departments.map(dep => (
           <li key={dep.id}>
             {dep.name}
-            <button onClick={() => deleteDepartment(dep.id)}>Delete</button>
+            <button onClick={() => deleteDepartment(dep.id)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>
