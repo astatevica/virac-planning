@@ -2,6 +2,7 @@ package lv.venta.virac.model;
 
 import java.util.Collection;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -58,7 +59,7 @@ public class Employee {
 	@ToString.Exclude
 	private Collection<ProjectManagement>  projectManagement;
 	
-	@OneToMany(mappedBy = "employee")
+	@OneToMany(mappedBy = "employee", cascade = CascadeType.REMOVE)
 	@ToString.Exclude
 	private Collection<Plan> plan;
 	

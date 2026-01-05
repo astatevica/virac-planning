@@ -6,13 +6,13 @@ const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
 
-  // ADD
+  // FORM STATE
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
-  const [departmentId, setDepartmentId] = useState("");
   const [position, setPosition] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
 
-  // UPDATE
+  // EDIT
   const [editId, setEditId] = useState(null);
 
   // FILTER
@@ -23,66 +23,61 @@ const EmployeeList = () => {
     loadDepartments();
   }, []);
 
+  /* ================= LOAD ================= */
+
   const loadEmployees = () => {
     EmployeeService.getAll()
       .then(res => setEmployees(res.data))
-      .catch(err => alert("Failed to load employees"));
+      .catch(() => alert("Failed to load employees"));
   };
 
   const loadDepartments = () => {
     DepartmentService.getAll()
       .then(res => setDepartments(res.data))
-      .catch(() => {});
+      .catch(() => alert("Failed to load departments"));
   };
 
-  // CREATE
+  /* ================= CREATE ================= */
+
   const addEmployee = () => {
-    if (!name || !surname || !departmentId || !position) {
+    if (!name || !surname || !position || !departmentId) {
       alert("All fields are required");
       return;
     }
 
     EmployeeService.create({
       name,
-      surame: surname, // backend typo preserved
-      department: departmentId,
-      position
+      surname,
+      position,
+      department: {
+        idDepartment: Number(departmentId)
+      }
     })
       .then(() => {
         clearForm();
         loadEmployees();
       })
-      .catch(err => alert(err.response?.data || "Add failed"));
+      .catch(err => alert(err.response?.data || "Create failed"));
   };
 
-  // DELETE
-  const deleteEmployee = (id) => {
-    EmployeeService.delete(id)
-      .then(loadEmployees)
-      .catch(err => alert(err.response?.data || "Delete failed"));
-  };
+  /* ================= UPDATE ================= */
 
-  // START UPDATE
   const startEdit = (emp) => {
-    setEditId(emp.id);
+    setEditId(emp.idEmployee);
     setName(emp.name);
     setSurname(emp.surname);
-    setDepartmentId(emp.department.id);
     setPosition(emp.position);
+    setDepartmentId(emp.viracDepartment?.idDepartment || "");
   };
 
-  const cancelEdit = () => {
-    setEditId(null);
-    clearForm();
-  };
-
-  // SAVE UPDATE
   const saveEdit = () => {
     EmployeeService.update(editId, {
       name,
-      surame: surname,
-      department: departmentId,
-      position
+      surname,
+      position,
+      department: {
+        idDepartment: Number(departmentId)
+      }
     })
       .then(() => {
         cancelEdit();
@@ -91,7 +86,23 @@ const EmployeeList = () => {
       .catch(err => alert(err.response?.data || "Update failed"));
   };
 
-  // FILTER
+  const cancelEdit = () => {
+    setEditId(null);
+    clearForm();
+  };
+
+  /* ================= DELETE ================= */
+
+  const deleteEmployee = (id) => {
+    if (!window.confirm("Delete employee?")) return;
+
+    EmployeeService.delete(id)
+      .then(loadEmployees)
+      .catch(err => alert(err.response?.data || "Delete failed"));
+  };
+
+  /* ================= FILTER ================= */
+
   const filterEmployees = () => {
     if (!filterDepartmentId) {
       loadEmployees();
@@ -100,35 +111,55 @@ const EmployeeList = () => {
 
     EmployeeService.getByDepartment(filterDepartmentId)
       .then(res => setEmployees(res.data))
-      .catch(err => alert("No employees found"));
+      .catch(() => alert("No employees found"));
   };
+
+  /* ================= UTILS ================= */
 
   const clearForm = () => {
     setName("");
     setSurname("");
-    setDepartmentId("");
     setPosition("");
+    setDepartmentId("");
   };
+
+  /* ================= RENDER ================= */
 
   return (
     <div>
       <h2>Employees</h2>
 
-      {/* ➕ ADD / UPDATE */}
+      {/* ADD / UPDATE */}
       <div style={{ marginBottom: "20px" }}>
-        <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} />
-        <input placeholder="Surname" value={surname} onChange={e => setSurname(e.target.value)} />
+        <input
+          placeholder="Name"
+          value={name}
+          onChange={e => setName(e.target.value)}
+        />
 
-        <select value={departmentId} onChange={e => setDepartmentId(e.target.value)}>
+        <input
+          placeholder="Surname"
+          value={surname}
+          onChange={e => setSurname(e.target.value)}
+        />
+
+        <input
+          placeholder="Position"
+          value={position}
+          onChange={e => setPosition(e.target.value)}
+        />
+
+        <select
+          value={departmentId}
+          onChange={e => setDepartmentId(e.target.value)}
+        >
           <option value="">Select department</option>
           {departments.map(dep => (
-            <option key={dep.id} value={dep.id}>
+            <option key={dep.idDepartment} value={dep.idDepartment}>
               {dep.name}
             </option>
           ))}
         </select>
-
-        <input placeholder="Position" value={position} onChange={e => setPosition(e.target.value)} />
 
         {editId ? (
           <>
@@ -140,12 +171,15 @@ const EmployeeList = () => {
         )}
       </div>
 
-      {/* 🔍 FILTER */}
+      {/* FILTER */}
       <div style={{ marginBottom: "15px" }}>
-        <select value={filterDepartmentId} onChange={e => setFilterDepartmentId(e.target.value)}>
+        <select
+          value={filterDepartmentId}
+          onChange={e => setFilterDepartmentId(e.target.value)}
+        >
           <option value="">All departments</option>
           {departments.map(dep => (
-            <option key={dep.id} value={dep.id}>
+            <option key={dep.idDepartment} value={dep.idDepartment}>
               {dep.name}
             </option>
           ))}
@@ -154,13 +188,17 @@ const EmployeeList = () => {
         <button onClick={filterEmployees}>Filter</button>
       </div>
 
-      {/* 📄 LIST */}
+      {/* LIST */}
       <ul>
         {employees.map(emp => (
           <li key={emp.id}>
-            {emp.name} {emp.surname} | {emp.department.name} | {emp.position}
+            {emp.name} {emp.surname} |{" "}
+            {emp.department?.name || "No department"} |{" "}
+            {emp.position}
             <button onClick={() => startEdit(emp)}>Update</button>
-            <button onClick={() => deleteEmployee(emp.id)}>Delete</button>
+            <button onClick={() => deleteEmployee(emp.id)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>

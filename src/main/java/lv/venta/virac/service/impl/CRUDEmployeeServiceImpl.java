@@ -5,9 +5,11 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lv.venta.virac.dto.EmployeeDTO;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.repo.IEmployeeRepo;
+import lv.venta.virac.repo.IViracDepartmentRepo;
 import lv.venta.virac.service.ICRUDEmployeeService;
 
 @Service
@@ -15,6 +17,11 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 	
 	@Autowired
 	private IEmployeeRepo emplRepo;
+	
+	@Autowired
+	private IViracDepartmentRepo depRepo;
+
+	private EmployeeDTO dto;
 	
 	@Override
     public ArrayList<Employee> retrieveAll() throws Exception {
@@ -43,9 +50,14 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 			throw new Exception("The input parameters are incorrect");
 		}
         
+        ViracDepartment dep = depRepo.findById(dto.getDepartment().getIdDepartment())
+                .orElseThrow(() -> new Exception("Department not found"));
+        
         for (Employee emp : employees) {
             if (emp.getName().equals(name) & emp.getSurname().equals(surname)) {
                 throw new Exception("Employee: " + emp.getName()+ emp.getSurname() + " already exists");
+            }else {
+            	emp.setViracDepartment(dep);
             }
         }
 

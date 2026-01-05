@@ -68,19 +68,20 @@ public class CRUDEmployeeController {
     public ResponseEntity<Void> create(
             @Valid @RequestBody EmployeeDTO dto,
             BindingResult result) throws Exception {
-    	
-    	System.out.println("NAME: " + dto.getName());
+
+        System.out.println("NAME: " + dto.getName());
         System.out.println("SURNAME: " + dto.getSurname());
-        System.out.println("DEPARTMENT: " + dto.getDepartment());
+        System.out.println("DEPARTMENT ID: " + (dto.getDepartment() != null ? dto.getDepartment().getIdDepartment() : null));
         System.out.println("POSITION: " + dto.getPosition());
-        
+
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        emplService.create(dto.getName(),dto.getSurname(),dto.getDepartment(),dto.getPosition());
+        emplService.create(dto.getName(), dto.getSurname(), dto.getDepartment().getIdDepartment(), dto.getPosition());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
