@@ -17,6 +17,11 @@ const Navigation = () => {
             Departments
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/employee" style={styles.link}>
+            Employee
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );
