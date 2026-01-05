@@ -96,6 +96,7 @@ public class CRUDEmployeeController {
         return ResponseEntity.ok().build();
     }
 
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
         emplService.deleteById(id);

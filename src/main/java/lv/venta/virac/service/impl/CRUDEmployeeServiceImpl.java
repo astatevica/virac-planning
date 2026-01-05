@@ -55,17 +55,18 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 
     @Override
     public void updateById(int id, String name, String surname,
-			ViracDepartment viracDepartment, String position) throws Exception {
+			ViracDepartment department, String position) throws Exception {
     	Employee employee = retrieveById(id);
     	if (employee == null) throw new 
-    		Exception("Employee with (id:" + id + ") does not exist");
+    		Exception("Employee with (id:" + id + ") does not exist");    	
     	
         employee.setName(name);
         employee.setSurname(surname);
-        employee.setViracDepartment(viracDepartment);
+        employee.setViracDepartment(department);
         employee.setPosition(position);
         emplRepo.save(employee);
     }
+
 
     @Override
     public void deleteById(int id) throws Exception {

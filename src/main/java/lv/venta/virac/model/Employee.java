@@ -35,13 +35,13 @@ public class Employee {
 	private int idEmployee;
 	
 	@Column(name = "name")
-	@NotNull
+	//@NotNull
 	@Pattern(regexp = "[A-ZĒŪĪĻĶĢŠĀŽČŅa-zēūīļķģšāžčņ' ]+", message = "Tikai burti un atstarpes ir atlautas")
 	@Size(max = 20, min = 2)
 	private String name;
 	
 	@Column(name = "surname")
-	@NotNull
+	//@NotNull
 	@Pattern(regexp = "[A-ZĒŪĪĻĶĢŠĀŽČŅa-zēūīļķģšāžčņ' ]+", message = "Tikai burti un atstarpes ir atlautas")
 	@Size(max = 20, min = 2)
 	private String surname;
