@@ -73,7 +73,7 @@ public class CRUDEmployeeController {
             return ResponseEntity.badRequest().build();
         }
 
-        emplService.create(dto.getName(),dto.getSurame(),dto.getDepartment(),dto.getPosition());
+        emplService.create(dto.getName(),dto.getSurname(),dto.getDepartment(),dto.getPosition());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -87,7 +87,7 @@ public class CRUDEmployeeController {
             return ResponseEntity.badRequest().build();
         }
 
-        emplService.updateById(id, dto.getName(), dto.getSurame(), dto.getDepartment(), dto.getPosition());
+        emplService.updateById(id, dto.getName(), dto.getSurname(), dto.getDepartment(), dto.getPosition());
         return ResponseEntity.ok().build();
     }
 

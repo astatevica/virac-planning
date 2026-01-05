@@ -30,7 +30,7 @@ public class EmployeeDTO {
         this.name = name;
     }
 	
-	public String getSurame() {
+	public String getSurname() {
 		return surname;
 	}
 	
