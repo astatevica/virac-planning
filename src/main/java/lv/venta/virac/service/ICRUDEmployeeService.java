@@ -1,5 +1,7 @@
 package lv.venta.virac.service;
 
+import java.util.ArrayList;
+
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ViracDepartment;
 
@@ -13,5 +15,8 @@ public interface ICRUDEmployeeService extends ICRUDBase<Employee>{
 	//U - update
 	public abstract void updateById(int id, String name, String surname,
 			ViracDepartment viracDepartment, String position) throws Exception;
+	
+	//Filter by Department
+	public abstract ArrayList<Employee> selectAllEmployeesByDepartment(ViracDepartment department) throws Exception;
 
 }

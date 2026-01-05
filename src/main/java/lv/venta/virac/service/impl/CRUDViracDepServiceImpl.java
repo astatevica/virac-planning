@@ -56,7 +56,7 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService {
     public void updateById(int id, String name) throws Exception {
     	ViracDepartment department = retrieveById(id);
     	if (department == null) throw new 
-    		Exception("Event with (id:" + id + ") does not exist");
+    		Exception("Department with (id:" + id + ") does not exist");
     	
         department.setName(name);
         depRepo.save(department);
@@ -68,5 +68,5 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService {
     	if (department == null) throw new Exception("Department with id:"+ id +" does not exist");
         depRepo.delete(department);
     }
-    //
+
 }
