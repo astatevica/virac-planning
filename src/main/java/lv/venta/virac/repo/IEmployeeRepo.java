@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import org.springframework.data.repository.CrudRepository;
 
 import lv.venta.virac.model.Employee;
-import lv.venta.virac.model.ViracDepartment;
 
 public interface IEmployeeRepo extends CrudRepository<Employee, Integer>{
 
-	public abstract ArrayList<Employee> findByIdDepartment(ViracDepartment department);
+	public abstract ArrayList<Employee> findByIdDepartment(int departmentId);
 }

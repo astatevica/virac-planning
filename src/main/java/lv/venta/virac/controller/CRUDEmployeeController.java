@@ -96,5 +96,29 @@ public class CRUDEmployeeController {
         emplService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    
+    //FILTER BY DEPARTMENT
+    @GetMapping("/filter/{departmentId}")
+    public ResponseEntity<ArrayList<EmployeeDTO>> getEmployeesByDepartment(
+            @PathVariable("departmentId") int departmentId) throws Exception {
+
+        ArrayList<Employee> employees =
+                emplService.selectAllEmployeesByDepartment(departmentId);
+
+        ArrayList<EmployeeDTO> response = new ArrayList<>(
+                employees.stream()
+                    .map(emp -> new EmployeeDTO(
+                    	emp.getIdEmployee(),
+                    	emp.getName(),
+                    	emp.getSurname(),
+                    	emp.getViracDepartment(),
+                    	emp.getPosition()
+                    ))
+                    .toList());
+        
+       
+
+        return ResponseEntity.ok(response);
+    }
 
 }

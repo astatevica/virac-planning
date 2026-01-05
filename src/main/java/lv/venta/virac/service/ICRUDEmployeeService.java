@@ -17,6 +17,6 @@ public interface ICRUDEmployeeService extends ICRUDBase<Employee>{
 			ViracDepartment viracDepartment, String position) throws Exception;
 	
 	//Filter by Department
-	public abstract ArrayList<Employee> selectAllEmployeesByDepartment(ViracDepartment department) throws Exception;
+	public abstract ArrayList<Employee> selectAllEmployeesByDepartment(int departmentId) throws Exception;
 
 }
