@@ -76,7 +76,7 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
     
     @Override
 	public ArrayList<Employee> selectAllEmployeesByDepartment(int departmentId) throws Exception {
-		ArrayList<Employee> result = emplRepo.findByIdDepartment(departmentId);
+		ArrayList<Employee> result = emplRepo.findByViracDepartment_IdDepartment(departmentId);
 		if(result.isEmpty()) {
 			throw new Exception("Employee with department id: " + departmentId + " does not exist");
 		}

@@ -68,7 +68,12 @@ public class CRUDEmployeeController {
     public ResponseEntity<Void> create(
             @Valid @RequestBody EmployeeDTO dto,
             BindingResult result) throws Exception {
-
+    	
+    	System.out.println("NAME: " + dto.getName());
+        System.out.println("SURNAME: " + dto.getSurname());
+        System.out.println("DEPARTMENT: " + dto.getDepartment());
+        System.out.println("POSITION: " + dto.getPosition());
+        
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }

@@ -10,6 +10,9 @@ public class EmployeeDTO {
 	private ViracDepartment viracDepartment;
 	private String position;
 	
+    public EmployeeDTO() {
+    }
+	
 	public EmployeeDTO(int idEmployee, String name, String surname,ViracDepartment viracDepartment, String position) {
 		this.idEmployee = idEmployee;
 		this.name = name;
@@ -53,5 +56,8 @@ public class EmployeeDTO {
 	public void setPosition(String position) {
         this.position = position;
     }
+	
+
+  
 
 }

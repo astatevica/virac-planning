@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navigation from "./components/Navigation";
 import DepartmentList from "./components/DepartmentList";
+import EmployeeList from "./components/EmployeeList";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Routes>
           <Route path="/" element={<h2>Welcome to VIRAC</h2>} />
           <Route path="/departments" element={<DepartmentList />} />
+          <Route path="/employee" element={<EmployeeList />} />
         </Routes>
       </div>
     </BrowserRouter>
