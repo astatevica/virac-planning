@@ -16,33 +16,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import lv.venta.virac.dto.DepartmentDTO;
-import lv.venta.virac.dto.DepartmentRequestDTO;
-import lv.venta.virac.model.ViracDepartment;
-import lv.venta.virac.service.ICRUDViracDepService;
+import lv.venta.virac.dto.EmployeeDTO;
+import lv.venta.virac.model.Employee;
+import lv.venta.virac.service.ICRUDEmployeeService;
 
 @RestController
-@RequestMapping("/api/department")
+@RequestMapping("/api/employee")
 @CrossOrigin(origins = "http://localhost:3000")
-public class CRUDViracDepController {
+public class CRUDEmployeeController {
+	
+	private ICRUDEmployeeService emplService;
 
-    private ICRUDViracDepService depService;
-
-    public CRUDViracDepController(ICRUDViracDepService depService) {
-        this.depService = depService;
-    }
+    public CRUDEmployeeController(ICRUDEmployeeService emplService) {
+		this.emplService = emplService;
+	}
 
     @GetMapping
-    public ResponseEntity<ArrayList<DepartmentDTO>> getAllDepartments() throws Exception {
+    public ResponseEntity<ArrayList<EmployeeDTO>> getAllDEmployees() throws Exception {
 
-        ArrayList<ViracDepartment> departments = depService.retrieveAll();
+        ArrayList<Employee> employee = emplService.retrieveAll();
 
-        ArrayList<DepartmentDTO> response =
+        ArrayList<EmployeeDTO> response =
         	    new ArrayList<>(
-        	        departments.stream()
-        	            .map(dep -> new DepartmentDTO(
-        	                dep.getIdDepartment(),
-        	                dep.getName()
+        	        employee.stream()
+        	            .map(emp -> new EmployeeDTO(
+        	                emp.getIdEmployee(),
+        	                emp.getName(),
+        	                emp.getSurname(),
+        	                emp.getViracDepartment(),
+        	                emp.getPosition()
         	            ))
         	            .toList()
         	    );
@@ -52,45 +54,47 @@ public class CRUDViracDepController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<DepartmentDTO> getById(
+    public ResponseEntity<EmployeeDTO> getById(
             @PathVariable("id") int id) throws Exception {
 
-        ViracDepartment dep = depService.retrieveById(id);
+        Employee emp = emplService.retrieveById(id);
         return ResponseEntity.ok(
-            new DepartmentDTO(dep.getIdDepartment(), dep.getName())
+            new EmployeeDTO(emp.getIdEmployee(), emp.getName(),emp.getSurname(),
+            		emp.getViracDepartment(),emp.getPosition())
         );
     }
 
     @PostMapping
     public ResponseEntity<Void> create(
-            @Valid @RequestBody DepartmentRequestDTO dto,
+            @Valid @RequestBody EmployeeDTO dto,
             BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        depService.create(dto.getName());
+        emplService.create(dto.getName(),dto.getSurame(),dto.getDepartment(),dto.getPosition());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
-            @Valid @RequestBody DepartmentRequestDTO dto,
+            @Valid @RequestBody EmployeeDTO dto,
             BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        depService.updateById(id, dto.getName());
+        emplService.updateById(id, dto.getName(), dto.getSurame(), dto.getDepartment(), dto.getPosition());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
-        depService.deleteById(id);
+        emplService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
 }

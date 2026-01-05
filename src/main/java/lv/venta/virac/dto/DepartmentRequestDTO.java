@@ -7,7 +7,7 @@ public class DepartmentRequestDTO {
     @NotBlank(message = "Department name cannot be empty")
     private String name;
 
-    // ✅ REQUIRED
+    //REQUIRED
     public DepartmentRequestDTO() {}
 
     public String getName() {
