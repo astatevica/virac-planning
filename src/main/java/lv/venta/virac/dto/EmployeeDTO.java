@@ -7,17 +7,17 @@ public class EmployeeDTO {
 	private int idEmployee;
 	private String name;
 	private String surname;
-	private ViracDepartment viracDepartment;
+	private ViracDepartment department;
 	private String position;
 	
     public EmployeeDTO() {
     }
 	
-	public EmployeeDTO(int idEmployee, String name, String surname,ViracDepartment viracDepartment, String position) {
+	public EmployeeDTO(int idEmployee, String name, String surname,ViracDepartment department, String position) {
 		this.idEmployee = idEmployee;
 		this.name = name;
 		this.surname = surname;
-		this.viracDepartment = viracDepartment;
+		this.department = department;
 		this.position = position;
 	}
 	
@@ -42,11 +42,11 @@ public class EmployeeDTO {
     }
 	
 	public ViracDepartment getDepartment() {
-		return viracDepartment;
+		return department;
 	}
 	
 	public void setDepartment(ViracDepartment department) {
-        this.viracDepartment = department;
+        this.department = department;
     }
 	
 	public String getPosition() {

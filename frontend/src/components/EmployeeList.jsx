@@ -10,13 +10,13 @@ const EmployeeList = () => {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [position, setPosition] = useState("");
-  const [departmentId, setDepartmentId] = useState("");
+  const [idDepartment, setIdDepartment] = useState("");
 
   // EDIT
   const [editId, setEditId] = useState(null);
 
   // FILTER
-  const [filterDepartmentId, setFilterDepartmentId] = useState("");
+  const [filterIdDepartment, setFilterIdDeparment] = useState("");
 
   useEffect(() => {
     loadEmployees();
@@ -40,7 +40,7 @@ const EmployeeList = () => {
   /* ================= CREATE ================= */
 
   const addEmployee = () => {
-    if (!name || !surname || !position || !departmentId) {
+    if (!name || !surname || !position || !idDepartment) {
       alert("All fields are required");
       return;
     }
@@ -50,7 +50,7 @@ const EmployeeList = () => {
       surname,
       position,
       department: {
-        idDepartment: Number(departmentId)
+        idDepartment: Number(idDepartment)
       }
     })
       .then(() => {
@@ -67,7 +67,7 @@ const EmployeeList = () => {
     setName(emp.name);
     setSurname(emp.surname);
     setPosition(emp.position);
-    setDepartmentId(emp.viracDepartment?.idDepartment || "");
+    setIdDepartment(emp.viracDepartment?.idDepartment || "");
   };
 
   const saveEdit = () => {
@@ -76,7 +76,7 @@ const EmployeeList = () => {
       surname,
       position,
       department: {
-        idDepartment: Number(departmentId)
+        idDepartment: Number(idDepartment)
       }
     })
       .then(() => {
@@ -104,12 +104,12 @@ const EmployeeList = () => {
   /* ================= FILTER ================= */
 
   const filterEmployees = () => {
-    if (!filterDepartmentId) {
+    if (!filterIdDepartment) {
       loadEmployees();
       return;
     }
 
-    EmployeeService.getByDepartment(filterDepartmentId)
+    EmployeeService.filterByDepartment(Number(filterIdDepartment))
       .then(res => setEmployees(res.data))
       .catch(() => alert("No employees found"));
   };
@@ -120,7 +120,7 @@ const EmployeeList = () => {
     setName("");
     setSurname("");
     setPosition("");
-    setDepartmentId("");
+    setIdDepartment("");
   };
 
   /* ================= RENDER ================= */
@@ -150,8 +150,8 @@ const EmployeeList = () => {
         />
 
         <select
-          value={departmentId}
-          onChange={e => setDepartmentId(e.target.value)}
+          value={idDepartment}
+          onChange={e => setIdDepartment(e.target.value)}
         >
           <option value="">Select department</option>
           {departments.map(dep => (
@@ -174,8 +174,8 @@ const EmployeeList = () => {
       {/* FILTER */}
       <div style={{ marginBottom: "15px" }}>
         <select
-          value={filterDepartmentId}
-          onChange={e => setFilterDepartmentId(e.target.value)}
+          value={filterIdDepartment}
+          onChange={e => setFilterIdDeparment(e.target.value)}
         >
           <option value="">All departments</option>
           {departments.map(dep => (

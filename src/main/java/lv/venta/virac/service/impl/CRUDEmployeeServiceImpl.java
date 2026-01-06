@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lv.venta.virac.dto.EmployeeDTO;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.repo.IEmployeeRepo;
@@ -20,8 +19,6 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 	
 	@Autowired
 	private IViracDepartmentRepo depRepo;
-
-	private EmployeeDTO dto;
 	
 	@Override
     public ArrayList<Employee> retrieveAll() throws Exception {
@@ -43,14 +40,14 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 
     @Override
     public void create(String name, String surname,
-			ViracDepartment viracDepartment, String position) throws Exception {
+			  ViracDepartment department, String position) throws Exception {
         ArrayList<Employee> employees = (ArrayList<Employee>) emplRepo.findAll();
         
-        if(name == null || surname == null || viracDepartment == null || position == null){
+        if(name == null || surname == null || department == null || position == null){
 			throw new Exception("The input parameters are incorrect");
 		}
         
-        ViracDepartment dep = depRepo.findById(dto.getDepartment().getIdDepartment())
+        ViracDepartment dep = depRepo.findById(department.getIdDepartment())
                 .orElseThrow(() -> new Exception("Department not found"));
         
         for (Employee emp : employees) {
@@ -61,7 +58,7 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
             }
         }
 
-        Employee employee = new Employee(name, surname, viracDepartment, position);
+        Employee employee = new Employee(name, surname, dep, position);
         emplRepo.save(employee);
     }
 
@@ -72,9 +69,12 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
     	if (employee == null) throw new 
     		Exception("Employee with (id:" + id + ") does not exist");    	
     	
+    	ViracDepartment dep = depRepo.findById(department.getIdDepartment())
+                .orElseThrow(() -> new Exception("Department not found"));
+    	
         employee.setName(name);
         employee.setSurname(surname);
-        employee.setViracDepartment(department);
+        employee.setViracDepartment(dep);
         employee.setPosition(position);
         emplRepo.save(employee);
     }

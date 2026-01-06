@@ -10,11 +10,11 @@ public interface ICRUDEmployeeService extends ICRUDBase<Employee>{
 
 	//C - create 
 	public abstract void create(String name, String surname,
-			ViracDepartment viracDepartment, String position) throws Exception;
+			ViracDepartment department, String position) throws Exception;
 		
 	//U - update
 	public abstract void updateById(int id, String name, String surname,
-			ViracDepartment viracDepartment, String position) throws Exception;
+			ViracDepartment department, String position) throws Exception;
 	
 	//Filter by Department
 	public abstract ArrayList<Employee> selectAllEmployeesByDepartment(int departmentId) throws Exception;

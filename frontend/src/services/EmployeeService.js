@@ -23,8 +23,8 @@ const EmployeeService = {
     return axios.delete(`${API_URL}/${id}`);
   },
 
-  filterByDepartment(departmentId) {
-    return axios.get(`${API_URL}/filter/${departmentId}`);
+  filterByDepartment(idDepartment) {
+    return axios.get(`${API_URL}/filter/${idDepartment}`);
   },
 };
 

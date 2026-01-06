@@ -48,6 +48,8 @@ public class CRUDEmployeeController {
         	            ))
         	            .toList()
         	    );
+        
+        System.out.println(employee.toString());
 
         return ResponseEntity.ok(response);
     }
@@ -58,6 +60,7 @@ public class CRUDEmployeeController {
             @PathVariable("id") int id) throws Exception {
 
         Employee emp = emplService.retrieveById(id);
+        System.out.println(emp);
         return ResponseEntity.ok(
             new EmployeeDTO(emp.getIdEmployee(), emp.getName(),emp.getSurname(),
             		emp.getViracDepartment(),emp.getPosition())
@@ -71,14 +74,14 @@ public class CRUDEmployeeController {
 
         System.out.println("NAME: " + dto.getName());
         System.out.println("SURNAME: " + dto.getSurname());
-        System.out.println("DEPARTMENT ID: " + (dto.getDepartment() != null ? dto.getDepartment().getIdDepartment() : null));
+        System.out.println("DEPARTMENT ID: " + dto.getDepartment().getIdDepartment());
         System.out.println("POSITION: " + dto.getPosition());
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        emplService.create(dto.getName(), dto.getSurname(), dto.getDepartment().getIdDepartment(), dto.getPosition());
+        emplService.create(dto.getName(), dto.getSurname(), dto.getDepartment(), dto.getPosition());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -88,6 +91,11 @@ public class CRUDEmployeeController {
             @PathVariable("id") int id,
             @Valid @RequestBody EmployeeDTO dto,
             BindingResult result) throws Exception {
+    	
+    	System.out.println("NAME: " + dto.getName());
+        System.out.println("SURNAME: " + dto.getSurname());
+        System.out.println("DEPARTMENT ID: " + dto.getDepartment().getIdDepartment());
+        System.out.println("POSITION: " + dto.getPosition());
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
@@ -123,7 +131,7 @@ public class CRUDEmployeeController {
                     ))
                     .toList());
         
-       
+       System.out.println(employees);
 
         return ResponseEntity.ok(response);
     }
