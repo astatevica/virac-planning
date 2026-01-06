@@ -22,6 +22,11 @@ const Navigation = () => {
             Employee
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/project-management" style={styles.link}>
+            Project Management
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );

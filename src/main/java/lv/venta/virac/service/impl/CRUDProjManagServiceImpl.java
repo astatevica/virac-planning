@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ProjectManagement;
-import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.repo.IEmployeeRepo;
 import lv.venta.virac.repo.IProjectManagementRepo;
 import lv.venta.virac.service.ICRUDProjManagService;
@@ -81,7 +80,7 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
     	Employee emp = emplRepo.findById(employee.getIdEmployee())
                 .orElseThrow(() -> new Exception("Employee not found"));
     	
-        management.setEmployee(employee);
+        management.setEmployee(emp);
         management.setStartDate(startDate);
         management.setEndDate(endDate);
         managRepo.save(management);
@@ -90,20 +89,35 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
 
 	@Override
 	public ArrayList<ProjectManagement> selectAllProjectManagemetByEmployee(int employeeId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<ProjectManagement> result = managRepo.findByEmployee_IdEmployee(employeeId);
+		
+		if(result.isEmpty()) {
+			throw new Exception("Management with employee id: " + employeeId + " does not exist");
+		}
+		
+		return result;
 	}
 
 	@Override
 	public ArrayList<ProjectManagement> selectAllProjectManagemetByStartDate(LocalDate startDate) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<ProjectManagement> result = managRepo.findByStartDate(startDate);
+		
+		if(result.isEmpty()) {
+			throw new Exception("Start date: " + startDate + " does not exist");
+		}
+		
+		return result;
 	}
 
 	@Override
 	public ArrayList<ProjectManagement> selectAllProjectManagemetByEndDate(LocalDate endDate) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<ProjectManagement> result = managRepo.findByEndDate(endDate);
+		
+		if(result.isEmpty()) {
+			throw new Exception("End date: " + endDate + " does not exist");
+		}
+		
+		return result;
 	}
 
 }

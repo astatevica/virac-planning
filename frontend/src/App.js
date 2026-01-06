@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import DepartmentList from "./components/DepartmentList";
 import EmployeeList from "./components/EmployeeList";
+import ProjectManagementList from "./components/ProjectManagementList";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<h2>Welcome to VIRAC</h2>} />
           <Route path="/departments" element={<DepartmentList />} />
           <Route path="/employee" element={<EmployeeList />} />
+          <Route path="/project-management" element={<ProjectManagementList />} />
         </Routes>
       </div>
     </BrowserRouter>
