@@ -27,7 +27,10 @@ const ProjectManagementList = () => {
 
   const loadAll = () => {
     ProjectManagementService.getAll()
-      .then(res => setManagements(res.data))
+      .then(res => {
+        console.log("ALL MANAGEMENT:", res.data);
+        setManagements(res.data);
+      })
       .catch(() => alert("Failed to load project management"));
   };
 
@@ -106,8 +109,11 @@ const ProjectManagementList = () => {
       return;
     }
 
-    ProjectManagementService.getByEmployee(filterEmployeeId)
-      .then(res => setManagements(res.data))
+    ProjectManagementService.getByEmployee(Number(filterEmployeeId))
+      .then(res => {
+        console.log("FILTERED:", res.data);
+        setManagements(res.data);
+      })
       .catch(() => alert("No records found"));
   };
 
@@ -125,12 +131,9 @@ const ProjectManagementList = () => {
     <div>
       <h2>Project Management</h2>
 
-      {/* FORM */}
+      {/* ADD / UPDATE */}
       <div style={{ marginBottom: "20px" }}>
-        <select
-          value={employeeId}
-          onChange={e => setEmployeeId(e.target.value)}
-        >
+        <select value={employeeId} onChange={e => setEmployeeId(e.target.value)}>
           <option value="">Select employee</option>
           {employees.map(emp => (
             <option key={emp.id} value={emp.id}>
@@ -182,8 +185,8 @@ const ProjectManagementList = () => {
       <ul>
         {managements.map(pm => (
           <li key={pm.idProjectManag}>
-            {pm.employee.name} {pm.employee.surname} |{" "}
-            {pm.startDate} → {pm.endDate}
+            <b>{pm.employee?.name} {pm.employee?.surname}</b>{" "}
+            | {pm.startDate} → {pm.endDate}
             <button onClick={() => startEdit(pm)}>Update</button>
             <button onClick={() => deleteManagement(pm.idProjectManag)}>
               Delete
