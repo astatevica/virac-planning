@@ -37,11 +37,6 @@ public class ProjectManagement {
 	@JoinColumn(name = "idEmployee")
 	private Employee employee;
 	
-	//TODO: jāsataisa kolekcija ar employees
-//	@OneToMany
-//	@JoinColumn(name = "idEmployee")
-//	private Collection<Employee> employee;
-	
 	@Column(name = "startDate")
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 	private LocalDate startDate;
