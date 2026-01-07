@@ -43,7 +43,7 @@ public class CRUDEmployeeController {
         	                emp.getIdEmployee(),
         	                emp.getName(),
         	                emp.getSurname(),
-        	                emp.getViracDepartment(),
+        	                emp.getViracDepartment().getName(),
         	                emp.getPosition()
         	            ))
         	            .toList()
@@ -63,7 +63,7 @@ public class CRUDEmployeeController {
         System.out.println(emp);
         return ResponseEntity.ok(
             new EmployeeDTO(emp.getIdEmployee(), emp.getName(),emp.getSurname(),
-            		emp.getViracDepartment(),emp.getPosition())
+            		emp.getViracDepartment().getName(),emp.getPosition())
         );
     }
 
@@ -74,14 +74,14 @@ public class CRUDEmployeeController {
 
         System.out.println("NAME: " + dto.getName());
         System.out.println("SURNAME: " + dto.getSurname());
-        System.out.println("DEPARTMENT ID: " + dto.getDepartment().getIdDepartment());
+        System.out.println("DEPARTMENT NAME: " + dto.getNameDepartment());
         System.out.println("POSITION: " + dto.getPosition());
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        emplService.create(dto.getName(), dto.getSurname(), dto.getDepartment(), dto.getPosition());
+        emplService.create(dto.getName(), dto.getSurname(), dto.getNameDepartment(), dto.getPosition());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -94,14 +94,14 @@ public class CRUDEmployeeController {
     	
     	System.out.println("NAME: " + dto.getName());
         System.out.println("SURNAME: " + dto.getSurname());
-        System.out.println("DEPARTMENT ID: " + dto.getDepartment().getIdDepartment());
+        System.out.println("DEPARTMENT NAME:" + dto.getNameDepartment());
         System.out.println("POSITION: " + dto.getPosition());
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        emplService.updateById(id, dto.getName(), dto.getSurname(), dto.getDepartment(), dto.getPosition());
+        emplService.updateById(id, dto.getName(), dto.getSurname(), dto.getNameDepartment(), dto.getPosition());
         return ResponseEntity.ok().build();
     }
 
@@ -126,7 +126,7 @@ public class CRUDEmployeeController {
                     	emp.getIdEmployee(),
                     	emp.getName(),
                     	emp.getSurname(),
-                    	emp.getViracDepartment(),
+                    	emp.getViracDepartment().getName(),
                     	emp.getPosition()
                     ))
                     .toList());

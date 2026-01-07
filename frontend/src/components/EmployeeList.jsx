@@ -10,7 +10,7 @@ const EmployeeList = () => {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [position, setPosition] = useState("");
-  const [idDepartment, setIdDepartment] = useState("");
+  const [nameDepartment, setIdDepartment] = useState("");
 
   // EDIT
   const [editId, setEditId] = useState(null);
@@ -40,18 +40,17 @@ const EmployeeList = () => {
   /* ================= CREATE ================= */
 
   const addEmployee = () => {
-    if (!name || !surname || !position || !idDepartment) {
+    console.log(nameDepartment)
+    if (!name || !surname || !position || !nameDepartment) {
       alert("All fields are required");
       return;
     }
-
+    
     EmployeeService.create({
       name,
       surname,
       position,
-      department: {
-        idDepartment: Number(idDepartment)
-      }
+      nameDepartment
     })
       .then(() => {
         clearForm();
@@ -67,7 +66,8 @@ const EmployeeList = () => {
     setName(emp.name);
     setSurname(emp.surname);
     setPosition(emp.position);
-    setIdDepartment(emp.viracDepartment?.idDepartment || "");
+    setIdDepartment(emp.nameDepartment || "");
+    //setIdDepartment(emp.viracDepartment?.nameDepartment || "");
   };
 
   const saveEdit = () => {
@@ -75,9 +75,7 @@ const EmployeeList = () => {
       name,
       surname,
       position,
-      department: {
-        idDepartment: Number(idDepartment)
-      }
+      nameDepartment
     })
       .then(() => {
         cancelEdit();
@@ -150,7 +148,7 @@ const EmployeeList = () => {
         />
 
         <select
-          value={idDepartment}
+          value={nameDepartment}
           onChange={e => setIdDepartment(e.target.value)}
         >
           <option value="">Select department</option>
@@ -193,7 +191,7 @@ const EmployeeList = () => {
         {employees.map(emp => (
           <li key={emp.id}>
             {emp.name} {emp.surname} |{" "}
-            {emp.department?.name || "No department"} |{" "}
+            {emp.nameDepartment || "No department"} |{" "}
             {emp.position}
             <button onClick={() => startEdit(emp)}>Update</button>
             <button onClick={() => deleteEmployee(emp.id)}>

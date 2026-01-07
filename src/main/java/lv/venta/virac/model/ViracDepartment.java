@@ -32,7 +32,7 @@ public class ViracDepartment {
 	@Setter(value = AccessLevel.NONE)
 	private int idDepartment;
 	
-	@Column(name = "name")
+	@Column(name = "name",unique = true)
 	@NotNull
 	//@Pattern(regexp = "[A-ZĒŪĪĻĶĢŠĀŽČŅa-zēūīļķģšāžčņ' ]+", message = "Tikai burti un atstarpes ir atlautas")
 	//@Size(max = 20, min = 2)

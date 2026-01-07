@@ -12,6 +12,7 @@ const EmployeeService = {
   },
 
   create(data) {
+    console.log(data);
     return axios.post(API_URL, data);
   },
 

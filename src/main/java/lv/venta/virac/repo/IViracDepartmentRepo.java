@@ -6,4 +6,5 @@ import lv.venta.virac.model.ViracDepartment;
 
 public interface IViracDepartmentRepo extends CrudRepository<ViracDepartment, Integer>{
 
+	public abstract ViracDepartment findByName(String nameDepartment);
 }

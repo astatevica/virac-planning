@@ -40,15 +40,17 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 
     @Override
     public void create(String name, String surname,
-			  ViracDepartment department, String position) throws Exception {
+			  String nameDepartment, String position) throws Exception {
         ArrayList<Employee> employees = (ArrayList<Employee>) emplRepo.findAll();
         
-        if(name == null || surname == null || department == null || position == null){
+        if(name == null || surname == null || nameDepartment == null || position == null){
 			throw new Exception("The input parameters are incorrect");
 		}
         
-        ViracDepartment dep = depRepo.findById(department.getIdDepartment())
-                .orElseThrow(() -> new Exception("Department not found"));
+        ViracDepartment dep = depRepo.findByName(nameDepartment);
+        if(dep == null) {
+        	throw new Exception("Department not found");
+        }
         
         for (Employee emp : employees) {
             if (emp.getName().equals(name) & emp.getSurname().equals(surname)) {
@@ -64,13 +66,15 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 
     @Override
     public void updateById(int id, String name, String surname,
-			ViracDepartment department, String position) throws Exception {
+			String nameDepartment, String position) throws Exception {
     	Employee employee = retrieveById(id);
     	if (employee == null) throw new 
     		Exception("Employee with (id:" + id + ") does not exist");    	
     	
-    	ViracDepartment dep = depRepo.findById(department.getIdDepartment())
-                .orElseThrow(() -> new Exception("Department not found"));
+    	ViracDepartment dep = depRepo.findByName(nameDepartment);
+        if(dep == null) {
+        	throw new Exception("Department not found");
+        }
     	
         employee.setName(name);
         employee.setSurname(surname);
