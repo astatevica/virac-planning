@@ -55,8 +55,6 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
         for (Employee emp : employees) {
             if (emp.getName().equals(name) & emp.getSurname().equals(surname)) {
                 throw new Exception("Employee: " + emp.getName()+ emp.getSurname() + " already exists");
-            }else {
-            	emp.setViracDepartment(dep);
             }
         }
 
@@ -92,10 +90,10 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
     }
     
     @Override
-	public ArrayList<Employee> selectAllEmployeesByDepartment(int departmentId) throws Exception {
-		ArrayList<Employee> result = emplRepo.findByViracDepartment_IdDepartment(departmentId);
+	public ArrayList<Employee> selectAllEmployeesByDepartment(String nameDepartment) throws Exception {
+		ArrayList<Employee> result = emplRepo.findByViracDepartment_IdDepartment(depRepo.findByName(nameDepartment).getIdDepartment());
 		if(result.isEmpty()) {
-			throw new Exception("Employee with department id: " + departmentId + " does not exist");
+			throw new Exception("Employees with department name: " + nameDepartment + " does not exist");
 		}
 		
 		return result;

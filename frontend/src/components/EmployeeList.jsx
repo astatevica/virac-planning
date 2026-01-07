@@ -62,12 +62,11 @@ const EmployeeList = () => {
   /* ================= UPDATE ================= */
 
   const startEdit = (emp) => {
-    setEditId(emp.idEmployee);
+    setEditId(emp.id);
     setName(emp.name);
     setSurname(emp.surname);
     setPosition(emp.position);
     setIdDepartment(emp.nameDepartment || "");
-    //setIdDepartment(emp.viracDepartment?.nameDepartment || "");
   };
 
   const saveEdit = () => {
@@ -106,8 +105,8 @@ const EmployeeList = () => {
       loadEmployees();
       return;
     }
-
-    EmployeeService.filterByDepartment(Number(filterIdDepartment))
+    
+    EmployeeService.filterByDepartment(nameDepartment)
       .then(res => setEmployees(res.data))
       .catch(() => alert("No employees found"));
   };

@@ -16,7 +16,6 @@ public interface ICRUDEmployeeService extends ICRUDBase<Employee>{
 			String nameDepartment, String position) throws Exception;
 	
 	//Filter by Department
-	//TODO: iespējams jārpārtais uz nameDepartment
-	public abstract ArrayList<Employee> selectAllEmployeesByDepartment(int departmentId) throws Exception;
+	public abstract ArrayList<Employee> selectAllEmployeesByDepartment(String nameDepartment) throws Exception;
 
 }

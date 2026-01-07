@@ -24,8 +24,9 @@ const EmployeeService = {
     return axios.delete(`${API_URL}/${id}`);
   },
 
-  filterByDepartment(idDepartment) {
-    return axios.get(`${API_URL}/filter/${idDepartment}`);
+  filterByDepartment(nameDepartment) {
+    console.log(nameDepartment);
+    return axios.get(`${API_URL}/filter/${nameDepartment}`);
   },
 };
 

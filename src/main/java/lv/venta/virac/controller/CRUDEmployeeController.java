@@ -113,12 +113,12 @@ public class CRUDEmployeeController {
     }
     
     //FILTER BY DEPARTMENT
-    @GetMapping("/filter/{departmentId}")
+    @GetMapping("/filter/{nameDepartment}")
     public ResponseEntity<ArrayList<EmployeeDTO>> getEmployeesByDepartment(
-            @PathVariable("departmentId") int departmentId) throws Exception {
+            @PathVariable("nameDepartment") String nameDepartment) throws Exception {
 
         ArrayList<Employee> employees =
-                emplService.selectAllEmployeesByDepartment(departmentId);
+                emplService.selectAllEmployeesByDepartment(nameDepartment);
 
         ArrayList<EmployeeDTO> response = new ArrayList<>(
                 employees.stream()
@@ -131,7 +131,7 @@ public class CRUDEmployeeController {
                     ))
                     .toList());
         
-       System.out.println(employees);
+       System.out.println(response);
 
         return ResponseEntity.ok(response);
     }
