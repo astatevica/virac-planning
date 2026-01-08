@@ -5,7 +5,6 @@ public class EmployeeDTO {
 	private int idEmployee;
 	private String name;
 	private String surname;
-	//TODO: jāmaina
 	private String nameDepartment;
 	private String position;
 	
