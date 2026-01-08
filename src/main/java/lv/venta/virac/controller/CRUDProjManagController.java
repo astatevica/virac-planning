@@ -42,7 +42,7 @@ public class CRUDProjManagController {
 	            new ArrayList<>(list.stream()
 	                .map(pm -> new ProjectManagementDTO(
 	                        pm.getIdProjectManag(),
-	                        pm.getEmployee(),
+	                        pm.getEmployee().getIdEmployee(),
 	                        pm.getStartDate(),
 	                        pm.getEndDate()
 	                ))
@@ -62,7 +62,7 @@ public class CRUDProjManagController {
 	        return ResponseEntity.ok(
 	            new ProjectManagementDTO(
 	                pm.getIdProjectManag(),
-	                pm.getEmployee(),
+	                pm.getEmployee().getIdEmployee(),
 	                pm.getStartDate(),
 	                pm.getEndDate()
 	            )
@@ -76,7 +76,7 @@ public class CRUDProjManagController {
 	            @RequestBody ProjectManagementDTO dto) throws Exception {
 
 	    	System.out.println("MANAGEMENT ID: " + dto.getIdProjectManag());
-	        System.out.println("EMPLOYEE: " + dto.getEmployee().getIdEmployee());
+	        System.out.println("EMPLOYEE ID: " + dto.getEmployeeId());
 	        System.out.println("START DATE: " + dto.getStartDate());
 	        System.out.println("END DATE: " + dto.getEndDate());
 
@@ -85,7 +85,7 @@ public class CRUDProjManagController {
 
 	        projService.create(
 	            //emp,
-	        	dto.getEmployee(),
+	        	dto.getEmployeeId(),
 	            dto.getStartDate(),
 	            dto.getEndDate()
 	        );
@@ -106,7 +106,7 @@ public class CRUDProjManagController {
 	        projService.updateById(
 	            id,
 	            //emp,
-	            dto.getEmployee(),
+	            dto.getEmployeeId(),
 	            dto.getStartDate(),
 	            dto.getEndDate()
 	        );
@@ -162,7 +162,7 @@ public class CRUDProjManagController {
 	        return new ArrayList<>(list.stream()
 	            .map(pm -> new ProjectManagementDTO(
 	                    pm.getIdProjectManag(),
-	                    pm.getEmployee(),
+	                    pm.getEmployee().getIdEmployee(),
 	                    pm.getStartDate(),
 	                    pm.getEndDate()
 	            ))

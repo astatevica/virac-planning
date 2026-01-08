@@ -48,14 +48,14 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
 
 	//Jāpārskata precizitāte
 	@Override
-	public void create(Employee employee, LocalDate startDate, LocalDate endDate) throws Exception {
+	public void create(int employeeId, LocalDate startDate, LocalDate endDate) throws Exception {
 		ArrayList<ProjectManagement> managements = (ArrayList<ProjectManagement>) managRepo.findAll();
         
-        if(employee == null || startDate == null || endDate == null){
+        if(employeeId == 0 || startDate == null || endDate == null){
 			throw new Exception("The input parameters are incorrect");
 		}
         
-        Employee foundEmployee = emplRepo.findById(employee.getIdEmployee())
+        Employee foundEmployee = emplRepo.findById(employeeId)
                 .orElseThrow(() -> new Exception("Employee not found"));
         
         for (ProjectManagement manag : managements) {
@@ -72,12 +72,12 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
 	}
 
 	@Override
-	public void updateById(int id, Employee employee, LocalDate startDate, LocalDate endDate) throws Exception {
+	public void updateById(int id, int employeeId, LocalDate startDate, LocalDate endDate) throws Exception {
 		ProjectManagement management = retrieveById(id);
     	if (management == null) throw new 
     		Exception("Management with (id:" + id + ") does not exist");    	
     	
-    	Employee emp = emplRepo.findById(employee.getIdEmployee())
+    	Employee emp = emplRepo.findById(employeeId)
                 .orElseThrow(() -> new Exception("Employee not found"));
     	
         management.setEmployee(emp);

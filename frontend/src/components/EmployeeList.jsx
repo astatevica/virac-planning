@@ -177,11 +177,11 @@ const EmployeeList = () => {
           <option value="">All departments</option>
           {departments.map(dep => (
             <option key={dep.idDepartment} value={dep.idDepartment}>
-              {dep.name}
+              {dep.name}              
             </option>
           ))}
         </select>
-
+  
         <button onClick={filterEmployees}>Filter</button>
       </div>
 

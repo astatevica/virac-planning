@@ -2,12 +2,10 @@ package lv.venta.virac.dto;
 
 import java.time.LocalDate;
 
-import lv.venta.virac.model.Employee;
-
 public class ProjectManagementDTO {
 
 	private int idProjectManag;
-	private Employee employee;
+	private int employeeId;
 	private LocalDate startDate;
 	private LocalDate endDate;
 	
@@ -15,9 +13,9 @@ public class ProjectManagementDTO {
 		
 	}
 	
-	public ProjectManagementDTO(int idProjectManag, Employee employee, LocalDate startDate, LocalDate endDate) {
+	public ProjectManagementDTO(int idProjectManag, int employeeId, LocalDate startDate, LocalDate endDate) {
 		this.setIdProjectManag(idProjectManag); //Vai šeit ir paredzēts id setot?
-		this.setEmployee(employee);
+		this.setEmployeeId(employeeId);
 		this.setStartDate(startDate);
 		this.setEndDate(endDate);
 	}
@@ -30,12 +28,12 @@ public class ProjectManagementDTO {
 		this.idProjectManag = idProjectManag;
 	}
 
-	public Employee getEmployee() {
-		return employee;
+	public int getEmployeeId() {
+		return employeeId;
 	}
 
-	public void setEmployee(Employee employee) {
-		this.employee = employee;
+	public void setEmployeeId(int employeeId) {
+		this.employeeId = employeeId;
 	}
 
 	public LocalDate getStartDate() {
