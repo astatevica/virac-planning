@@ -106,7 +106,7 @@ const EmployeeList = () => {
       return;
     }
     
-    EmployeeService.filterByDepartment(nameDepartment)
+    EmployeeService.filterByDepartment(filterIdDepartment)
       .then(res => setEmployees(res.data))
       .catch(() => alert("No employees found"));
   };

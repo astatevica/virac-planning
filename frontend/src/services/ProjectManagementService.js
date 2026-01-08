@@ -37,4 +37,5 @@ class ProjectManagementService {
   }
 }
 
-export default new ProjectManagementService();
+const projectManagementService = new ProjectManagementService();
+export default projectManagementService;

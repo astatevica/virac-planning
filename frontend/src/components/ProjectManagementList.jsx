@@ -15,8 +15,10 @@ const ProjectManagementList = () => {
   // EDIT
   const [editId, setEditId] = useState(null);
 
-  // FILTER
+  // FILTERS
   const [filterEmployeeId, setFilterEmployeeId] = useState("");
+  const [filterStartDate, setFilterStartDate] = useState("");
+  const [filterEndDate, setFilterEndDate] = useState("");
 
   useEffect(() => {
     loadAll();
@@ -27,10 +29,7 @@ const ProjectManagementList = () => {
 
   const loadAll = () => {
     ProjectManagementService.getAll()
-      .then(res => {
-        console.log("ALL MANAGEMENT:", res.data);
-        setManagements(res.data);
-      })
+      .then(res => setManagements(res.data))
       .catch(() => alert("Failed to load project management"));
   };
 
@@ -49,7 +48,7 @@ const ProjectManagementList = () => {
     }
 
     ProjectManagementService.create({
-      employeeId,
+      employeeId: Number(employeeId),
       startDate,
       endDate
     })
@@ -64,14 +63,14 @@ const ProjectManagementList = () => {
 
   const startEdit = (pm) => {
     setEditId(pm.idProjectManag);
-    setEmployeeId(pm.employeeId);
+    setEmployeeId(pm.employee?.id || pm.employeeId);
     setStartDate(pm.startDate);
     setEndDate(pm.endDate);
   };
 
   const saveEdit = () => {
     ProjectManagementService.update(editId, {
-      employeeId,
+      employeeId: Number(employeeId),
       startDate,
       endDate
     })
@@ -97,7 +96,7 @@ const ProjectManagementList = () => {
       .catch(err => alert(err.response?.data || "Delete failed"));
   };
 
-  /* ================= FILTER ================= */
+  /* ================= FILTERS ================= */
 
   const filterByEmployee = () => {
     if (!filterEmployeeId) {
@@ -105,11 +104,33 @@ const ProjectManagementList = () => {
       return;
     }
 
-    ProjectManagementService.getByEmployee(Number(filterEmployeeId))
-      .then(res => {
-        console.log("FILTERED:", res.data);
-        setManagements(res.data);
-      })
+    ProjectManagementService
+      .getByEmployee(Number(filterEmployeeId))
+      .then(res => setManagements(res.data))
+      .catch(() => alert("No records found"));
+  };
+
+  const filterByStartDate = () => {
+    if (!filterStartDate) {
+      loadAll();
+      return;
+    }
+
+    ProjectManagementService
+      .getByStartDate(Date(filterStartDate))
+      .then(res => setManagements(res.data))
+      .catch(() => alert("No records found"));
+  };
+
+  const filterByEndDate = () => {
+    if (!filterEndDate) {
+      loadAll();
+      return;
+    }
+
+    ProjectManagementService
+      .getByEndDate(Date(filterEndDate))
+      .then(res => setManagements(res.data))
       .catch(() => alert("No records found"));
   };
 
@@ -138,17 +159,8 @@ const ProjectManagementList = () => {
           ))}
         </select>
 
-        <input
-          type="date"
-          value={startDate}
-          onChange={e => setStartDate(e.target.value)}
-        />
-
-        <input
-          type="date"
-          value={endDate}
-          onChange={e => setEndDate(e.target.value)}
-        />
+        <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
+        <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
 
         {editId ? (
           <>
@@ -160,12 +172,9 @@ const ProjectManagementList = () => {
         )}
       </div>
 
-      {/* FILTER */}
+      {/* FILTERS */}
       <div style={{ marginBottom: "15px" }}>
-        <select
-          value={filterEmployeeId}
-          onChange={e => setFilterEmployeeId(e.target.value)}
-        >
+        <select value={filterEmployeeId} onChange={e => setFilterEmployeeId(e.target.value)}>
           <option value="">All employees</option>
           {employees.map(emp => (
             <option key={emp.id} value={emp.id}>
@@ -173,8 +182,17 @@ const ProjectManagementList = () => {
             </option>
           ))}
         </select>
+        <button onClick={filterByEmployee}>Filter by employee</button>
+      </div>
 
-        <button onClick={filterByEmployee}>Filter</button>
+      <div style={{ marginBottom: "15px" }}>
+        <input type="date" value={filterStartDate} onChange={e => setFilterStartDate(e.target.value)} />
+        <button onClick={filterByStartDate}>Filter by start date</button>
+      </div>
+
+      <div style={{ marginBottom: "15px" }}>
+        <input type="date" value={filterEndDate} onChange={e => setFilterEndDate(e.target.value)} />
+        <button onClick={filterByEndDate}>Filter by end date</button>
       </div>
 
       {/* LIST */}
@@ -182,11 +200,10 @@ const ProjectManagementList = () => {
         {managements.map(pm => (
           <li key={pm.idProjectManag}>
             {"Employee id: "}<b>{pm.employeeId}</b>
-            | {pm.startDate} → {pm.endDate}
+            {" | "}
+            {pm.startDate} → {pm.endDate}
             <button onClick={() => startEdit(pm)}>Update</button>
-            <button onClick={() => deleteManagement(pm.idProjectManag)}>
-              Delete
-            </button>
+            <button onClick={() => deleteManagement(pm.idProjectManag)}>Delete</button>
           </li>
         ))}
       </ul>
