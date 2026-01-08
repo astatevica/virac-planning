@@ -29,9 +29,7 @@ public class CRUDProjManagController {
 	    public CRUDProjManagController(ICRUDProjManagService projService) {
 	        this.projService = projService;
 	    }
-
-	    /* ===================== GET ALL ===================== */
-
+	    
 	    @GetMapping
 	    public ResponseEntity<ArrayList<ProjectManagementDTO>> getAll()
 	            throws Exception {
@@ -51,8 +49,6 @@ public class CRUDProjManagController {
 	        return ResponseEntity.ok(response);
 	    }
 
-	    /* ===================== GET BY ID ===================== */
-
 	    @GetMapping("/{id}")
 	    public ResponseEntity<ProjectManagementDTO> getById(
 	            @PathVariable("id") int id) throws Exception {
@@ -68,9 +64,7 @@ public class CRUDProjManagController {
 	            )
 	        );
 	    }
-
-	    /* ===================== CREATE ===================== */
-
+	    
 	    @PostMapping
 	    public ResponseEntity<Void> create(
 	            @RequestBody ProjectManagementDTO dto) throws Exception {
@@ -80,11 +74,7 @@ public class CRUDProjManagController {
 	        System.out.println("START DATE: " + dto.getStartDate());
 	        System.out.println("END DATE: " + dto.getEndDate());
 
-//	        Employee emp = new Employee();
-//	        emp.setIdEmployee(dto.getEmployeeId());
-
 	        projService.create(
-	            //emp,
 	        	dto.getEmployeeId(),
 	            dto.getStartDate(),
 	            dto.getEndDate()
@@ -93,19 +83,13 @@ public class CRUDProjManagController {
 	        return ResponseEntity.status(HttpStatus.CREATED).build();
 	    }
 
-	    /* ===================== UPDATE ===================== */
-
 	    @PutMapping("/{id}")
 	    public ResponseEntity<Void> update(
 	            @PathVariable("id") int id,
 	            @RequestBody ProjectManagementDTO dto) throws Exception {
 
-//	        Employee emp = new Employee();
-//	        emp.setIdEmployee(dto.getEmployeeId());
-
 	        projService.updateById(
 	            id,
-	            //emp,
 	            dto.getEmployeeId(),
 	            dto.getStartDate(),
 	            dto.getEndDate()
@@ -114,8 +98,6 @@ public class CRUDProjManagController {
 	        return ResponseEntity.ok().build();
 	    }
 
-	    /* ===================== DELETE ===================== */
-
 	    @DeleteMapping("/{id}")
 	    public ResponseEntity<Void> delete(
 	            @PathVariable("id") int id) throws Exception {
@@ -123,8 +105,6 @@ public class CRUDProjManagController {
 	        projService.deleteById(id);
 	        return ResponseEntity.noContent().build();
 	    }
-
-	    /* ===================== FILTERS ===================== */
 
 	    @GetMapping("/employee/{idEmployee}")
 	    public ResponseEntity<ArrayList<ProjectManagementDTO>>
@@ -154,8 +134,7 @@ public class CRUDProjManagController {
 	        );
 	    }
 
-	    /* ===================== HELPER ===================== */
-
+	    //Helper
 	    private ArrayList<ProjectManagementDTO> mapToDTO(
 	            ArrayList<ProjectManagement> list) {
 

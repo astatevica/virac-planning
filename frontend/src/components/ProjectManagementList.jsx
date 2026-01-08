@@ -25,8 +25,7 @@ const ProjectManagementList = () => {
     loadEmployees();
   }, []);
 
-  /* ================= LOAD ================= */
-
+  //LOAD
   const loadAll = () => {
     ProjectManagementService.getAll()
       .then(res => setManagements(res.data))
@@ -39,8 +38,7 @@ const ProjectManagementList = () => {
       .catch(() => alert("Failed to load employees"));
   };
 
-  /* ================= CREATE ================= */
-
+  //CREATE
   const addManagement = () => {
     if (!employeeId || !startDate || !endDate) {
       alert("All fields required");
@@ -59,11 +57,10 @@ const ProjectManagementList = () => {
       .catch(err => alert(err.response?.data || "Create failed"));
   };
 
-  /* ================= UPDATE ================= */
-
+  //UPDATE
   const startEdit = (pm) => {
     setEditId(pm.idProjectManag);
-    setEmployeeId(pm.employee?.id || pm.employeeId);
+    setEmployeeId(pm.employeeId);
     setStartDate(pm.startDate);
     setEndDate(pm.endDate);
   };
@@ -86,8 +83,7 @@ const ProjectManagementList = () => {
     clearForm();
   };
 
-  /* ================= DELETE ================= */
-
+  //DELETE
   const deleteManagement = (id) => {
     if (!window.confirm("Delete management?")) return;
 
@@ -96,8 +92,7 @@ const ProjectManagementList = () => {
       .catch(err => alert(err.response?.data || "Delete failed"));
   };
 
-  /* ================= FILTERS ================= */
-
+  //FILTERS
   const filterByEmployee = () => {
     if (!filterEmployeeId) {
       loadAll();
@@ -117,7 +112,7 @@ const ProjectManagementList = () => {
     }
 
     ProjectManagementService
-      .getByStartDate(Date(filterStartDate))
+      .getByStartDate(filterStartDate)
       .then(res => setManagements(res.data))
       .catch(() => alert("No records found"));
   };
@@ -129,21 +124,19 @@ const ProjectManagementList = () => {
     }
 
     ProjectManagementService
-      .getByEndDate(Date(filterEndDate))
+      .getByEndDate(filterEndDate)
       .then(res => setManagements(res.data))
       .catch(() => alert("No records found"));
   };
 
-  /* ================= UTILS ================= */
-
+  //UTILS
   const clearForm = () => {
     setEmployeeId("");
     setStartDate("");
     setEndDate("");
   };
 
-  /* ================= RENDER ================= */
-
+  //RENDER
   return (
     <div>
       <h2>Project Management</h2>

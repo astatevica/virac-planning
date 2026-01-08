@@ -23,8 +23,7 @@ const EmployeeList = () => {
     loadDepartments();
   }, []);
 
-  /* ================= LOAD ================= */
-
+  //LOAD
   const loadEmployees = () => {
     EmployeeService.getAll()
       .then(res => setEmployees(res.data))
@@ -37,10 +36,8 @@ const EmployeeList = () => {
       .catch(() => alert("Failed to load departments"));
   };
 
-  /* ================= CREATE ================= */
-
+  //CREATE
   const addEmployee = () => {
-    console.log(nameDepartment)
     if (!name || !surname || !position || !nameDepartment) {
       alert("All fields are required");
       return;
@@ -59,8 +56,7 @@ const EmployeeList = () => {
       .catch(err => alert(err.response?.data || "Create failed"));
   };
 
-  /* ================= UPDATE ================= */
-
+  //UPDATE
   const startEdit = (emp) => {
     setEditId(emp.id);
     setName(emp.name);
@@ -88,8 +84,7 @@ const EmployeeList = () => {
     clearForm();
   };
 
-  /* ================= DELETE ================= */
-
+  //DELETE
   const deleteEmployee = (id) => {
     if (!window.confirm("Delete employee?")) return;
 
@@ -98,8 +93,7 @@ const EmployeeList = () => {
       .catch(err => alert(err.response?.data || "Delete failed"));
   };
 
-  /* ================= FILTER ================= */
-
+  //FILTER
   const filterEmployees = () => {
     if (!filterIdDepartment) {
       loadEmployees();
@@ -111,8 +105,7 @@ const EmployeeList = () => {
       .catch(() => alert("No employees found"));
   };
 
-  /* ================= UTILS ================= */
-
+  //UTILS
   const clearForm = () => {
     setName("");
     setSurname("");
@@ -120,8 +113,7 @@ const EmployeeList = () => {
     setIdDepartment("");
   };
 
-  /* ================= RENDER ================= */
-
+  //RENDER
   return (
     <div>
       <h2>Employees</h2>

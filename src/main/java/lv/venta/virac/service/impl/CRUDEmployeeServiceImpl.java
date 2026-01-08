@@ -35,7 +35,6 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
         if (foundEmployees == null) throw new Exception("Employee with the id: (" + id + ") does not exist!");
         
         return foundEmployees;
-        
     }
 
     @Override

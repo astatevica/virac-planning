@@ -46,7 +46,6 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
 		
 	}
 
-	//Jāpārskata precizitāte
 	@Override
 	public void create(int employeeId, LocalDate startDate, LocalDate endDate) throws Exception {
 		ArrayList<ProjectManagement> managements = (ArrayList<ProjectManagement>) managRepo.findAll();
@@ -84,7 +83,6 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
         management.setStartDate(startDate);
         management.setEndDate(endDate);
         managRepo.save(management);
-		
 	}
 
 	@Override

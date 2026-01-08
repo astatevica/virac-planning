@@ -48,9 +48,6 @@ public class CRUDEmployeeController {
         	            ))
         	            .toList()
         	    );
-        
-        System.out.println(employee.toString());
-
         return ResponseEntity.ok(response);
     }
 
@@ -72,11 +69,6 @@ public class CRUDEmployeeController {
             @Valid @RequestBody EmployeeDTO dto,
             BindingResult result) throws Exception {
 
-        System.out.println("NAME: " + dto.getName());
-        System.out.println("SURNAME: " + dto.getSurname());
-        System.out.println("DEPARTMENT NAME: " + dto.getNameDepartment());
-        System.out.println("POSITION: " + dto.getPosition());
-
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
@@ -91,11 +83,6 @@ public class CRUDEmployeeController {
             @PathVariable("id") int id,
             @Valid @RequestBody EmployeeDTO dto,
             BindingResult result) throws Exception {
-    	
-    	System.out.println("NAME: " + dto.getName());
-        System.out.println("SURNAME: " + dto.getSurname());
-        System.out.println("DEPARTMENT NAME:" + dto.getNameDepartment());
-        System.out.println("POSITION: " + dto.getPosition());
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
@@ -112,7 +99,6 @@ public class CRUDEmployeeController {
         return ResponseEntity.noContent().build();
     }
     
-    //FILTER BY DEPARTMENT
     @GetMapping("/filter/{nameDepartment}")
     public ResponseEntity<ArrayList<EmployeeDTO>> getEmployeesByDepartment(
             @PathVariable("nameDepartment") String nameDepartment) throws Exception {
@@ -131,8 +117,6 @@ public class CRUDEmployeeController {
                     ))
                     .toList());
         
-        System.out.println(response);
-
         return ResponseEntity.ok(response);
     }
 
