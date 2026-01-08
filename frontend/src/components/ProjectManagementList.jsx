@@ -49,9 +49,7 @@ const ProjectManagementList = () => {
     }
 
     ProjectManagementService.create({
-      employee: {
-        idEmployee: Number(employeeId)
-      },
+      employeeId,
       startDate,
       endDate
     })
@@ -66,16 +64,14 @@ const ProjectManagementList = () => {
 
   const startEdit = (pm) => {
     setEditId(pm.idProjectManag);
-    setEmployeeId(pm.employee.idEmployee);
+    setEmployeeId(pm.employeeId);
     setStartDate(pm.startDate);
     setEndDate(pm.endDate);
   };
 
   const saveEdit = () => {
     ProjectManagementService.update(editId, {
-      employee: {
-        idEmployee: Number(employeeId)
-      },
+      employeeId,
       startDate,
       endDate
     })
@@ -94,7 +90,7 @@ const ProjectManagementList = () => {
   /* ================= DELETE ================= */
 
   const deleteManagement = (id) => {
-    if (!window.confirm("Delete record?")) return;
+    if (!window.confirm("Delete management?")) return;
 
     ProjectManagementService.delete(id)
       .then(loadAll)
@@ -109,7 +105,7 @@ const ProjectManagementList = () => {
       return;
     }
 
-    ProjectManagementService.getByEmployee(Number(filterEmployeeId))
+    ProjectManagementService.getByEmployee(employeeId)
       .then(res => {
         console.log("FILTERED:", res.data);
         setManagements(res.data);
@@ -185,7 +181,7 @@ const ProjectManagementList = () => {
       <ul>
         {managements.map(pm => (
           <li key={pm.idProjectManag}>
-            <b>{pm.employee?.name} {pm.employee?.surname}</b>{" "}
+            {"Employee id: "}<b>{pm.employeeId}</b>
             | {pm.startDate} → {pm.endDate}
             <button onClick={() => startEdit(pm)}>Update</button>
             <button onClick={() => deleteManagement(pm.idProjectManag)}>
