@@ -105,7 +105,7 @@ const ProjectManagementList = () => {
       return;
     }
 
-    ProjectManagementService.getByEmployee(employeeId)
+    ProjectManagementService.getByEmployee(Number(filterEmployeeId))
       .then(res => {
         console.log("FILTERED:", res.data);
         setManagements(res.data);
@@ -169,7 +169,7 @@ const ProjectManagementList = () => {
           <option value="">All employees</option>
           {employees.map(emp => (
             <option key={emp.id} value={emp.id}>
-              {emp.name} {emp.surname}
+              {emp.id} {emp.name} {emp.surname}
             </option>
           ))}
         </select>
