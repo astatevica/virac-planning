@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectManagement;
 import lv.venta.virac.repo.IProjectManagementRepo;
@@ -52,50 +51,75 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
 			String acronym) throws Exception {
 		ArrayList<Project> projects = (ArrayList<Project>) projRepo.findAll();
         
-        if(name == null || number == 0  || startDate == null || endDate == null){
+        if(name == null || number == 0  || managementId == 0 || startDate == null || endDate == null || acronym == null){
 			throw new Exception("The input parameters are incorrect");
 		}
         
-        Employee foundEmployee = emplRepo.findById(employeeId)
-                .orElseThrow(() -> new Exception("Employee not found"));
+        ProjectManagement foundManagement = managRepo.findById(managementId)
+                .orElseThrow(() -> new Exception("Management not found"));
         
-        for (ProjectManagement manag : managements) {
-            if (manag.getEmployee().equals(foundEmployee) & manag.getStartDate().equals(startDate)
-            		& manag.getEndDate().equals(endDate) ) {
-                throw new Exception("Management: " + manag.getEmployee().getIdEmployee()+ " with start date: " + manag.getStartDate() + 
-                		" and end date : " + manag.getEndDate() + " already exists");
+        for (Project proj : projects) {
+            if (proj.getName().equals(name)& proj.getNumber() == number & proj.getProjectManagement().getIdProjectManag() == managementId & 
+            		proj.getStartDate().equals(startDate)& proj.getEndDate().equals(endDate) & proj.getAcronym().equals(acronym) ) {
+                throw new Exception("Project: " + proj.getName()+ " with number: " + proj.getNumber() + " already exists");
             }
         }
 
-        ProjectManagement management = new ProjectManagement(foundEmployee, startDate, endDate);
-        managRepo.save(management);
-		
-		
+        Project project = new Project(name, number, foundManagement, startDate, endDate, acronym);
+        projRepo.save(project);
 	}
 
 	@Override
 	public void updateById(int id, String name, int number, int managementId, LocalDate startDate, LocalDate endDate,
 			String acronym) throws Exception {
-		// TODO Auto-generated method stub
+		Project project = retrieveById(id);
+    	if (project == null) throw new 
+    		Exception("Project with (id:" + id + ") does not exist");    	
+    	
+    	ProjectManagement manag = managRepo.findById(managementId)
+                .orElseThrow(() -> new Exception("Management not found"));
+    	
+        project.setName(name);
+        project.setNumber(number);
+        project.setProjectManagement(manag);
+        project.setStartDate(startDate);
+        project.setEndDate(endDate);
+        project.setAcronym(acronym);
+        projRepo.save(project);
 		
 	}
 
 	@Override
-	public ArrayList<Project> selectAllProjectsByNumber(int employeeId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Project> selectAllProjectsByNumber(int number) throws Exception {
+		ArrayList<Project> result = projRepo.findByNumber(number);
+		
+		if(result.isEmpty()) {
+			throw new Exception("Project with number: " + number + " does not exist");
+		}
+		
+		return result;
 	}
 
 	@Override
-	public ArrayList<ProjectManagement> selectAllProjectsByStartDate(LocalDate startDate) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Project> selectAllProjectsByStartDate(LocalDate startDate) throws Exception {
+		ArrayList<Project> result = projRepo.findByStartDate(startDate);
+		
+		if(result.isEmpty()) {
+			throw new Exception("Start date: " + startDate + " does not exist");
+		}
+		
+		return result;
 	}
 
 	@Override
-	public ArrayList<ProjectManagement> selectAllProjectsByEndDate(LocalDate endDate) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
+	public ArrayList<Project> selectAllProjectsByEndDate(LocalDate endDate) throws Exception {
+		ArrayList<Project> result = projRepo.findByEndDate(endDate);
+		
+		if(result.isEmpty()) {
+			throw new Exception("End date: " + endDate + " does not exist");
+		}
+		
+		return result;
 	}
 
 	

@@ -24,7 +24,7 @@ import lv.venta.virac.service.ICRUDProjManagService;
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDProjManagController {
 	
-	 private final ICRUDProjManagService projService;
+	 private ICRUDProjManagService projService;
 
 	    public CRUDProjManagController(ICRUDProjManagService projService) {
 	        this.projService = projService;
