@@ -27,6 +27,11 @@ const Navigation = () => {
             Project Management
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/project" style={styles.link}>
+            Project
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );

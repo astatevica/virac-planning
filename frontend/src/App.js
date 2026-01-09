@@ -5,6 +5,7 @@ import Navigation from "./components/Navigation";
 import DepartmentList from "./components/DepartmentList";
 import EmployeeList from "./components/EmployeeList";
 import ProjectManagementList from "./components/ProjectManagementList";
+import ProjectList from "./components/ProjectList";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/departments" element={<DepartmentList />} />
           <Route path="/employee" element={<EmployeeList />} />
           <Route path="/project-management" element={<ProjectManagementList />} />
+          <Route path="/project" element={<ProjectList />} />
         </Routes>
       </div>
     </BrowserRouter>

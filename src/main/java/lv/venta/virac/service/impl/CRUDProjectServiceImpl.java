@@ -26,7 +26,7 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
 		ArrayList<Project> projects = (ArrayList<Project>) projRepo.findAll();
 	       if (projects.isEmpty()) throw new Exception("There is no projects");
 
-	        return projects;
+	       return projects;
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
 			String acronym) throws Exception {
 		ArrayList<Project> projects = (ArrayList<Project>) projRepo.findAll();
         
-        if(name == null || number == 0  || managementId == 0 || startDate == null || endDate == null || acronym == null){
+        if(name == null || number == 0  || startDate == null || endDate == null || acronym == null){
 			throw new Exception("The input parameters are incorrect");
 		}
         

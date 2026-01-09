@@ -141,12 +141,14 @@ public class ViracPlaningIApplication {
 		        LocalDate ed2 = LocalDate.of(2025,11,13);
 				
 				ProjectManagement projMan1 = new ProjectManagement(emp1, sd1, ed1);
+				ProjectManagement projMan2 = new ProjectManagement(emp2, sd1, ed1);
 				
 				projMangRepo.save(projMan1);
+				projMangRepo.save(projMan2);
 				
 				//ProjectTable DONE
 				Project proj1 = new Project("Project 1", 54862, projMan1, sd1, ed1, "P1");
-				Project proj2 = new Project("Project 2", 43512, null, sd2, ed2, "P2");
+				Project proj2 = new Project("Project 2", 43512, projMan2, sd2, ed2, "P2");
 				
 				projRepo.saveAll(Arrays.asList(proj1,proj2));
 				
