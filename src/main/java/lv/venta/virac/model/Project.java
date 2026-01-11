@@ -32,7 +32,7 @@ import lombok.ToString;
 @Table(name = "projectTable")
 @ToString
 @Entity
-@SQLDelete(sql = "UPDATE projectTable SET deleted = true WHERE id=?")
+@SQLDelete(sql = "UPDATE project_table SET deleted = true WHERE id_project=?")
 @FilterDef(name = "deletedProjectFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedProjectFilter", condition = "deleted = :isDeleted")
 public class Project {

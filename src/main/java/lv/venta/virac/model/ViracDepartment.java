@@ -29,7 +29,7 @@ import lombok.ToString;
 @Table(name = "viracDepartmentTable")
 @ToString
 @Entity
-@SQLDelete(sql = "UPDATE viracDepartmentTable SET deleted = true WHERE id=?")
+@SQLDelete(sql = "UPDATE virac_department_table SET deleted = true WHERE id_department=?")
 @FilterDef(name = "deletedDepartmentFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedDepartmentFilter", condition = "deleted = :isDeleted")
 public class ViracDepartment {

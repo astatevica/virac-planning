@@ -52,10 +52,10 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
 
 	@Override
 	public void deleteById(int id) throws Exception {
-		Project projects = projRepo.findById(id).get();
-    	if (projects == null) throw new Exception("Project with id:"+ id +" does not exist");
-    	projects.setDeleted(true); // SOFT DELETE
-        projRepo.delete(projects);
+		Project project = projRepo.findById(id).get();
+    	if (project == null) throw new Exception("Project with id:"+ id +" does not exist");
+    	project.setDeleted(true); // SOFT DELETE
+    	projRepo.save(project);  // SAVE, NOT DELETE
 		
 	}
 

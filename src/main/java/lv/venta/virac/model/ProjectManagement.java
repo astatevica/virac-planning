@@ -29,7 +29,7 @@ import lombok.ToString;
 @Table(name = "projectManagementTable")
 @ToString
 @Entity
-@SQLDelete(sql = "UPDATE projectManagementTable SET deleted = true WHERE id=?")
+@SQLDelete(sql = "UPDATE project_management_table SET deleted = true WHERE id_project_manag=?")
 @FilterDef(name = "deletedManagementFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedManagementFilter", condition = "deleted = :isDeleted")
 public class ProjectManagement {

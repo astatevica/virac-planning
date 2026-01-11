@@ -78,7 +78,7 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
     	ViracDepartment department = depRepo.findById(id).get();
     	if (department == null) throw new Exception("Department with id:"+ id +" does not exist");
     	department.setDeleted(true); // SOFT DELETE
-        depRepo.delete(department);
+    	depRepo.save(department);  // SAVE, NOT DELETE
     }
 
 }
