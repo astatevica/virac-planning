@@ -4,24 +4,39 @@ import java.util.ArrayList;
 
 import javax.naming.NotContextException;
 
+import org.hibernate.Session;
+import org.hibernate.Filter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.repo.IViracDepartmentRepo;
 import lv.venta.virac.service.ICRUDViracDepService;
 
 @Service
-public class CRUDViracDepServiceImpl implements ICRUDViracDepService {
+public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
 
     @Autowired
     private IViracDepartmentRepo depRepo;
     
+    @PersistenceContext
+    private EntityManager entityManager;
+    
     @Override
-    public ArrayList<ViracDepartment> retrieveAll() throws NotContextException {
-       ArrayList<ViracDepartment> departmets = (ArrayList<ViracDepartment>) depRepo.findAll();
-       if (departmets.isEmpty()) throw new NotContextException("There is no department");
-
+    public ArrayList<ViracDepartment> retrieveAll(boolean isDeleted) throws NotContextException {
+//       ArrayList<ViracDepartment> departmets = (ArrayList<ViracDepartment>) depRepo.findAll();
+//       if (departmets.isEmpty()) throw new NotContextException("There is no department");
+//
+//        return departmets;
+        
+        Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
+        Filter filter = session.enableFilter("deletedDepartmentFilter");
+        filter.setParameter("isDeleted", isDeleted);
+        ArrayList<ViracDepartment> departmets = (ArrayList<ViracDepartment>) depRepo.findAll();
+        if (departmets.isEmpty()) throw new NotContextException("There is no department");
+        session.disableFilter("deletedDepartmentFilter");
         return departmets;
     }
     

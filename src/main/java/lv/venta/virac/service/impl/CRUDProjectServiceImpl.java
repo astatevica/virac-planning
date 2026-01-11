@@ -3,9 +3,13 @@ package lv.venta.virac.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectManagement;
 import lv.venta.virac.repo.IProjectManagementRepo;
@@ -20,13 +24,21 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
 	
 	@Autowired
 	private IProjectManagementRepo managRepo;
+
+	@PersistenceContext
+    private EntityManager entityManager;
 	
 	@Override
-	public ArrayList<Project> retrieveAll() throws Exception {
+	public ArrayList<Project> retrieveAll(boolean isDeleted) throws Exception {
+		
+		Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
+        Filter filter = session.enableFilter("deletedProjectFilter");
+        filter.setParameter("isDeleted", isDeleted);
 		ArrayList<Project> projects = (ArrayList<Project>) projRepo.findAll();
-	       if (projects.isEmpty()) throw new Exception("There is no projects");
+	    if (projects.isEmpty()) throw new Exception("There is no projects");
+	    session.disableFilter("deletedProjectFilter");
 
-	       return projects;
+	    return projects;
 	}
 
 	@Override

@@ -2,9 +2,13 @@ package lv.venta.virac.service.impl;
 
 import java.util.ArrayList;
 
+import org.hibernate.Filter;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.repo.IEmployeeRepo;
@@ -20,11 +24,18 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 	@Autowired
 	private IViracDepartmentRepo depRepo;
 	
+	@PersistenceContext
+    private EntityManager entityManager;
+	
 	@Override
-    public ArrayList<Employee> retrieveAll() throws Exception {
-       ArrayList<Employee> employees = (ArrayList<Employee>) emplRepo.findAll();
-       if (employees.isEmpty()) throw new Exception("There is no employee");
-
+    public ArrayList<Employee> retrieveAll(boolean isDeleted) throws Exception {
+        
+        Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
+        Filter filter = session.enableFilter("deletedEmployeeFilter");
+        filter.setParameter("isDeleted", isDeleted);
+        ArrayList<Employee> employees = (ArrayList<Employee>) emplRepo.findAll();
+        if (employees.isEmpty()) throw new Exception("There is no employee");
+        session.disableFilter("deletedEmployeeFilter");
         return employees;
     }
 
