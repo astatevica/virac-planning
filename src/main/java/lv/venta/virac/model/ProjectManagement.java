@@ -6,7 +6,6 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
@@ -31,8 +30,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @SQLDelete(sql = "UPDATE projectManagementTable SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false")
-@FilterDef(name = "deletedManagementFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+@FilterDef(name = "deletedManagementFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedManagementFilter", condition = "deleted = :isDeleted")
 public class ProjectManagement {
 	

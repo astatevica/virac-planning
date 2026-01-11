@@ -6,7 +6,6 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -31,8 +30,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @SQLDelete(sql = "UPDATE viracDepartmentTable SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false")
-@FilterDef(name = "deletedDepartmentFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+@FilterDef(name = "deletedDepartmentFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedDepartmentFilter", condition = "deleted = :isDeleted")
 public class ViracDepartment {
 

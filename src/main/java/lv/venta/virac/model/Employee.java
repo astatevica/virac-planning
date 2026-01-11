@@ -6,7 +6,6 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -34,8 +33,7 @@ import lombok.ToString;
 @ToString
 @Entity
 @SQLDelete(sql = "UPDATE employeeTable SET deleted = true WHERE id=?")
-@Where(clause = "deleted=false")
-@FilterDef(name = "deletedEmployeeFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+@FilterDef(name = "deletedEmployeeFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedEmployeeFilter", condition = "deleted = :isDeleted")
 public class Employee {
 	
