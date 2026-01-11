@@ -2,6 +2,9 @@ package lv.venta.virac.model;
 
 import java.util.Collection;
 
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -32,6 +35,8 @@ import lombok.ToString;
 @Entity
 @SQLDelete(sql = "UPDATE employeeTable SET deleted = true WHERE id=?")
 @Where(clause = "deleted=false")
+@FilterDef(name = "deletedEmployeeFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+@Filter(name = "deletedEmployeeFilter", condition = "deleted = :isDeleted")
 public class Employee {
 	
 	@Id
