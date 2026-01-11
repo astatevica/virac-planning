@@ -1,5 +1,10 @@
 package lv.venta.virac.model;
 
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +25,9 @@ import lombok.ToString;
 @Table(name = "projectPlanTable")
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE project_plan_table SET deleted = true WHERE id_project_plan=?")
+@FilterDef(name = "deletedProjectPlanFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "deletedProjectPlanFilter", condition = "deleted = :isDeleted")
 public class ProjectPlan {
 	
 	@Id
@@ -45,6 +53,9 @@ public class ProjectPlan {
 	//@NotNull
 	//@Size(max = 200, min = 2)
 	private String workDone;
+	
+	@Column(name = "deleted")
+	private boolean deleted = Boolean.FALSE;
 	
 	public ProjectPlan(Plan plan, Project project, String tasks, String workDone) {
 		setPlan(plan);
