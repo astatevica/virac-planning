@@ -29,11 +29,11 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
     private EntityManager entityManager;
 	
 	@Override
-	public ArrayList<ProjectManagement> retrieveAll(boolean isDeleted) throws Exception {
+	public ArrayList<ProjectManagement> retrieveAll() throws Exception {
 		
 		Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
         Filter filter = session.enableFilter("deletedManagementFilter");
-        filter.setParameter("isDeleted", isDeleted);
+        filter.setParameter("isDeleted", false);
 		ArrayList<ProjectManagement> projectManag = (ArrayList<ProjectManagement>) managRepo.findAll();
 	    if (projectManag.isEmpty()) throw new Exception("There is no project management");
 	    session.disableFilter("deletedManagementFilter");
@@ -54,6 +54,7 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
 	public void deleteById(int id) throws Exception {
 		ProjectManagement management = managRepo.findById(id).get();
     	if (management == null) throw new Exception("Management with id:"+ id +" does not exist");
+    	managRepo.setDeleted(true); // SOFT DELETE
         managRepo.delete(management);
 		
 	}

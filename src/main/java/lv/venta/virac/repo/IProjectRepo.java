@@ -9,9 +9,12 @@ import lv.venta.virac.model.Project;
 
 public interface IProjectRepo extends CrudRepository<Project, Integer>{
 
-	ArrayList<Project> findByNumber(int number);
+	public abstract ArrayList<Project> findByNumber(int number);
 	
-	ArrayList<Project> findByStartDate(LocalDate startDate);
+	public abstract ArrayList<Project> findByStartDate(LocalDate startDate);
 	
-	ArrayList<Project> findByEndDate(LocalDate endDate);
+	public abstract ArrayList<Project> findByEndDate(LocalDate endDate);
+
+	//TODO: needs to be checked
+	public abstract void setDeleted(boolean deleted);
 }

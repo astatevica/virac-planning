@@ -29,11 +29,11 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
     private EntityManager entityManager;
 	
 	@Override
-	public ArrayList<Project> retrieveAll(boolean isDeleted) throws Exception {
+	public ArrayList<Project> retrieveAll() throws Exception {
 		
 		Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
         Filter filter = session.enableFilter("deletedProjectFilter");
-        filter.setParameter("isDeleted", isDeleted);
+        filter.setParameter("isDeleted", false);
 		ArrayList<Project> projects = (ArrayList<Project>) projRepo.findAll();
 	    if (projects.isEmpty()) throw new Exception("There is no projects");
 	    session.disableFilter("deletedProjectFilter");

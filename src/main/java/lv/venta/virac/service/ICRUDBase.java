@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public interface ICRUDBase <Ttype>{
 
 		//R - retrieve all
-		public abstract ArrayList<Ttype> retrieveAll(boolean isDeleted) throws Exception;
+		public abstract ArrayList<Ttype> retrieveAll() throws Exception;
 		
 		//R - retrieve by id
 		public abstract Ttype retrieveById(int id) throws Exception;

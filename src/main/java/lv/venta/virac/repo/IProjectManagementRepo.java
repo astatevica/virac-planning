@@ -14,4 +14,7 @@ public interface IProjectManagementRepo extends CrudRepository<ProjectManagement
 	public abstract ArrayList<ProjectManagement> findByStartDate(LocalDate startDate);
 	
 	public abstract ArrayList<ProjectManagement> findByEndDate(LocalDate endDate);
+
+	//TODO: needs to be checked
+	public abstract void setDeleted(boolean deleted);
 }

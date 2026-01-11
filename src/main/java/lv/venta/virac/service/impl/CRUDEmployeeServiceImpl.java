@@ -28,11 +28,11 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
     private EntityManager entityManager;
 	
 	@Override
-    public ArrayList<Employee> retrieveAll(boolean isDeleted) throws Exception {
+    public ArrayList<Employee> retrieveAll() throws Exception {
         
         Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
         Filter filter = session.enableFilter("deletedEmployeeFilter");
-        filter.setParameter("isDeleted", isDeleted);
+        filter.setParameter("isDeleted", false);
         ArrayList<Employee> employees = (ArrayList<Employee>) emplRepo.findAll();
         if (employees.isEmpty()) throw new Exception("There is no employee");
         session.disableFilter("deletedEmployeeFilter");
