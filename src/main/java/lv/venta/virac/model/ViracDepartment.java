@@ -2,6 +2,9 @@ package lv.venta.virac.model;
 
 import java.util.Collection;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -24,6 +27,8 @@ import lombok.ToString;
 @Table(name = "viracDepartmentTable")
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE viracDepartmentTable SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class ViracDepartment {
 
 	@Id
@@ -42,6 +47,9 @@ public class ViracDepartment {
 	@ToString.Exclude
 	@JsonIgnore
 	private Collection<Employee> employee;
+	
+	@Column(name = "deleted")
+	private boolean deleted = Boolean.FALSE;
 	
 	public ViracDepartment(String name){
 		setName(name);

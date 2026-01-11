@@ -2,6 +2,9 @@ package lv.venta.virac.model;
 
 import java.util.Collection;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +30,8 @@ import lombok.ToString;
 @Table(name = "employeeTable")
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE employeeTable SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class Employee {
 	
 	@Id
@@ -62,6 +67,9 @@ public class Employee {
 	@OneToMany(mappedBy = "employee", cascade = CascadeType.REMOVE)
 	@ToString.Exclude
 	private Collection<Plan> plan;
+
+	@Column(name = "deleted")
+	private boolean deleted = Boolean.FALSE;
 	
 	public Employee(String name, String surname,ViracDepartment viracDepartment, String position) {
 		setName(name);

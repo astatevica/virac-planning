@@ -3,6 +3,8 @@ package lv.venta.virac.model;
 import java.time.LocalDate;
 import java.util.Collection;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.Column;
@@ -28,6 +30,8 @@ import lombok.ToString;
 @Table(name = "projectTable")
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE projectTable SET deleted = true WHERE id=?")
+@Where(clause = "deleted=false")
 public class Project {
 
 	@Id
@@ -49,7 +53,6 @@ public class Project {
 	@JoinColumn(name = "idProjectManag")
 	private ProjectManagement projectManagement;
 	
-	//TODO:Formatējums jāizlabo, nestrādā
 	@NotNull
 	@Column(name = "startDate")
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -68,6 +71,9 @@ public class Project {
 	@OneToMany(mappedBy = "project")
 	@ToString.Exclude
 	private Collection<ProjectPlan> projectPlan;
+	
+	@Column(name = "deleted")
+	private boolean deleted = Boolean.FALSE;
 	
 	public Project(String name, int number, ProjectManagement projectManagement, LocalDate startDate, LocalDate endDate, String acronym){
 		setName(name);
