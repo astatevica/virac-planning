@@ -54,7 +54,7 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
 	public void deleteById(int id) throws Exception {
 		Project projects = projRepo.findById(id).get();
     	if (projects == null) throw new Exception("Project with id:"+ id +" does not exist");
-    	projRepo.setDeleted(true); // SOFT DELETE
+    	projects.setDeleted(true); // SOFT DELETE
         projRepo.delete(projects);
 		
 	}

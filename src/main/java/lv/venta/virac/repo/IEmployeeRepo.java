@@ -10,6 +10,4 @@ public interface IEmployeeRepo extends CrudRepository<Employee, Integer>{
 
 	public abstract ArrayList<Employee> findByViracDepartment_IdDepartment(int departmentId);
 
-	//TODO: needs to be checked
-	public abstract void setDeleted(boolean deleted);
 }

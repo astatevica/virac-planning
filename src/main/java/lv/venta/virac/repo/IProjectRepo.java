@@ -14,7 +14,4 @@ public interface IProjectRepo extends CrudRepository<Project, Integer>{
 	public abstract ArrayList<Project> findByStartDate(LocalDate startDate);
 	
 	public abstract ArrayList<Project> findByEndDate(LocalDate endDate);
-
-	//TODO: needs to be checked
-	public abstract void setDeleted(boolean deleted);
 }

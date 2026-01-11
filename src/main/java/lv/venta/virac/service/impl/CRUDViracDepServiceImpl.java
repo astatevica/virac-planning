@@ -26,10 +26,6 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
     
     @Override
     public ArrayList<ViracDepartment> retrieveAll() throws NotContextException {
-//       ArrayList<ViracDepartment> departmets = (ArrayList<ViracDepartment>) depRepo.findAll();
-//       if (departmets.isEmpty()) throw new NotContextException("There is no department");
-//
-//        return departmets;
         
         Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
         Filter filter = session.enableFilter("deletedDepartmentFilter");
@@ -81,7 +77,7 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
     public void deleteById(int id) throws Exception {
     	ViracDepartment department = depRepo.findById(id).get();
     	if (department == null) throw new Exception("Department with id:"+ id +" does not exist");
-    	depRepo.setDeleted(true); // SOFT DELETE
+    	department.setDeleted(true); // SOFT DELETE
         depRepo.delete(department);
     }
 

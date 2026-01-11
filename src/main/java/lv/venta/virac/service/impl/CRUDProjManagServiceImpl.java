@@ -54,7 +54,7 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
 	public void deleteById(int id) throws Exception {
 		ProjectManagement management = managRepo.findById(id).get();
     	if (management == null) throw new Exception("Management with id:"+ id +" does not exist");
-    	managRepo.setDeleted(true); // SOFT DELETE
+    	management.setDeleted(true); // SOFT DELETE
         managRepo.delete(management);
 		
 	}

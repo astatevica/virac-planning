@@ -96,7 +96,7 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
     public void deleteById(int id) throws Exception {
     	Employee employee = emplRepo.findById(id).get();
     	if (employee == null) throw new Exception("Employee with id:"+ id +" does not exist");
-    	emplRepo.setDeleted(true); // SOFT DELETE
+    	employee.setDeleted(true); // SOFT DELETE
         emplRepo.delete(employee);
     }
     
