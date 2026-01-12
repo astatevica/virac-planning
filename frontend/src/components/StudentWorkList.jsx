@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import StudentWorkService from "../services/StudentWorkService";
-import { data } from "react-router-dom";
 
 const StudentWorkList = () => {
 
@@ -97,7 +96,6 @@ const StudentWorkList = () => {
       loadAll();
       return;
     }
-    console.log(data);
 
     StudentWorkService.getByDegree(filterDegree)
       .then(res => setStudentWorks(res.data))
@@ -141,10 +139,10 @@ const StudentWorkList = () => {
 
         <select value={degree} onChange={e => setDegree(e.target.value)}>
           <option value="">Select degrees</option>
-          <option value="bakalaurs">BAKALAURS</option>
-          <option value="magistrs">MAĢISTRS</option>
-          <option value="doktors">DOKTORS</option>
-          <option value="pirma_cikla">PIRMĀ CIKLA</option>
+          <option value="bakalaurs">Bakalaurs</option>
+          <option value="magistrs">Maģistrs</option>
+          <option value="doktors">Doktors</option>
+          <option value="pirma_cikla">Pirmā cikla</option>
           <option value="cits">Cits</option>
         </select>
 
@@ -162,10 +160,10 @@ const StudentWorkList = () => {
       <div style={{ marginBottom: "15px" }}>
         <select value={filterDegree} onChange={e => setFilterDegree(e.target.value)}>
           <option value="">All degrees</option>
-          <option value="bakalaurs">BAKALAURS</option>
-          <option value="magistrs">MAĢISTRS</option>
-          <option value="doktors">DOKTORS</option>
-          <option value="pirma_cikla">PIRMĀ CIKLA</option>
+          <option value="bakalaurs">Bakalaurs</option>
+          <option value="magistrs">Maģistrs</option>
+          <option value="doktors">Doktors</option>
+          <option value="pirma_cikla">Pirmā cikla</option>
           <option value="cits">Cits</option>
         </select>
         <button onClick={filterByDegree}>Filter by degree</button>

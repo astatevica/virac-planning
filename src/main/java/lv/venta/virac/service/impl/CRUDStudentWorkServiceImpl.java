@@ -107,7 +107,7 @@ public class CRUDStudentWorkServiceImpl implements ICRUDStudentWorkService{
 
 	    Degree degreeFound;
 	    try {
-	        degreeFound = Degree.valueOf(degree.trim().toUpperCase());
+	        degreeFound = Degree.valueOf(degree.trim().toLowerCase());
 	    } catch (IllegalArgumentException e) {
 	        throw new Exception("Invalid degree: " + degree);
 	    }
