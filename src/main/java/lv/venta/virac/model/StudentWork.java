@@ -2,6 +2,11 @@ package lv.venta.virac.model;
 
 import java.util.Collection;
 
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +28,9 @@ import lv.venta.virac.model.enums.Degree;
 @Table(name = "studentWorkTable")
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE student_work_table SET deleted = true WHERE id_stud_work=?")
+@FilterDef(name = "deletedStudentWorkFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "deletedStudentWorkFilter", condition = "deleted = :isDeleted")
 public class StudentWork {
 	@Id
 	@Column(name = "idStudWork")
@@ -54,6 +62,9 @@ public class StudentWork {
 	@OneToMany(mappedBy = "studentWork")
 	@ToString.Exclude
 	private Collection<WorkPlan> workPlan;
+	
+	@Column(name = "deleted")
+	private boolean deleted = Boolean.FALSE;
 	
 	public StudentWork(String name, String studentName, String studentSurname, Degree degree) {
 		setName(name);
