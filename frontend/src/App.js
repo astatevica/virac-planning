@@ -6,7 +6,7 @@ import DepartmentList from "./components/DepartmentList";
 import EmployeeList from "./components/EmployeeList";
 import ProjectManagementList from "./components/ProjectManagementList";
 import ProjectList from "./components/ProjectList";
-import ProjectPlanList from "./components/ProjectPlanList";
+import StudentWorkList from "./components/StudentWorkList";
 
 function App() {
   return (
@@ -20,7 +20,8 @@ function App() {
           <Route path="/employee" element={<EmployeeList />} />
           <Route path="/project-management" element={<ProjectManagementList />} />
           <Route path="/project" element={<ProjectList />} />
-          <Route path="/project-plan" element={<ProjectPlanList />} />
+          {/* <Route path="/project-plan" element={<ProjectPlanList />} /> */}
+          <Route path="/student-work" element={<StudentWorkList />} />
         </Routes>
       </div>
     </BrowserRouter>

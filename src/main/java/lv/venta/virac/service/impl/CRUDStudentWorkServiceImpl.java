@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -13,6 +14,7 @@ import lv.venta.virac.model.enums.Degree;
 import lv.venta.virac.repo.IStudentWorkRepo;
 import lv.venta.virac.service.ICRUDStudentWorkService;
 
+@Service
 public class CRUDStudentWorkServiceImpl implements ICRUDStudentWorkService{
 
 	@Autowired
@@ -99,15 +101,24 @@ public class CRUDStudentWorkServiceImpl implements ICRUDStudentWorkService{
 
 	@Override
 	public ArrayList<StudentWork> selectAllStudentWorkByDegree(String degree) throws Exception {
-		Degree degreeFound = Degree.valueOf(degree);
-		int number = degreeFound.hashCode();
-		ArrayList<StudentWork> result = studWorkRepo.findByDegree(number);
-		
-		if(result.isEmpty()) {
-			throw new Exception("Student wor with degree: " + degree + " does not exist");
-		}
-		
-		return result;
+		if (degree == null || degree.isBlank()) {
+	        throw new Exception("Degree must not be empty");
+	    }
+
+	    Degree degreeFound;
+	    try {
+	        degreeFound = Degree.valueOf(degree.trim().toUpperCase());
+	    } catch (IllegalArgumentException e) {
+	        throw new Exception("Invalid degree: " + degree);
+	    }
+
+	    ArrayList<StudentWork> result = studWorkRepo.findByDegree(degreeFound);
+
+	    if (result.isEmpty()) {
+	        throw new Exception("Student work with degree: " + degree + " does not exist");
+	    }
+
+	    return result;
 		
 	}
 	
