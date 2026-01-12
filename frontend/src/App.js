@@ -7,6 +7,7 @@ import EmployeeList from "./components/EmployeeList";
 import ProjectManagementList from "./components/ProjectManagementList";
 import ProjectList from "./components/ProjectList";
 import StudentWorkList from "./components/StudentWorkList";
+import JournalList from "./components/JournalList";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           {/* <Route path="/project-plan" element={<ProjectPlanList />} /> */}
           <Route path="/student-work" element={<StudentWorkList />} />
           {/* <Route path="/work-plan" element={<WorkPlanList />} /> */}
+          <Route path="/journal" element={<JournalList />} />
         </Routes>
       </div>
     </BrowserRouter>

@@ -47,6 +47,11 @@ const Navigation = () => {
             Work Plan
           </NavLink>
         </li> */}
+        <li>
+          <NavLink to="/journal" style={styles.link}>
+            Journal
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );
