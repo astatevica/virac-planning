@@ -2,6 +2,11 @@ package lv.venta.virac.model;
 
 import java.util.Collection;
 
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +27,9 @@ import lombok.ToString;
 @Table(name = "journalTable")
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE journal_table SET deleted = true WHERE id_journal=?")
+@FilterDef(name = "deletedJournalFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "deletedJournalFilter", condition = "deleted = :isDeleted")
 public class Journal {
 	
 	@Id
@@ -37,6 +45,9 @@ public class Journal {
 	@OneToMany(mappedBy = "journal")
 	@ToString.Exclude
 	private Collection<ScientificArticles>  scientificArticles;
+	
+	@Column(name = "deleted")
+	private boolean deleted = Boolean.FALSE;
 	
 	public Journal(String name) {
 		setName(name);
