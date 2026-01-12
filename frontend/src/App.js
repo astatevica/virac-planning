@@ -22,6 +22,7 @@ function App() {
           <Route path="/project" element={<ProjectList />} />
           {/* <Route path="/project-plan" element={<ProjectPlanList />} /> */}
           <Route path="/student-work" element={<StudentWorkList />} />
+          {/* <Route path="/work-plan" element={<WorkPlanList />} /> */}
         </Routes>
       </div>
     </BrowserRouter>

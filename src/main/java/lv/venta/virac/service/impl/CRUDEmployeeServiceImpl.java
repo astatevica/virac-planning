@@ -30,7 +30,7 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 	@Override
     public ArrayList<Employee> retrieveAll() throws Exception {
         
-        Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
+        Session session = entityManager.unwrap(Session.class);
         Filter filter = session.enableFilter("deletedEmployeeFilter");
         filter.setParameter("isDeleted", false);
         ArrayList<Employee> employees = (ArrayList<Employee>) emplRepo.findAll();
