@@ -98,7 +98,7 @@ public class CRUDScientificArticlesImpl implements ICRUDScientificArticlesServic
 		
 	}
 
-	//TODO: iespējams var uzlabot, lai kaut vai kaut kas atbilstu un tad atgireztu rezultātu
+	//TODO: iespējams var uzlabot, lai kaut vai kaut kas atbilstu un tad atgireztu rezultātu, Ieraksta kaut vai tikai viena autora vārdu uzvārdu
 	@Override
 	public ArrayList<ScientificArticles> selectAllScientificArticlesByCoauthor(String coAuthors) throws Exception {
 		ArrayList<ScientificArticles> result = scArtRepo.findByCoAuthors(coAuthors);
