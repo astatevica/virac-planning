@@ -52,6 +52,11 @@ const Navigation = () => {
             Journal
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/scientific-articles" style={styles.link}>
+            Scientific Articles
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );

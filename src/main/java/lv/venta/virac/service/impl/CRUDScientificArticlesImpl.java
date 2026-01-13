@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -14,6 +15,7 @@ import lv.venta.virac.repo.IJournalRepo;
 import lv.venta.virac.repo.IScientificArticlesRepo;
 import lv.venta.virac.service.ICRUDScientificArticlesService;
 
+@Service
 public class CRUDScientificArticlesImpl implements ICRUDScientificArticlesService{
 	
 	@Autowired
@@ -99,7 +101,7 @@ public class CRUDScientificArticlesImpl implements ICRUDScientificArticlesServic
 	//TODO: iespējams var uzlabot, lai kaut vai kaut kas atbilstu un tad atgireztu rezultātu
 	@Override
 	public ArrayList<ScientificArticles> selectAllScientificArticlesByCoauthor(String coAuthors) throws Exception {
-		ArrayList<ScientificArticles> result = scArtRepo.findBy_CoAuthors(coAuthors);
+		ArrayList<ScientificArticles> result = scArtRepo.findByCoAuthors(coAuthors);
 		if(result.isEmpty()) {
 			throw new Exception("Scientific articles with CoAuthors: " + coAuthors + " does not exist");
 		}
