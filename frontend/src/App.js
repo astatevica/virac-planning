@@ -27,6 +27,7 @@ function App() {
           {/* <Route path="/work-plan" element={<WorkPlanList />} /> */}
           <Route path="/journal" element={<JournalList />} />
           <Route path="/scientific-articles" element={<ScientificArticlesList />} />
+          {/* <Route path="/article-plan" element={<ArticlePlanList />} /> */}
         </Routes>
       </div>
     </BrowserRouter>

@@ -57,6 +57,11 @@ const Navigation = () => {
             Scientific Articles
           </NavLink>
         </li>
+        {/* <li>
+          <NavLink to="/article-plan" style={styles.link}>
+            Article Plan
+          </NavLink>
+        </li> */}
       </ul>
     </nav>
   );
