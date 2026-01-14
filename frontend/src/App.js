@@ -30,6 +30,7 @@ function App() {
           <Route path="/scientific-articles" element={<ScientificArticlesList />} />
           {/* <Route path="/article-plan" element={<ArticlePlanList />} /> */}
           <Route path="/course" element={<CourseList />} />
+          {/* <Route path="/course-plan" element={<CoursePlanList />} /> */}
         </Routes>
       </div>
     </BrowserRouter>
