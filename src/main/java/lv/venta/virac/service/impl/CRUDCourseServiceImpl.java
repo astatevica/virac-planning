@@ -60,7 +60,7 @@ public class CRUDCourseServiceImpl implements ICRUDCourseService{
 		}
         
         for (Course co : courses) {
-            if (co.getName().equals(name) & co.getEctsCredits()==ectsCredits & co.getSemester().equals(semester) & co.getFaculty().equals(faculty)) {
+            if (co.getName().equals(name) & co.getEctsCredits()==ectsCredits & co.getSemester().equals(semester) & co.getFaculty().equals(faculty) & co.isDeleted( )== false) {
                 throw new Exception("Course: " + co.getName() + " already exists");
             }
         }

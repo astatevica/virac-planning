@@ -69,7 +69,7 @@ public class CRUDStudentWorkServiceImpl implements ICRUDStudentWorkService{
         
         for (StudentWork sw : studentWork) {
             if (sw.getName().equals(name)& sw.getStudentName().equals(studentName) & sw.getStudentSurname().equals(studentSurname) & 
-            		sw.getDegree().equals(degreeFound) ) {
+            		sw.getDegree().equals(degreeFound) & sw.isDeleted( )== false ) {
                 throw new Exception("Student work: " + sw.getName()+ " | " + sw.getStudentName() + " " + sw.getStudentSurname() + " already exists");
             }
         }

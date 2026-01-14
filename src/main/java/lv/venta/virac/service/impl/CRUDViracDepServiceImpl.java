@@ -53,7 +53,7 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
         ArrayList<ViracDepartment> departmets = (ArrayList<ViracDepartment>) depRepo.findAll();
         
         for (ViracDepartment dep : departmets) {
-            if (dep.getName().equals(name)) {
+            if (dep.getName().equals(name) & dep.isDeleted( )== false) {
                 throw new Exception("Department with title: " + dep.getName() + " already exists");
             }
         }

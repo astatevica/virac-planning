@@ -2,6 +2,11 @@ package lv.venta.virac.model;
 
 import java.util.Collection;
 
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.SQLDelete;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +27,9 @@ import lombok.ToString;
 @Table(name = "yearTable")
 @ToString
 @Entity
+@SQLDelete(sql = "UPDATE year_table SET deleted = true WHERE id_year=?")
+@FilterDef(name = "deletedYearFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "deletedYearFilter", condition = "deleted = :isDeleted")
 public class Year {
 	
 	@Id
@@ -38,6 +46,9 @@ public class Year {
 	@OneToMany(mappedBy = "year")
 	@ToString.Exclude
 	private Collection<Plan> plan;
+	
+	@Column(name = "deleted")
+	private boolean deleted = Boolean.FALSE;
 	
 	public Year(Integer yearNumber) {
 		setYearNumber(yearNumber);

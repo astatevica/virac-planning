@@ -79,7 +79,7 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
         }
         
         for (CoursePlan cp : coursePlans) {
-            if (cp.getPlan().getIdPlan() == idPlan & cp.getCourse().getIdCourse() == idCourse) {
+            if (cp.getPlan().getIdPlan() == idPlan & cp.getCourse().getIdCourse() == idCourse & cp.isDeleted( )== false) {
                 throw new Exception("Course-plan with paln id: " + cp.getPlan().getIdPlan() + " and course id: " 
             + cp.getCourse().getIdCourse() + " already exists");
             }

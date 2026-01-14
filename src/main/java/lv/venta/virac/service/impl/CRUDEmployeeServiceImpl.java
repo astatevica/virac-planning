@@ -63,7 +63,7 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
         }
         
         for (Employee emp : employees) {
-            if (emp.getName().equals(name) & emp.getSurname().equals(surname)) {
+            if (emp.getName().equals(name) & emp.getSurname().equals(surname) & emp.isDeleted( )== false) {
                 throw new Exception("Employee: " + emp.getName()+ emp.getSurname() + " already exists");
             }
         }

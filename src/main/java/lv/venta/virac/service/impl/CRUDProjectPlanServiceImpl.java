@@ -80,7 +80,7 @@ public class CRUDProjectPlanServiceImpl implements ICRUDProjectPlanService{
         
         for (ProjectPlan projPlan : projectPlans) {
             if (projPlan.getPlan().getIdPlan() == idPlan && projPlan.getProject().getIdProject() == idProject &&
-            		projPlan.getTasks().equals(tasks) && projPlan.getWorkDone().equals(workDone)) {
+            		projPlan.getTasks().equals(tasks) && projPlan.getWorkDone().equals(workDone) && projPlan.isDeleted( )== false) {
                 throw new Exception("Project-Plan with PLAN_ID: " + projPlan.getPlan().getIdPlan() + " and PROJECT_ID: " 
             		+ projPlan.getProject().getIdProject() + " already exists");
             }

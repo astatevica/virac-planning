@@ -80,7 +80,7 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
         }
         
         for (ArticlePlan art : artPlan) {
-            if (art.getPlan().getIdPlan() == idPlan & art.getScientificArticles().getIdArticle() == idScientificArticles) {
+            if (art.getPlan().getIdPlan() == idPlan & art.getScientificArticles().getIdArticle() == idScientificArticles & art.isDeleted( )== false) {
                 throw new Exception("Scientific article-plan with paln id: " + art.getPlan().getIdPlan() + " and artticle id: " 
             + art.getScientificArticles().getIdArticle() + " already exists");
             }

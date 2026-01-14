@@ -70,7 +70,7 @@ public class CRUDScientificArticlesImpl implements ICRUDScientificArticlesServic
         }
         
         for (ScientificArticles art : articles) {
-            if (art.getName().equals(name) & art.getCoAuthors().equals(coAuthors) & art.getJournal().getIdJournal()==idJournal) {
+            if (art.getName().equals(name) & art.getCoAuthors().equals(coAuthors) & art.getJournal().getIdJournal()==idJournal & art.isDeleted( )== false) {
                 throw new Exception("Scientific article: " + art.getName() + " already exists");
             }
         }

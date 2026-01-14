@@ -72,6 +72,11 @@ const Navigation = () => {
             Course Plan
           </NavLink>
         </li> */}
+        <li>
+          <NavLink to="/year" style={styles.link}>
+            Year
+          </NavLink>
+        </li>
       </ul>
     </nav>
   );

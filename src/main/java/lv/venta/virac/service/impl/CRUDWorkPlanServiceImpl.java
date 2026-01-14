@@ -80,7 +80,7 @@ public class CRUDWorkPlanServiceImpl implements ICRUDWorkPlanService{
         
         for (WorkPlan wp : workPlans) {
             if (wp.getStudentWork().getIdStudWork()==idStudentWork & wp.getPlan().getIdPlan()==0 &
-            		wp.getWorkDone().equals(workDone)) {
+            		wp.getWorkDone().equals(workDone) & wp.isDeleted( )== false) {
                 throw new Exception("Work-Plan with ID: " + wp.getIdWorkPlan() + " already exists");
             }
         }

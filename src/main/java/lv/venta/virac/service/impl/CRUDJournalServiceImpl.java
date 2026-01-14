@@ -60,7 +60,7 @@ public class CRUDJournalServiceImpl implements ICRUDJournalService{
 		}
         
         for (Journal jour : journals) {
-            if (jour.getName().equals(name)) {
+            if (jour.getName().equals(name) & jour.isDeleted( )== false) {
                 throw new Exception("Journal: " + jour.getName() + " already exists");
             }
         }

@@ -73,7 +73,7 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
         
         for (Project proj : projects) {
             if (proj.getName().equals(name)& proj.getNumber() == number & proj.getProjectManagement().getIdProjectManag() == managementId & 
-            		proj.getStartDate().equals(startDate)& proj.getEndDate().equals(endDate) & proj.getAcronym().equals(acronym) ) {
+            		proj.getStartDate().equals(startDate)& proj.getEndDate().equals(endDate) & proj.getAcronym().equals(acronym) & proj.isDeleted( )== false ) {
                 throw new Exception("Project: " + proj.getName()+ " with number: " + proj.getNumber() + " already exists");
             }
         }
