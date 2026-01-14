@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import lv.venta.virac.dto.ArticlePlanDTO;
 import lv.venta.virac.dto.CourseDTO;
-import lv.venta.virac.model.ArticlePlan;
 import lv.venta.virac.model.Course;
 import lv.venta.virac.service.ICRUDCourseService;
 
@@ -61,7 +59,7 @@ public class CRUDCourseController {
         Course co = courseService.retrieveById(id);
         System.out.println(co);
         return ResponseEntity.ok(
-            new new CourseDTO(
+            new CourseDTO(
 	            	co.getIdCourse(),
 	            	co.getName(),
 	            	co.getEctsCredits(),

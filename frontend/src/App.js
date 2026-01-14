@@ -9,6 +9,7 @@ import ProjectList from "./components/ProjectList";
 import StudentWorkList from "./components/StudentWorkList";
 import JournalList from "./components/JournalList";
 import ScientificArticlesList from "./components/ScientificArticlesList";
+import CourseList from "./components/CourseList";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/journal" element={<JournalList />} />
           <Route path="/scientific-articles" element={<ScientificArticlesList />} />
           {/* <Route path="/article-plan" element={<ArticlePlanList />} /> */}
+          <Route path="/course" element={<CourseList />} />
         </Routes>
       </div>
     </BrowserRouter>
