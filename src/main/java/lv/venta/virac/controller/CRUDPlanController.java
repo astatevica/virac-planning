@@ -115,7 +115,7 @@ public class CRUDPlanController {
         return ResponseEntity.noContent().build();
     }
     
-    @GetMapping("/filter/{idEmployee}")
+    @GetMapping("/filter/employee/{idEmployee}")
     public ResponseEntity<ArrayList<PlanDTO>> selectAllPlansByEmployee(
             @PathVariable("idEmployee") int idEmployee) throws Exception {
 
@@ -138,7 +138,7 @@ public class CRUDPlanController {
         return ResponseEntity.ok(response);
     }
     
-    @GetMapping("/filter/{idYear}")
+    @GetMapping("/filter/year/{idYear}")
     public ResponseEntity<ArrayList<PlanDTO>> selectAllPlansByYear(
             @PathVariable("idYear") int idYear) throws Exception {
 
@@ -161,7 +161,7 @@ public class CRUDPlanController {
         return ResponseEntity.ok(response);
     }
     
-    @GetMapping("/filter/{department}")
+    @GetMapping("/filter/department/{department}")
     public ResponseEntity<ArrayList<PlanDTO>> selectAllPlansByDepartment(
             @PathVariable("department") String department) throws Exception {
 

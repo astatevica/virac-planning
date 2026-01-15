@@ -1,0 +1,153 @@
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+const API = "http://localhost:8080/api";
+
+export default function PlanForm() {
+  const [employees, setEmployees] = useState([]);
+  const [years, setYears] = useState([]);
+
+  const [plan, setPlan] = useState({
+    idEmployee: "",
+    idYear: "",
+
+    numOfProjects: 0,
+    numOfArticles: 0,
+    numOfCourses: 0,
+    numOfStudWork: 0,
+
+    partInConf: "",
+    partInConfEnd: "",
+
+    comAbConf: "",
+    comAbConfEnd: "",
+
+    promoOfResearch: "",
+    promoOfResearchEnd: "",
+
+    adminWork: "",
+    adminWorkEnd: "",
+
+    projApplicSub: "",
+    projApplicSubEnd: "",
+
+    skillsDevelopment: "",
+    skillsDevelopmentEnd: "",
+
+    participationInSeminars: "",
+    participationInSeminarsEnd: "",
+
+    otherJobs: "",
+    otherJobsEnd: ""
+  });
+
+  useEffect(() => {
+    axios.get(`${API}/employee`).then(res => setEmployees(res.data));
+    axios.get(`${API}/year`).then(res => setYears(res.data));
+  }, []);
+
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setPlan(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    axios.post(`${API}/plan`, plan)
+      .then(() => alert("Plan saved successfully"))
+      .catch(err => alert(err.response?.data?.message || "Error saving plan"));
+  };
+
+  const NumberField = ({ label, name }) => (
+    <div style={{ marginBottom: 10 }}>
+      <label>{label}</label><br />
+      <input type="number" name={name} value={plan[name]} onChange={handleChange} />
+    </div>
+  );
+
+  const TextPair = ({ label, planned, completed }) => (
+    <tr>
+      <td><strong>{label}</strong></td>
+      <td>
+        <textarea
+          name={planned}
+          value={plan[planned]}
+          onChange={handleChange}
+          rows={3}
+          placeholder="Planned at beginning of year"
+        />
+      </td>
+      <td>
+        <textarea
+          name={completed}
+          value={plan[completed]}
+          onChange={handleChange}
+          rows={3}
+          placeholder="Completed by end of year"
+        />
+      </td>
+    </tr>
+  );
+
+  return (
+    <form onSubmit={handleSubmit} style={{ maxWidth: 1100, margin: "auto" }}>
+      <h2>Annual Employee Plan</h2>
+
+      <label>Employee</label><br />
+      <select name="idEmployee" value={plan.idEmployee} onChange={handleChange} required>
+        <option value="">-- Select Employee --</option>
+        {employees.map(e => (
+          <option key={e.idEmployee} value={e.idEmployee}>
+            {e.name} {e.surname}
+          </option>
+        ))}
+      </select>
+
+      <br /><br />
+
+      <label>Year</label><br />
+      <select name="idYear" value={plan.idYear} onChange={handleChange}>
+        <option value="">Select year</option>
+        {years.map(y => (
+          <option key={y.idYear} value={y.idYear}>
+            {y.yearNumber}
+          </option>
+        ))}
+      </select>
+
+      <hr />
+
+      <h3>Quantitative Indicators</h3>
+      <NumberField label="Number of Research Projects" name="numOfProjects" />
+      <NumberField label="Number of Scientific Articles" name="numOfArticles" />
+      <NumberField label="Courses Taught" name="numOfCourses" />
+      <NumberField label="Student Works Supervised" name="numOfStudWork" />
+
+      <hr />
+
+      <h3>Planned vs Completed Activities</h3>
+      <table border="1" width="100%" cellPadding="8">
+        <thead>
+          <tr>
+            <th>Activity</th>
+            <th>Planned (Beginning of year)</th>
+            <th>Completed (End of year)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <TextPair label="Conference Participation" planned="partInConf" completed="partInConfEnd" />
+          <TextPair label="Conference Abstracts" planned="comAbConf" completed="comAbConfEnd" />
+          <TextPair label="Research Promotion" planned="promoOfResearch" completed="promoOfResearchEnd" />
+          <TextPair label="Project Applications" planned="projApplicSub" completed="projApplicSubEnd" />
+          <TextPair label="Skill Development" planned="skillsDevelopment" completed="skillsDevelopmentEnd" />
+          <TextPair label="Seminar Participation" planned="participationInSeminars" completed="participationInSeminarsEnd" />
+          <TextPair label="Administrative Work" planned="adminWork" completed="adminWorkEnd" />
+          <TextPair label="Other Duties" planned="otherJobs" completed="otherJobsEnd" />
+        </tbody>
+      </table>
+
+      <br />
+      <button type="submit">Save Plan</button>
+    </form>
+  );
+}

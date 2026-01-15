@@ -11,6 +11,7 @@ import JournalList from "./components/JournalList";
 import ScientificArticlesList from "./components/ScientificArticlesList";
 import CourseList from "./components/CourseList";
 import YearList from "./components/YearList";
+import PlanList from "./components/PlanList";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Route path="/course" element={<CourseList />} />
           {/* <Route path="/course-plan" element={<CoursePlanList />} /> */}
           <Route path="/year" element={<YearList />} />
+          <Route path="/plan" element={<PlanList />} />
         </Routes>
       </div>
     </BrowserRouter>

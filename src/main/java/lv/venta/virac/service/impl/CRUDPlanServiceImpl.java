@@ -170,7 +170,7 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 
 	@Override
 	public ArrayList<Plan> selectAllPlansByDepartment(String nameDepartment) throws Exception {
-		ArrayList<Plan> result = planRepo.findByEmployeeViracDepartment_IdDepartment(depRepo.findByName(nameDepartment).getIdDepartment());
+		ArrayList<Plan> result = planRepo.findByEmployee_ViracDepartment_IdDepartment(depRepo.findByName(nameDepartment).getIdDepartment());
 		if(result.isEmpty()) {
 			throw new Exception("Plan with in Department: " + nameDepartment + " does not exist");
 		}
