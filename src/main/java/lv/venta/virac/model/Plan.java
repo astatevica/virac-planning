@@ -63,20 +63,20 @@ public class Plan {
 	private Collection<ArticlePlan> articlePlan;
 	
 	@Column(name = "partInConf")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String partInConf;
 	
 	//Q: Vai te var nelikt @NotNull?
 	@Column(name = "partInConfEnd")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String partInConfEnd;
 	
 	@Column(name = "comAbConf")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String comAbConf;
 	
 	@Column(name = "comAbConfEnd")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String comAbConfEnd;
 	
 	@Column(name = "numOfCourses")
@@ -95,51 +95,51 @@ public class Plan {
 	private Collection<WorkPlan> workPlan;
 	
 	@Column(name = "promoOfResearch")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String promoOfResearch;
 	
 	@Column(name = "promoOfResearchEnd")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String promoOfResearchEnd;
 	
 	@Column(name = "adminWork")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String adminWork;
 	
 	@Column(name = "adminWorkEnd")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String adminWorkEnd;
 	
 	@Column(name = "projApplicSub")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String projApplicSub;
 	
 	@Column(name = "projApplicSubEnd")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String projApplicSubEnd;
 	
 	@Column(name = "skillsDevelopment")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String skillsDevelopment;
 	
 	@Column(name = "skillsDevelopmentEnd")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String skillsDevelopmentEnd;
 	
 	@Column(name = "participationInSeminars")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String participationInSeminars;
 	
 	@Column(name = "participationInSeminarsEnd")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String participationInSeminarsEnd;
 	
 	@Column(name = "otherJobs")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String otherJobs;
 	
 	@Column(name = "otherJobsEnd")
-	@Size(max = 200, min = 2)
+	//@Size(max = 200, min = 2)
 	private String otherJobsEnd;
 	
 	@Column(name = "deleted")

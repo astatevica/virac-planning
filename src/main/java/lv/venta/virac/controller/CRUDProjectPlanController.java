@@ -99,7 +99,7 @@ public class CRUDProjectPlanController {
         return ResponseEntity.noContent().build();
     }
     
-    @GetMapping("/filter/{idPlan}")
+    @GetMapping("/filter/plan/{idPlan}")
     public ResponseEntity<ArrayList<ProjectPlanDTO>> selectAllProjectPlanByPlan(
             @PathVariable("idPlan") int idPlan) throws Exception {
 
@@ -120,7 +120,7 @@ public class CRUDProjectPlanController {
         return ResponseEntity.ok(response);
     }
     
-    @GetMapping("/filter/{idProject}")
+    @GetMapping("/filter/project/{idProject}")
     public ResponseEntity<ArrayList<ProjectPlanDTO>> selectAllProjectPlanByProject(
             @PathVariable("idProject") int idProject) throws Exception {
 

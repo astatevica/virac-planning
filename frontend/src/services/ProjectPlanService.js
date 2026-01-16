@@ -1,39 +1,39 @@
-// import axios from "axios";
+import axios from "axios";
 
-// const API_URL = "http://localhost:8080/api/project-plan";
+const API_URL = "http://localhost:8080/api/project-plan";
 
-// const ProjectPlanService = {
-//   // ===== CRUD =====
+const ProjectPlanService = {
+  // ===== CRUD =====
 
-//   getAll() {
-//     return axios.get(API_URL);
-//   },
+  getAll() {
+    return axios.get(API_URL);
+  },
 
-//   getById(id) {
-//     return axios.get(`${API_URL}/${id}`);
-//   },
+  getById(id) {
+    return axios.get(`${API_URL}/${id}`);
+  },
 
-//   create(data) {
-//     return axios.post(API_URL, data);
-//   },
+  create(data) {
+    return axios.post(API_URL, data);
+  },
 
-//   update(id, data) {
-//     return axios.put(`${API_URL}/${id}`, data);
-//   },
+  update(id, data) {
+    return axios.put(`${API_URL}/${id}`, data);
+  },
 
-//   delete(id) {
-//     return axios.delete(`${API_URL}/${id}`);
-//   },
+  delete(id) {
+    return axios.delete(`${API_URL}/${id}`);
+  },
 
-//   // ===== FILTERS =====
+  // ===== FILTERS =====
 
-//   getByPlan(idPlan) {
-//     return axios.get(`${API_URL}/filter/${idPlan}`);
-//   },
+  getByPlan(idPlan) {
+    return axios.get(`${API_URL}/filter/plan/${idPlan}`);
+  },
 
-//   getByProject(idProject) {
-//     return axios.get(`${API_URL}/filter/${idProject}`);
-//   }
-// };
+  getByProject(idProject) {
+    return axios.get(`${API_URL}/filter/project/${idProject}`);
+  }
+};
 
-// export default ProjectPlanService;
+export default ProjectPlanService;

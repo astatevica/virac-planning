@@ -11,10 +11,10 @@ export default function PlanForm() {
     idEmployee: "",
     idYear: "",
 
-    numOfProjects: 0,
-    numOfArticles: 0,
-    numOfCourses: 0,
-    numOfStudWork: 0,
+    numOfProjects: "", 
+    numOfArticles: "", 
+    numOfCourses: "", 
+    numOfStudWork: "", 
 
     partInConf: "",
     partInConfEnd: "",
@@ -46,13 +46,18 @@ export default function PlanForm() {
     axios.get(`${API}/year`).then(res => setYears(res.data));
   }, []);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setPlan(prev => ({ ...prev, [name]: value }));
+    console.log(name, value);
+
+    setPlan(prev => ({
+        ...prev,
+        [name]: value ?? ""
+    }));
   };
 
   const handleSubmit = e => {
-    e.preventDefault();
+    console.log("Sending:", plan);
     axios.post(`${API}/plan`, plan)
       .then(() => alert("Plan saved successfully"))
       .catch(err => alert(err.response?.data?.message || "Error saving plan"));
@@ -66,28 +71,30 @@ export default function PlanForm() {
   );
 
   const TextPair = ({ label, planned, completed }) => (
-    <tr>
-      <td><strong>{label}</strong></td>
-      <td>
+    <tr key={planned}>
+        <td><strong>{label}</strong></td>
+
+        <td>
         <textarea
-          name={planned}
-          value={plan[planned]}
-          onChange={handleChange}
-          rows={3}
-          placeholder="Planned at beginning of year"
+            name={planned}
+            value={plan[planned] || ""}
+            onChange={handleChange}
+            rows={3}
+            placeholder="Planned at beginning of year"
         />
-      </td>
-      <td>
+        </td>
+
+        <td>
         <textarea
-          name={completed}
-          value={plan[completed]}
-          onChange={handleChange}
-          rows={3}
-          placeholder="Completed by end of year"
+            name={completed}
+            value={plan[completed] || ""}
+            onChange={handleChange}
+            rows={3}
+            placeholder="Completed by end of year"
         />
-      </td>
+        </td>
     </tr>
-  );
+   );
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 1100, margin: "auto" }}>
@@ -97,7 +104,7 @@ export default function PlanForm() {
       <select name="idEmployee" value={plan.idEmployee} onChange={handleChange} required>
         <option value="">-- Select Employee --</option>
         {employees.map(e => (
-          <option key={e.idEmployee} value={e.idEmployee}>
+          <option key={e.idEmployee} value={e.id}>
             {e.name} {e.surname}
           </option>
         ))}
