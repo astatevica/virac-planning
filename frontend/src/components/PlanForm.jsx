@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
 const API = "http://localhost:8080/api";
 
 export default function PlanForm() {
+  //controlls inputs
   const [employees, setEmployees] = useState([]);
   const [years, setYears] = useState([]);
 
@@ -48,11 +49,11 @@ export default function PlanForm() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(name, value);
+    if (!name) return;
 
     setPlan(prev => ({
-        ...prev,
-        [name]: value ?? ""
+      ...prev,
+      [name]: value
     }));
   };
 
@@ -71,13 +72,13 @@ export default function PlanForm() {
   );
 
   const TextPair = ({ label, planned, completed }) => (
-    <tr key={planned}>
+    <tr>
         <td><strong>{label}</strong></td>
 
         <td>
-        <textarea
+        <AutoTextarea
             name={planned}
-            value={plan[planned] || ""}
+            value={plan[planned] ?? ""}
             onChange={handleChange}
             rows={3}
             placeholder="Planned at beginning of year"
@@ -85,9 +86,9 @@ export default function PlanForm() {
         </td>
 
         <td>
-        <textarea
+        <AutoTextarea
             name={completed}
-            value={plan[completed] || ""}
+            value={plan[completed] ?? ""}
             onChange={handleChange}
             rows={3}
             placeholder="Completed by end of year"
@@ -95,6 +96,35 @@ export default function PlanForm() {
         </td>
     </tr>
    );
+
+  const AutoTextarea = ({ name, value, onChange, placeholder }) => {
+    const ref = useRef(null);
+  
+    useEffect(() => {
+      if (ref.current) {
+        ref.current.style.height = "auto";
+        ref.current.style.height = ref.current.scrollHeight + "px";
+      }
+    }, [value]);
+  
+      return (
+        <textarea
+          ref={ref}
+          name={name}
+          value={value}
+          onChange={onChange}
+          rows={3}
+          placeholder={placeholder}
+          style={{
+            width: "95%",
+            resize: "none",
+            overflow: "hidden",
+            padding: "8px",
+            lineHeight: "1.5"
+          }}
+        />
+      );
+    };
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 1100, margin: "auto" }}>
