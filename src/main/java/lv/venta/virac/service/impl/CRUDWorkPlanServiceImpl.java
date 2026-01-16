@@ -61,14 +61,16 @@ public class CRUDWorkPlanServiceImpl implements ICRUDWorkPlanService{
 	}
 
 	@Override
-	public void create(int idStudentWork, int idPlan, String workDone) throws Exception {
+	public void create(int idStudWork, int idPlan, String workDone) throws Exception {
 		ArrayList<WorkPlan> workPlans = (ArrayList<WorkPlan>) workPlanRepo.findAll();
-        
-        if(idStudentWork == 0 || idPlan == 0){
+		System.out.println(workPlans);
+		System.out.println("idStudWork: " + idStudWork + " idPlan: " + idPlan + " workDone: " + workDone );
+		
+        if(idStudWork == 0 || idPlan == 0){
 			throw new Exception("The input parameters are incorrect");
 		}
         
-        StudentWork sw = studWorkRepo.findById(idStudentWork).get();
+        StudentWork sw = studWorkRepo.findById(idStudWork).get();
         if(sw == null) {
         	throw new Exception("Student-Work not found");
         }
@@ -79,8 +81,7 @@ public class CRUDWorkPlanServiceImpl implements ICRUDWorkPlanService{
         }
         
         for (WorkPlan wp : workPlans) {
-            if (wp.getStudentWork().getIdStudWork()==idStudentWork & wp.getPlan().getIdPlan()==0 &
-            		wp.getWorkDone().equals(workDone) & wp.isDeleted( )== false) {
+            if (wp.getStudentWork().getIdStudWork()==idStudWork & wp.getPlan().getIdPlan()==0 & wp.isDeleted( )== false) {
                 throw new Exception("Work-Plan with ID: " + wp.getIdWorkPlan() + " already exists");
             }
         }
@@ -91,12 +92,12 @@ public class CRUDWorkPlanServiceImpl implements ICRUDWorkPlanService{
 	}
 
 	@Override
-	public void updateById(int id, int idStudentWork, int idPlan, String workDone) throws Exception {
+	public void updateById(int id, int idStudWork, int idPlan, String workDone) throws Exception {
 		WorkPlan wp = retrieveById(id);
     	if (wp == null) throw new 
     		Exception("Work-Plan with (id:" + id + ") does not exist");    	
     	
-    	StudentWork sw = studWorkRepo.findById(idStudentWork).get();
+    	StudentWork sw = studWorkRepo.findById(idStudWork).get();
         if(sw == null) {
         	throw new Exception("Student-Work not found");
         }
@@ -113,10 +114,10 @@ public class CRUDWorkPlanServiceImpl implements ICRUDWorkPlanService{
 	}
 
 	@Override
-	public ArrayList<WorkPlan> selectAllWorkPlanByStudentWork(int idStudentWork) throws Exception {
-		ArrayList<WorkPlan> result = workPlanRepo.findByStudentWork_IdStudWork(idStudentWork);
+	public ArrayList<WorkPlan> selectAllWorkPlanByStudentWork(int idStudWork) throws Exception {
+		ArrayList<WorkPlan> result = workPlanRepo.findByStudentWork_IdStudWork(idStudWork);
 		if(result.isEmpty()) {
-			throw new Exception("Student-Work with Student-Work ID: " + idStudentWork + " does not exist");
+			throw new Exception("Student-Work with Student-Work ID: " + idStudWork + " does not exist");
 		}
 		
 		return result;

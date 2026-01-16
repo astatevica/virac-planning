@@ -3,7 +3,7 @@ package lv.venta.virac.dto;
 public class WorkPlanDTO {
 	
 	private int idWorkPlan;
-	private int idStudentWork;
+	private int idStudWork;
 	private int idPlan;
 	private String workDone;
 	
@@ -11,9 +11,9 @@ public class WorkPlanDTO {
 		
 	}
 	
-	public WorkPlanDTO(int idWorkPlan, int idStudentWork, int idPlan, String workDone) {
+	public WorkPlanDTO(int idWorkPlan, int idStudWork, int idPlan, String workDone) {
 		this.idWorkPlan = idWorkPlan;
-		this.idStudentWork = idStudentWork;
+		this.idStudWork = idStudWork;
 		this.idPlan = idPlan;
 		this.workDone = workDone;
 	}
@@ -24,11 +24,11 @@ public class WorkPlanDTO {
 	public void setIdWorkPlan(int idWorkPlan) {
 		this.idWorkPlan = idWorkPlan;
 	}
-	public int getIdStudentWork() {
-		return idStudentWork;
+	public int getIdStudWork() {
+		return idStudWork;
 	}
-	public void setIdStudentWork(int idStudentWork) {
-		this.idStudentWork = idStudentWork;
+	public void setIdStudWork(int idStudWork) {
+		this.idStudWork = idStudWork;
 	}
 	public int getIdPlan() {
 		return idPlan;

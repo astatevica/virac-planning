@@ -15,6 +15,7 @@ import PlanList from "./components/PlanList";
 import ProjectPlanList from "./components/ProjectPlanList";
 import ArticlePlanList from "./components/ArticlePlanList";
 import CoursePlanList from "./components/CoursePlanList";
+import WorkPlanList from "./components/WorkPlanList";
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
           <Route path="/project" element={<ProjectList />} />
           <Route path="/project-plan" element={<ProjectPlanList />} />
           <Route path="/student-work" element={<StudentWorkList />} />
-          {/* <Route path="/work-plan" element={<WorkPlanList />} /> */}
+          <Route path="/work-plan" element={<WorkPlanList />} />
           <Route path="/journal" element={<JournalList />} />
           <Route path="/scientific-articles" element={<ScientificArticlesList />} />
           <Route path="/article-plan" element={<ArticlePlanList />} />

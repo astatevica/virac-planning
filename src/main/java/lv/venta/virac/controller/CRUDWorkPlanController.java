@@ -74,7 +74,7 @@ public class CRUDWorkPlanController {
             return ResponseEntity.badRequest().build();
         }
 
-        wpService.create(dto.getIdStudentWork(), dto.getIdPlan(), dto.getWorkDone());
+        wpService.create(dto.getIdStudWork(), dto.getIdPlan(), dto.getWorkDone());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
@@ -89,7 +89,7 @@ public class CRUDWorkPlanController {
             return ResponseEntity.badRequest().build();
         }
 
-        wpService.updateById(id, dto.getIdStudentWork(), dto.getIdPlan(), dto.getWorkDone());
+        wpService.updateById(id, dto.getIdStudWork(), dto.getIdPlan(), dto.getWorkDone());
         return ResponseEntity.ok().build();
     }
 
@@ -100,7 +100,7 @@ public class CRUDWorkPlanController {
         return ResponseEntity.noContent().build();
     }
     
-    @GetMapping("/filter/{idStudentWork}")
+    @GetMapping("/filter/student-work/{idStudentWork}")
     public ResponseEntity<ArrayList<WorkPlanDTO>> selectAllWorkPlanByStudentWork(
             @PathVariable("idStudentWork") int idStudentWork) throws Exception {
 
@@ -121,7 +121,7 @@ public class CRUDWorkPlanController {
         return ResponseEntity.ok(response);
     }
     
-    @GetMapping("/filter/{idPlan}")
+    @GetMapping("/filter/plan/{idPlan}")
     public ResponseEntity<ArrayList<WorkPlanDTO>> selectAllWorkPlanByPlan(
             @PathVariable("idPlan") int idPlan) throws Exception {
 

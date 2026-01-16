@@ -1,229 +1,244 @@
-// import React, { useEffect, useState } from "react";
-// import WorkPlanService from "../services/WorkPlanService";
-// import StudentWorkService from "../services/StudentWorkService";
-// import PlanService from "../services/PlanService";
+import React, { useEffect, useState } from "react";
+import WorkPlanService from "../services/WorkPlanService";
+import StudentWorkService from "../services/StudentWorkService";
+import PlanService from "../services/PlanService";
 
-// const WorkPlanList = () => {
+const WorkPlanList = () => {
 
-//   const [workPlans, setWorkPlans] = useState([]);
-//   const [studentWorks, setStudentWorks] = useState([]);
-//   const [plans, setPlans] = useState([]);
+  const [workPlans, setWorkPlans] = useState([]);
+  const [studentWorks, setStudentWorks] = useState([]);
+  const [plans, setPlans] = useState([]);
 
-//   // ===== FORM =====
-//   const [studentWorkId, setStudentWorkId] = useState("");
-//   const [planId, setPlanId] = useState("");
-//   const [workDone, setWorkDone] = useState("");
+  // ===== FORM =====
+  const [idStudWork, setIdStudWork] = useState("");
+  const [idPlan, setPlanId] = useState("");
+  const [workDone, setWorkDone] = useState("");
 
-//   // EDIT
-//   const [editId, setEditId] = useState(null);
+  // EDIT
+  const [editId, setEditId] = useState(null);
 
-//   // ===== FILTERS =====
-//   const [filterStudentWorkId, setFilterStudentWorkId] = useState("");
-//   const [filterPlanId, setFilterPlanId] = useState("");
+  // ===== FILTERS =====
+  const [filterIdStudentWork, setFilterIdStudentWork] = useState("");
+  const [filterPlanId, setFilterPlanId] = useState("");
 
-//   useEffect(() => {
-//     loadAll();
-//     loadStudentWorks();
-//     loadPlans();
-//   }, []);
+  useEffect(() => {
+    loadAll();
+    loadStudentWorks();
+    loadPlans();
+  }, []);
 
-//   /* ================= LOAD ================= */
+  /* ================= LOAD ================= */
 
-//   const loadAll = () => {
-//     WorkPlanService.getAll()
-//       .then(res => setWorkPlans(res.data))
-//       .catch(() => alert("Failed to load work plans"));
-//   };
+  const loadAll = () => {
+    WorkPlanService.getAll()
+      .then(res => setWorkPlans(res.data))
+      .catch(() => alert("Failed to load work plans"));
+  };
 
-//   const loadStudentWorks = () => {
-//     StudentWorkService.getAll()
-//       .then(res => setStudentWorks(res.data))
-//       .catch(() => alert("Failed to load student works"));
-//   };
+  const loadStudentWorks = () => {
+    StudentWorkService.getAll()
+      .then(res => setStudentWorks(res.data))
+      .catch(() => alert("Failed to load student works"));
+  };
 
-//   const loadPlans = () => {
-//     PlanService.getAll()
-//       .then(res => setPlans(res.data))
-//       .catch(() => alert("Failed to load plans"));
-//   };
+  const loadPlans = () => {
+    PlanService.getAll()
+      .then(res => setPlans(res.data))
+      .catch(() => alert("Failed to load plans"));
+  };
 
-//   /* ================= CREATE ================= */
+  /* ================= CREATE ================= */
 
-//   const addWorkPlan = () => {
-//     if (!studentWorkId || !planId || !workDone) {
-//       alert("All fields are required");
-//       return;
-//     }
+  const addWorkPlan = () => {
+    if (!idStudWork || !idPlan || !workDone) {
+      alert("All fields are required");
+      return;
+    }
 
-//     WorkPlanService.create({
-//       idStudentWork: Number(studentWorkId),
-//       idPlan: Number(planId),
-//       workDone
-//     })
-//       .then(() => {
-//         clearForm();
-//         loadAll();
-//       })
-//       .catch(err => alert(err.response?.data || "Create failed"));
-//   };
+    // Check whats been sent
+    console.log("CREATE payload", {
+      idStudWork,
+      idPlan,
+      workDone
+    });
 
-//   /* ================= UPDATE ================= */
+    WorkPlanService.create({
+      idStudWork: Number(idStudWork),
+      idPlan: Number(idPlan),
+      workDone: workDone
+    })
+      .then(() => {
+        clearForm();
+        loadAll();
+      })
+      .catch(err => alert(err.response?.data || "Create failed"));
+  };
 
-//   const startEdit = (wp) => {
-//     setEditId(wp.idWorkPlan);
-//     setStudentWorkId(wp.idStudentWork);
-//     setPlanId(wp.idPlan);
-//     setWorkDone(wp.workDone);
-//   };
+  /* ================= UPDATE ================= */
 
-//   const saveEdit = () => {
-//     WorkPlanService.update(editId, {
-//       idStudentWork: Number(studentWorkId),
-//       idPlan: Number(planId),
-//       workDone
-//     })
-//       .then(() => {
-//         cancelEdit();
-//         loadAll();
-//       })
-//       .catch(err => alert(err.response?.data || "Update failed"));
-//   };
+  const startEdit = (wp) => {
+    setEditId(wp.idWorkPlan);
+    setIdStudWork(wp.idStudWork);
+    setPlanId(wp.idPlan);
+    setWorkDone(wp.workDone || "");
+  };
 
-//   const cancelEdit = () => {
-//     setEditId(null);
-//     clearForm();
-//   };
+  const saveEdit = () => {
 
-//   /* ================= DELETE ================= */
+    // Check whats been sent
+    console.log("CREATE payload", {
+      idStudWork,
+      idPlan,
+      workDone
+    });
 
-//   const deleteWorkPlan = (id) => {
-//     if (!window.confirm("Delete work plan?")) return;
+    WorkPlanService.update(editId, {
+      idStudWork: Number(idStudWork),
+      idPlan: Number(idPlan),
+      workDone: workDone
+    })
+      .then(() => {
+        cancelEdit();
+        loadAll();
+      })
+      .catch(err => alert(err.response?.data || "Update failed"));
+  };
 
-//     WorkPlanService.delete(id)
-//       .then(loadAll)
-//       .catch(err => alert(err.response?.data || "Delete failed"));
-//   };
+  const cancelEdit = () => {
+    setEditId(null);
+    clearForm();
+  };
 
-//   /* ================= FILTERS ================= */
+  /* ================= DELETE ================= */
 
-//   const filterByStudentWork = () => {
-//     if (!filterStudentWorkId) {
-//       loadAll();
-//       return;
-//     }
+  const deleteWorkPlan = (id) => {
+    if (!window.confirm("Delete work plan?")) return;
 
-//     WorkPlanService.getByStudentWork(Number(filterStudentWorkId))
-//       .then(res => setWorkPlans(res.data))
-//       .catch(() => alert("No records found"));
-//   };
+    WorkPlanService.delete(id)
+      .then(loadAll)
+      .catch(err => alert(err.response?.data || "Delete failed"));
+  };
 
-//   const filterByPlan = () => {
-//     if (!filterPlanId) {
-//       loadAll();
-//       return;
-//     }
+  /* ================= FILTERS ================= */
 
-//     WorkPlanService.getByPlan(Number(filterPlanId))
-//       .then(res => setWorkPlans(res.data))
-//       .catch(() => alert("No records found"));
-//   };
+  const filterByStudentWork = () => {
+    if (!filterIdStudentWork) {
+      loadAll();
+      return;
+    }
 
-//   /* ================= UTILS ================= */
+    WorkPlanService.getByStudentWork(Number(filterIdStudentWork))
+      .then(res => setWorkPlans(res.data))
+      .catch(() => alert("No records found"));
+  };
 
-//   const clearForm = () => {
-//     setStudentWorkId("");
-//     setPlanId("");
-//     setWorkDone("");
-//   };
+  const filterByPlan = () => {
+    if (!filterPlanId) {
+      loadAll();
+      return;
+    }
 
-//   /* ================= RENDER ================= */
+    WorkPlanService.getByPlan(Number(filterPlanId))
+      .then(res => setWorkPlans(res.data))
+      .catch(() => alert("No records found"));
+  };
 
-//   return (
-//     <div>
-//       <h2>Work Plans</h2>
+  /* ================= UTILS ================= */
 
-//       {/* ADD / UPDATE */}
-//       <div style={{ marginBottom: "20px" }}>
-//         <select value={studentWorkId} onChange={e => setStudentWorkId(e.target.value)}>
-//           <option value="">Select student work</option>
-//           {studentWorks.map(sw => (
-//             <option key={sw.idStudWork} value={sw.idStudWork}>
-//               {sw.idStudWork} – {sw.name}
-//             </option>
-//           ))}
-//         </select>
+  const clearForm = () => {
+    setIdStudWork("");
+    setPlanId("");
+    setWorkDone("");
+  };
 
-//         <select value={planId} onChange={e => setPlanId(e.target.value)}>
-//           <option value="">Select plan</option>
-//           {plans.map(pl => (
-//             <option key={pl.idPlan} value={pl.idPlan}>
-//               {pl.idPlan}
-//             </option>
-//           ))}
-//         </select>
+  /* ================= RENDER ================= */
 
-//         <input
-//           placeholder="Work done"
-//           value={workDone}
-//           onChange={e => setWorkDone(e.target.value)}
-//         />
+  return (
+    <div>
+      <h2>Work Plans</h2>
 
-//         {editId ? (
-//           <>
-//             <button onClick={saveEdit}>Save</button>
-//             <button onClick={cancelEdit}>Cancel</button>
-//           </>
-//         ) : (
-//           <button onClick={addWorkPlan}>Add</button>
-//         )}
-//       </div>
+      {/* ADD / UPDATE */}
+      <div style={{ marginBottom: "20px" }}>
+        <select value={idStudWork} onChange={e => setIdStudWork(e.target.value)}>
+          <option value="">Select student work</option>
+          {studentWorks.map(sw => (
+            <option key={sw.idStudWork} value={sw.idStudWork}>
+              {sw.idStudWork} – {sw.name}
+            </option>
+          ))}
+        </select>
 
-//       {/* FILTERS */}
-//       <div style={{ marginBottom: "15px" }}>
-//         <select
-//           value={filterStudentWorkId}
-//           onChange={e => setFilterStudentWorkId(e.target.value)}
-//         >
-//           <option value="">All student works</option>
-//           {studentWorks.map(sw => (
-//             <option key={sw.idStudWork} value={sw.idStudWork}>
-//               {sw.idStudWork}
-//             </option>
-//           ))}
-//         </select>
+        <select value={idPlan} onChange={e => setPlanId(e.target.value)}>
+          <option value="">Select plan</option>
+          {plans.map(pl => (
+            <option key={pl.idPlan} value={pl.idPlan}>
+              {pl.idPlan}
+            </option>
+          ))}
+        </select>
 
-//         <button onClick={filterByStudentWork}>Filter by student work</button>
-//       </div>
+        <input
+          placeholder="Work done"
+          value={workDone}
+          onChange={e => setWorkDone(e.target.value)}
+        />
 
-//       <div style={{ marginBottom: "15px" }}>
-//         <select
-//           value={filterPlanId}
-//           onChange={e => setFilterPlanId(e.target.value)}
-//         >
-//           <option value="">All plans</option>
-//           {plans.map(pl => (
-//             <option key={pl.idPlan} value={pl.idPlan}>
-//               {pl.idPlan}
-//             </option>
-//           ))}
-//         </select>
+        {editId ? (
+          <>
+            <button onClick={saveEdit}>Save</button>
+            <button onClick={cancelEdit}>Cancel</button>
+          </>
+        ) : (
+          <button onClick={addWorkPlan}>Add</button>
+        )}
+      </div>
 
-//         <button onClick={filterByPlan}>Filter by plan</button>
-//       </div>
+      {/* FILTERS */}
+      <div style={{ marginBottom: "15px" }}>
+        <select
+          value={filterIdStudentWork}
+          onChange={e => setFilterIdStudentWork(e.target.value)}
+        >
+          <option value="">All student works</option>
+          {studentWorks.map(sw => (
+            <option key={sw.idStudWork} value={sw.idStudWork}>
+              {sw.idStudWork}
+            </option>
+          ))}
+        </select>
 
-//       {/* LIST */}
-//       <ul>
-//         {workPlans.map(wp => (
-//           <li key={wp.idWorkPlan}>
-//             StudentWork: <b>{wp.idStudentWork}</b> | Plan: <b>{wp.idPlan}</b> |
-//             Work: {wp.workDone}
-//             <button onClick={() => startEdit(wp)}>Update</button>
-//             <button onClick={() => deleteWorkPlan(wp.idWorkPlan)}>Delete</button>
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// };
+        <button onClick={filterByStudentWork}>Filter by student work</button>
+      </div>
 
-// export default WorkPlanList;
+      <div style={{ marginBottom: "15px" }}>
+        <select
+          value={filterPlanId}
+          onChange={e => setFilterPlanId(e.target.value)}
+        >
+          <option value="">All plans</option>
+          {plans.map(pl => (
+            <option key={pl.idPlan} value={pl.idPlan}>
+              {pl.idPlan}
+            </option>
+          ))}
+        </select>
+
+        <button onClick={filterByPlan}>Filter by plan</button>
+      </div>
+
+      {/* LIST */}
+      <ul>
+        {workPlans.map(wp => (
+          <li key={wp.idWorkPlan}>
+            StudentWork: <b>{wp.idStudWork}</b> | Plan: <b>{wp.idPlan}</b> |
+            Work: {wp.workDone}
+            <button onClick={() => startEdit(wp)}>Update</button>
+            <button onClick={() => deleteWorkPlan(wp.idWorkPlan)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default WorkPlanList;

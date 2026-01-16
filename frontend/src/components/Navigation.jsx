@@ -42,11 +42,11 @@ const Navigation = () => {
             Student Work
           </NavLink>
         </li>
-        {/* <li>
+        <li>
           <NavLink to="/work-plan" style={styles.link}>
             Work Plan
           </NavLink>
-        </li> */}
+        </li>
         <li>
           <NavLink to="/journal" style={styles.link}>
             Journal

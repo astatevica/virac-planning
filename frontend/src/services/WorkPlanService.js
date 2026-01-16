@@ -1,39 +1,39 @@
-// import axios from "axios";
+import axios from "axios";
 
-// const API_URL = "http://localhost:8080/api/work-plan";
+const API_URL = "http://localhost:8080/api/work-plan";
 
-// const WorkPlanService = {
-//   // ===== CRUD =====
+const WorkPlanService = {
+  // ===== CRUD =====
 
-//   getAll() {
-//     return axios.get(API_URL);
-//   },
+  getAll() {
+    return axios.get(API_URL);
+  },
 
-//   getById(id) {
-//     return axios.get(`${API_URL}/${id}`);
-//   },
+  getById(id) {
+    return axios.get(`${API_URL}/${id}`);
+  },
 
-//   create(data) {
-//     return axios.post(API_URL, data);
-//   },
+  create(data) {
+    return axios.post(API_URL, data);
+  },
 
-//   update(id, data) {
-//     return axios.put(`${API_URL}/${id}`, data);
-//   },
+  update(id, data) {
+    return axios.put(`${API_URL}/${id}`, data);
+  },
 
-//   delete(id) {
-//     return axios.delete(`${API_URL}/${id}`);
-//   },
+  delete(id) {
+    return axios.delete(`${API_URL}/${id}`);
+  },
 
-//   // ===== FILTERS =====
+  // ===== FILTERS =====
 
-//   getByStudentWork(idStudentWork) {
-//     return axios.get(`${API_URL}/filter/${idStudentWork}`);
-//   },
+  getByStudentWork(idStudentWork) {
+    return axios.get(`${API_URL}/filter/student-work/${idStudentWork}`);
+  },
 
-//   getByPlan(idPlan) {
-//     return axios.get(`${API_URL}/filter/${idPlan}`);
-//   }
-// };
+  getByPlan(idPlan) {
+    return axios.get(`${API_URL}/filter/plan/${idPlan}`);
+  }
+};
 
-// export default WorkPlanService;
+export default WorkPlanService;
