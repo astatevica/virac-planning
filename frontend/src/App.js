@@ -14,6 +14,7 @@ import YearList from "./components/YearList";
 import PlanList from "./components/PlanList";
 import ProjectPlanList from "./components/ProjectPlanList";
 import ArticlePlanList from "./components/ArticlePlanList";
+import CoursePlanList from "./components/CoursePlanList";
 
 function App() {
   return (
@@ -34,7 +35,7 @@ function App() {
           <Route path="/scientific-articles" element={<ScientificArticlesList />} />
           <Route path="/article-plan" element={<ArticlePlanList />} />
           <Route path="/course" element={<CourseList />} />
-          {/* <Route path="/course-plan" element={<CoursePlanList />} /> */}
+          <Route path="/course-plan" element={<CoursePlanList />} />
           <Route path="/year" element={<YearList />} />
           <Route path="/plan" element={<PlanList />} />
         </Routes>

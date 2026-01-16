@@ -67,11 +67,11 @@ const Navigation = () => {
             Course
           </NavLink>
         </li>
-        {/* <li>
+        <li>
           <NavLink to="/course-plan" style={styles.link}>
             Course Plan
           </NavLink>
-        </li> */}
+        </li>
         <li>
           <NavLink to="/year" style={styles.link}>
             Year

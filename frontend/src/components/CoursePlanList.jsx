@@ -1,157 +1,202 @@
-// import React, { useEffect, useState } from "react";
-// import CoursePlanService from "../services/CoursePlanService";
+import React, { useEffect, useState } from "react";
+import CoursePlanService from "../services/CoursePlanService";
+import CourseService from "../services/CourseService";
+import PlanService from "../services/PlanService";
 
-// const CoursePlanList = () => {
-//   const [coursePlans, setCoursePlans] = useState([]);
+const CoursePlanList = () => {
+  const [coursePlans, setCoursePlans] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [plans, setPlans] = useState([]);
 
-//   // ADD / EDIT FIELDS
-//   const [idCourse, setIdCourse] = useState("");
-//   const [idPlan, setIdPlan] = useState("");
-//   const [workDone, setWorkDone] = useState("");
+  // ADD / EDIT
+  const [idCourse, setIdCourse] = useState("");
+  const [idPlan, setIdPlan] = useState("");
+  const [workDone, setWorkDone] = useState("");
 
-//   // UPDATE
-//   const [editId, setEditId] = useState(null);
+  // EDIT
+  const [editId, setEditId] = useState(null);
 
-//   // FILTER
-//   const [filterPlanId, setFilterPlanId] = useState("");
+  // FILTER
+  const [filterPlanId, setFilterPlanId] = useState("");
 
-//   useEffect(() => {
-//     loadAll();
-//   }, []);
+  useEffect(() => {
+    loadAll();
+    loadCourses();
+    loadPlans();
+  }, []);
 
-//   const loadAll = () => {
-//     CoursePlanService.getAll()
-//       .then(res => setCoursePlans(res.data))
-//       .catch(err => alert(err.response?.data || "Failed to load course plans"));
-//   };
+  /* ================= LOAD ================= */
 
-//   const loadByPlan = () => {
-//     if (!filterPlanId) {
-//       loadAll();
-//       return;
-//     }
+  const loadAll = () => {
+    CoursePlanService.getAll()
+      .then(res => setCoursePlans(res.data))
+      .catch(() => alert("Failed to load course plans"));
+  };
 
-//     CoursePlanService.getByPlanId(filterPlanId)
-//       .then(res => setCoursePlans(res.data))
-//       .catch(err => alert(err.response?.data || "Filter failed"));
-//   };
+  const loadCourses = () => {
+    CourseService.getAll()
+      .then(res => setCourses(res.data))
+      .catch(() => alert("Failed to load courses"));
+  };
 
-//   // CREATE
-//   const addCoursePlan = () => {
-//     if (!idCourse || !idPlan) {
-//       alert("Course ID and Plan ID are required");
-//       return;
-//     }
+  const loadPlans = () => {
+    PlanService.getAll()
+      .then(res => setPlans(res.data))
+      .catch(() => alert("Failed to load plans"));
+  };
 
-//     CoursePlanService.create({
-//       idCourse: Number(idCourse),
-//       idPlan: Number(idPlan),
-//       workDone
-//     })
-//       .then(() => {
-//         clearForm();
-//         loadAll();
-//       })
-//       .catch(err => alert(err.response?.data || "Create failed"));
-//   };
+  /* ================= FILTER ================= */
 
-//   // DELETE
-//   const deleteCoursePlan = (id) => {
-//     CoursePlanService.delete(id)
-//       .then(loadAll)
-//       .catch(err => alert(err.response?.data || "Delete failed"));
-//   };
+  const loadByPlan = () => {
+    if (!filterPlanId) {
+      loadAll();
+      return;
+    }
 
-//   // UPDATE
-//   const startEdit = (cp) => {
-//     setEditId(cp.idCoursePlan);
-//     setIdCourse(cp.idCourse);
-//     setIdPlan(cp.idPlan);
-//     setWorkDone(cp.workDone || "");
-//   };
+    CoursePlanService.getByPlanId(Number(filterPlanId))
+      .then(res => setCoursePlans(res.data))
+      .catch(() => alert("Filter failed"));
+  };
 
-//   const cancelEdit = () => {
-//     setEditId(null);
-//     clearForm();
-//   };
+  /* ================= CREATE ================= */
 
-//   const saveEdit = () => {
-//     CoursePlanService.update(editId, {
-//       idCourse: Number(idCourse),
-//       idPlan: Number(idPlan),
-//       workDone
-//     })
-//       .then(() => {
-//         cancelEdit();
-//         loadAll();
-//       })
-//       .catch(err => alert(err.response?.data || "Update failed"));
-//   };
+  const addCoursePlan = () => {
+    if (!idCourse || !idPlan) {
+      alert("Course and Plan are required");
+      return;
+    }
 
-//   const clearForm = () => {
-//     setIdCourse("");
-//     setIdPlan("");
-//     setWorkDone("");
-//   };
+    CoursePlanService.create({
+      idPlan: Number(idPlan),
+      idCourse: Number(idCourse),
+      workDone
+    })
+      .then(() => {
+        clearForm();
+        loadAll();
+      })
+      .catch(err => alert(err.response?.data || "Create failed"));
+  };
 
-//   return (
-//     <div>
-//       <h2>Course Plans</h2>
+  /* ================= UPDATE ================= */
 
-//       {/* 🔍 FILTER */}
-//       <div style={{ marginBottom: "10px" }}>
-//         <input
-//           placeholder="Filter by Plan ID"
-//           value={filterPlanId}
-//           onChange={e => setFilterPlanId(e.target.value)}
-//         />
-//         <button onClick={loadByPlan}>Filter</button>
-//         <button onClick={loadAll}>Clear</button>
-//       </div>
+  const startEdit = (cp) => {
+    setEditId(cp.idCoursePlan);
+    setIdCourse(cp.idCourse);
+    setIdPlan(cp.idPlan);
+    setWorkDone(cp.workDone || "");
+  };
 
-//       {/* ➕ ADD / ✏️ UPDATE */}
-//       <div style={{ marginBottom: "15px" }}>
-//         <input
-//           placeholder="Course ID"
-//           value={idCourse}
-//           onChange={e => setIdCourse(e.target.value)}
-//         />
-//         <input
-//           placeholder="Plan ID"
-//           value={idPlan}
-//           onChange={e => setIdPlan(e.target.value)}
-//         />
-//         <input
-//           placeholder="Work done"
-//           value={workDone}
-//           onChange={e => setWorkDone(e.target.value)}
-//         />
+  const saveEdit = () => {
+    CoursePlanService.update(editId, {
+      idCourse: Number(idCourse),
+      idPlan: Number(idPlan),
+      workDone
+    })
+      .then(() => {
+        cancelEdit();
+        loadAll();
+      })
+      .catch(err => alert(err.response?.data || "Update failed"));
+  };
 
-//         {editId ? (
-//           <>
-//             <button onClick={saveEdit}>Save</button>
-//             <button onClick={cancelEdit}>Cancel</button>
-//           </>
-//         ) : (
-//           <button onClick={addCoursePlan}>Add</button>
-//         )}
-//       </div>
+  const cancelEdit = () => {
+    setEditId(null);
+    clearForm();
+  };
 
-//       {/* 📄 LIST */}
-//       <ul>
-//         {coursePlans.map(cp => (
-//           <li key={cp.idCoursePlan}>
-//             Course ID: {cp.idCourse} | Plan ID: {cp.idPlan} | Work:{" "}
-//             {cp.workDone || "-"}
-//             <button onClick={() => startEdit(cp)}>Update</button>
-//             <button onClick={() => deleteCoursePlan(cp.idCoursePlan)}>
-//               Delete
-//             </button>
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// };
+  /* ================= DELETE ================= */
 
-// export default CoursePlanList;
+  const deleteCoursePlan = (id) => {
+    if (!window.confirm("Delete course plan?")) return;
+
+    CoursePlanService.delete(id)
+      .then(loadAll)
+      .catch(() => alert("Delete failed"));
+  };
+
+  /* ================= UTILS ================= */
+
+  const clearForm = () => {
+    setIdCourse("");
+    setIdPlan("");
+    setWorkDone("");
+  };
+
+  /* ================= RENDER ================= */
+
+  return (
+    <div>
+      <h2>Course Plans</h2>
+
+      {/* 🔍 FILTER */}
+      <div style={{ marginBottom: "15px" }}>
+        <select
+          value={filterPlanId}
+          onChange={e => setFilterPlanId(e.target.value)}
+        >
+          <option value="">All plans</option>
+          {plans.map(p => (
+            <option key={p.idPlan} value={p.idPlan}>
+              Plan #{p.idPlan}
+            </option>
+          ))}
+        </select>
+        <button onClick={loadByPlan}>Filter</button>
+        <button onClick={loadAll}>Clear</button>
+      </div>
+
+      {/* ➕ ADD / ✏️ EDIT */}
+      <div style={{ marginBottom: "20px" }}>
+        <select value={idPlan} onChange={e => setIdPlan(e.target.value)}>
+          <option value="">Select plan</option>
+          {plans.map(p => (
+            <option key={p.idPlan} value={p.idPlan}>
+              Plan #{p.idPlan}
+            </option>
+          ))}
+        </select>
+
+        <select value={idCourse} onChange={e => setIdCourse(e.target.value)}>
+          <option value="">Select course</option>
+          {courses.map(c => (
+            <option key={c.idCourse} value={c.idCourse}>
+              {c.idCourse} {c.name}
+            </option>
+          ))}
+        </select>
+
+        <input
+          placeholder="Work done"
+          value={workDone}
+          onChange={e => setWorkDone(e.target.value)}
+        />
+
+        {editId ? (
+          <>
+            <button onClick={saveEdit}>Save</button>
+            <button onClick={cancelEdit}>Cancel</button>
+          </>
+        ) : (
+          <button onClick={addCoursePlan}>Add</button>
+        )}
+      </div>
+
+      {/*LIST */}
+      <ul>
+        {coursePlans.map(cp => (
+          <li key={cp.idCoursePlan}>
+            {/* Kāpēc te jāmaina vietām, lai ielādētu pareizo?*/}
+            Course: {cp.idPlan} | Plan: {cp.idCourse} |  Work done: {cp.workDone || " -"}
+            <button onClick={() => startEdit(cp)}>Update</button>
+            <button onClick={() => deleteCoursePlan(cp.idCoursePlan)}>
+              Delete
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default CoursePlanList;

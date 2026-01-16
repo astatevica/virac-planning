@@ -94,7 +94,7 @@ public class ViracPlaningIApplication {
 				
 				//CoursePlanTable DONE
 				CoursePlan cp1 = new CoursePlan(plan1, c3, null);
-				CoursePlan cp2 = new CoursePlan(null, c1, null);
+				CoursePlan cp2 = new CoursePlan(plan1, c1, null);
 				CoursePlan cp3 = new CoursePlan(plan1, c2, "Novadīts veiksmīgi");
 				
 				courPlanRepo.saveAll((Arrays.asList(cp1,cp2,cp3)));
