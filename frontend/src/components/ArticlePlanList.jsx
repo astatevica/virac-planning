@@ -1,171 +1,233 @@
-// import React, { useEffect, useState } from "react";
-// import ArticlePlanService from "../services/ArticlePlanService";
+import React, { useEffect, useState } from "react";
+import ProjectPlanService from "../services/ProjectPlanService";
+import ProjectService from "../services/ProjectService";
+import PlanService from "../services/PlanService"; // assumes you already have this
 
-// const ArticlePlanList = () => {
-//   const [articlePlans, setArticlePlans] = useState([]);
+const ProjectPlanList = () => {
 
-//   // ADD
-//   const [idPlan, setIdPlan] = useState("");
-//   const [idArticle, setIdArticle] = useState("");
-//   const [articleComments, setArticleComments] = useState("");
-//   const [publicationLink, setPublicationLink] = useState("");
+  const [projectPlans, setProjectPlans] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [plans, setPlans] = useState([]);
 
-//   // UPDATE
-//   const [editId, setEditId] = useState(null);
+  // ===== FORM =====
+  const [idPlan, setIdPlan] = useState("");
+  const [idProject, setIdProject] = useState("");
+  const [tasks, setTasks] = useState("");
+  const [workDone, setWorkDone] = useState("");
 
-//   // FILTER
-//   const [filterPlanId, setFilterPlanId] = useState("");
+  // EDIT
+  const [editId, setEditId] = useState(null);
 
-//   useEffect(() => {
-//     loadArticlePlans();
-//   }, []);
+  // FILTERS
+  const [filterPlanId, setFilterPlanId] = useState("");
+  const [filterProjectId, setFilterProjectId] = useState("");
 
-//   const loadArticlePlans = () => {
-//     ArticlePlanService.getAll()
-//       .then(res => setArticlePlans(res.data))
-//       .catch(err => alert(err.response?.data || "Load failed"));
-//   };
+  useEffect(() => {
+    loadAll();
+    loadProjects();
+    loadPlans();
+  }, []);
 
-//   // CREATE
-//   const addArticlePlan = () => {
-//     if (!idPlan || !idArticle) {
-//       alert("Plan ID and Article ID are required");
-//       return;
-//     }
+  /* ================= LOAD ================= */
 
-//     ArticlePlanService.create({
-//       idPlan: Number(idPlan),
-//       idArticlePlan: Number(idArticle),
-//       articleComments,
-//       publicationLink
-//     })
-//       .then(() => {
-//         clearForm();
-//         loadArticlePlans();
-//       })
-//       .catch(err => alert(err.response?.data || "Create failed"));
-//   };
+  const loadAll = () => {
+    ProjectPlanService.getAll()
+      .then(res => setProjectPlans(res.data))
+      .catch(() => alert("Failed to load project plans"));
+  };
 
-//   // DELETE
-//   const deleteArticlePlan = (id) => {
-//     ArticlePlanService.delete(id)
-//       .then(loadArticlePlans)
-//       .catch(err => alert(err.response?.data || "Delete failed"));
-//   };
+  const loadProjects = () => {
+    ProjectService.getAll()
+      .then(res => setProjects(res.data))
+      .catch(() => alert("Failed to load projects"));
+  };
 
-//   // UPDATE
-//   const startEdit = (ap) => {
-//     setEditId(ap.idArticlePlan);
-//     setIdPlan(ap.idPlan);
-//     setIdArticle(ap.idArticle);
-//     setArticleComments(ap.articleComments || "");
-//     setPublicationLink(ap.publicationLink || "");
-//   };
+  const loadPlans = () => {
+    PlanService.getAll()
+      .then(res => setPlans(res.data))
+      .catch(() => alert("Failed to load plans"));
+  };
 
-//   const saveEdit = () => {
-//     ArticlePlanService.update(editId, {
-//       idPlan: Number(idPlan),
-//       idArticlePlan: Number(idArticle),
-//       articleComments,
-//       publicationLink
-//     })
-//       .then(() => {
-//         cancelEdit();
-//         loadArticlePlans();
-//       })
-//       .catch(err => alert(err.response?.data || "Update failed"));
-//   };
+  /* ================= CREATE ================= */
 
-//   const cancelEdit = () => {
-//     setEditId(null);
-//     clearForm();
-//   };
+  const addProjectPlan = () => {
+    if (!idPlan || !idProject || !tasks || !workDone) {
+      alert("All fields are required");
+      return;
+    }
 
-//   const clearForm = () => {
-//     setIdPlan("");
-//     setIdArticle("");
-//     setArticleComments("");
-//     setPublicationLink("");
-//   };
+    ProjectPlanService.create({
+      idPlan: Number(idPlan),
+      idProject: Number(idProject),
+      tasks,
+      workDone
+    })
+      .then(() => {
+        clearForm();
+        loadAll();
+      })
+      .catch(err => alert(err.response?.data || "Create failed"));
+  };
 
-//   // FILTER
-//   const filterByPlan = () => {
-//     if (!filterPlanId) {
-//       loadArticlePlans();
-//       return;
-//     }
+  /* ================= UPDATE ================= */
 
-//     ArticlePlanService.filterByPlan(filterPlanId)
-//       .then(res => setArticlePlans(res.data))
-//       .catch(err => alert(err.response?.data || "Filter failed"));
-//   };
+  const startEdit = (pp) => {
+    setEditId(pp.idProjectPlan);
+    setIdPlan(pp.idPlan);
+    setIdProject(pp.idProject);
+    setTasks(pp.tasks);
+    setWorkDone(pp.workDone);
+  };
 
-//   return (
-//     <div>
-//       <h2>Article Plans</h2>
+  const saveEdit = () => {
+    ProjectPlanService.update(editId, {
+      idProjectPlan: editId,
+      idPlan: Number(idPlan),
+      idProject: Number(idProject),
+      tasks,
+      workDone
+    })
+      .then(() => {
+        cancelEdit();
+        loadAll();
+      })
+      .catch(err => alert(err.response?.data || "Update failed"));
+  };
 
-//       {/* 🔍 FILTER */}
-//       <div style={{ marginBottom: "15px" }}>
-//         <input
-//           placeholder="Filter by Plan ID"
-//           value={filterPlanId}
-//           onChange={e => setFilterPlanId(e.target.value)}
-//         />
-//         <button onClick={filterByPlan}>Filter</button>
-//         <button onClick={loadArticlePlans}>Clear</button>
-//       </div>
+  const cancelEdit = () => {
+    setEditId(null);
+    clearForm();
+  };
 
-//       {/* ➕ ADD / ✏️ EDIT */}
-//       <div style={{ marginBottom: "15px" }}>
-//         <input
-//           placeholder="Plan ID"
-//           value={idPlan}
-//           onChange={e => setIdPlan(e.target.value)}
-//         />
-//         <input
-//           placeholder="Article ID"
-//           value={idArticle}
-//           onChange={e => setIdArticle(e.target.value)}
-//         />
-//         <input
-//           placeholder="Comments"
-//           value={articleComments}
-//           onChange={e => setArticleComments(e.target.value)}
-//         />
-//         <input
-//           placeholder="Publication link"
-//           value={publicationLink}
-//           onChange={e => setPublicationLink(e.target.value)}
-//         />
+  /* ================= DELETE ================= */
 
-//         {editId ? (
-//           <>
-//             <button onClick={saveEdit}>Save</button>
-//             <button onClick={cancelEdit}>Cancel</button>
-//           </>
-//         ) : (
-//           <button onClick={addArticlePlan}>Add</button>
-//         )}
-//       </div>
+  const deleteProjectPlan = (id) => {
+    if (!window.confirm("Delete project plan?")) return;
 
-//       {/* 📄 LIST */}
-//       <ul>
-//         {articlePlans.map(ap => (
-//           <li key={ap.idArticlePlan}>
-//             Plan: {ap.idPlan} | Article: {ap.idArticle} | {ap.articleComments}
-//             {" "}
-//             <a href={ap.publicationLink} target="_blank" rel="noreferrer">
-//               Link
-//             </a>
-//             <button onClick={() => startEdit(ap)}>Update</button>
-//             <button onClick={() => deleteArticlePlan(ap.idArticlePlan)}>
-//               Delete
-//             </button>
-//           </li>
-//         ))}
-//       </ul>
-//     </div>
-//   );
-// };
+    ProjectPlanService.delete(id)
+      .then(loadAll)
+      .catch(err => alert(err.response?.data || "Delete failed"));
+  };
 
-// export default ArticlePlanList;
+  /* ================= FILTERS ================= */
+
+  const filterByPlan = () => {
+    if (!filterPlanId) {
+      loadAll();
+      return;
+    }
+
+    ProjectPlanService.getByPlan(Number(filterPlanId))
+      .then(res => setProjectPlans(res.data))
+      .catch(() => alert("No records found"));
+  };
+
+  const filterByProject = () => {
+    if (!filterProjectId) {
+      loadAll();
+      return;
+    }
+
+    ProjectPlanService.getByProject(Number(filterProjectId))
+      .then(res => setProjectPlans(res.data))
+      .catch(() => alert("No records found"));
+  };
+
+  /* ================= UTILS ================= */
+
+  const clearForm = () => {
+    setIdPlan("");
+    setIdProject("");
+    setTasks("");
+    setWorkDone("");
+  };
+
+  /* ================= RENDER ================= */
+
+  return (
+    <div>
+      <h2>Project Plans</h2>
+
+      {/* ADD / UPDATE */}
+      <div style={{ marginBottom: "20px" }}>
+        <select value={idPlan} onChange={e => setIdPlan(e.target.value)}>
+          <option value="">Select plan</option>
+          {plans.map(p => (
+            <option key={p.idPlan} value={p.idPlan}>
+              {p.idPlan}
+            </option>
+          ))}
+        </select>
+
+        <select value={idProject} onChange={e => setIdProject(e.target.value)}>
+          <option value="">Select project</option>
+          {projects.map(pr => (
+            <option key={pr.idProject} value={pr.idProject}>
+              {pr.name}
+            </option>
+          ))}
+        </select>
+
+        <input
+          placeholder="Tasks"
+          value={tasks}
+          onChange={e => setTasks(e.target.value)}
+        />
+
+        <input
+          placeholder="Work done"
+          value={workDone}
+          onChange={e => setWorkDone(e.target.value)}
+        />
+
+        {editId ? (
+          <>
+            <button onClick={saveEdit}>Save</button>
+            <button onClick={cancelEdit}>Cancel</button>
+          </>
+        ) : (
+          <button onClick={addProjectPlan}>Add</button>
+        )}
+      </div>
+
+      {/* FILTERS */}
+      <div style={{ marginBottom: "15px" }}>
+        <select value={filterPlanId} onChange={e => setFilterPlanId(e.target.value)}>
+          <option value="">All plans</option>
+          {plans.map(p => (
+            <option key={p.idPlan} value={p.idPlan}>
+              {p.idPlan}
+            </option>
+          ))}
+        </select>
+        <button onClick={filterByPlan}>Filter by plan</button>
+      </div>
+
+      <div style={{ marginBottom: "15px" }}>
+        <select value={filterProjectId} onChange={e => setFilterProjectId(e.target.value)}>
+          <option value="">All projects</option>
+          {projects.map(pr => (
+            <option key={pr.idProject} value={pr.idProject}>
+              {pr.name}
+            </option>
+          ))}
+        </select>
+        <button onClick={filterByProject}>Filter by project</button>
+      </div>
+
+      {/* LIST */}
+      <ul>
+        {projectPlans.map(pp => (
+          <li key={pp.idProjectPlan}>
+            Plan {pp.idPlan} | Project {pp.idProject} |
+            Tasks: {pp.tasks} | Work done: {pp.workDone}
+            <button onClick={() => startEdit(pp)}>Update</button>
+            <button onClick={() => deleteProjectPlan(pp.idProjectPlan)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default ProjectPlanList;
