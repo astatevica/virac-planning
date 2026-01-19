@@ -16,6 +16,7 @@ import ProjectPlanList from "./components/ProjectPlanList";
 import ArticlePlanList from "./components/ArticlePlanList";
 import CoursePlanList from "./components/CoursePlanList";
 import WorkPlanList from "./components/WorkPlanList";
+import PlanView from "./components/PlanView";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="/course-plan" element={<CoursePlanList />} />
           <Route path="/year" element={<YearList />} />
           <Route path="/plan" element={<PlanList />} />
+          <Route path="/plans/:id" element={<PlanView />} />
         </Routes>
       </div>
     </BrowserRouter>

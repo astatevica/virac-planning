@@ -3,7 +3,7 @@ import axios from "axios";
 
 const API = "http://localhost:8080/api";
 
-export default function PlanForm() {
+export default function PlanForm({ selectedPlan, onSuccess, onCancel }) {
   //controlls inputs
   const [employees, setEmployees] = useState([]);
   const [years, setYears] = useState([]);
@@ -47,6 +47,12 @@ export default function PlanForm() {
     axios.get(`${API}/year`).then(res => setYears(res.data));
   }, []);
 
+  useEffect(() => {
+    if (selectedPlan) {
+      setPlan(selectedPlan);
+    }
+  }, [selectedPlan]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (!name) return;
@@ -57,12 +63,49 @@ export default function PlanForm() {
     }));
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
     console.log("Sending:", plan);
-    axios.post(`${API}/plan`, plan)
-      .then(() => alert("Plan saved successfully"))
-      .catch(err => alert(err.response?.data?.message || "Error saving plan"));
+
+    const request = plan.idPlan
+      ? axios.put(`${API}/plan/${plan.idPlan}`, plan) // UPDATE
+      : axios.post(`${API}/plan`, plan);              // CREATE
+
+    request
+      .then(() => {
+        alert(plan.idPlan ? "Plan updated successfully" : "Plan created successfully");
+        setPlan({
+          idEmployee: "",
+          idYear: "",
+          numOfProjects: "",
+          numOfArticles: "",
+          numOfCourses: "",
+          numOfStudWork: "",
+          partInConf: "",
+          partInConfEnd: "",
+          comAbConf: "",
+          comAbConfEnd: "",
+          promoOfResearch: "",
+          promoOfResearchEnd: "",
+          adminWork: "",
+          adminWorkEnd: "",
+          projApplicSub: "",
+          projApplicSubEnd: "",
+          skillsDevelopment: "",
+          skillsDevelopmentEnd: "",
+          participationInSeminars: "",
+          participationInSeminarsEnd: "",
+          otherJobs: "",
+          otherJobsEnd: ""
+        });
+        onSuccess?.();
+      })
+      .catch(err =>
+        alert(err.response?.data?.message || "Error saving plan")
+      );
   };
+
 
   const NumberField = ({ label, name }) => (
     <div style={{ marginBottom: 10 }}>
@@ -128,7 +171,8 @@ export default function PlanForm() {
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 1100, margin: "auto" }}>
-      <h2>Annual Employee Plan</h2>
+      <hr />
+      <h2>Annual Employee Plan Form</h2>
 
       <label>Employee</label><br />
       <select name="idEmployee" value={plan.idEmployee} onChange={handleChange} required>
@@ -184,7 +228,46 @@ export default function PlanForm() {
       </table>
 
       <br />
-      <button type="submit">Save Plan</button>
+      <button type="submit">
+        {plan.idPlan ? "Update Plan" : "Save Plan"}
+      </button>
+
+      {plan.idPlan && (
+        <button
+          type="button"
+          onClick={() => {
+            onCancel();
+            setPlan({
+              idEmployee: "",
+              idYear: "",
+              numOfProjects: "",
+              numOfArticles: "",
+              numOfCourses: "",
+              numOfStudWork: "",
+              partInConf: "",
+              partInConfEnd: "",
+              comAbConf: "",
+              comAbConfEnd: "",
+              promoOfResearch: "",
+              promoOfResearchEnd: "",
+              adminWork: "",
+              adminWorkEnd: "",
+              projApplicSub: "",
+              projApplicSubEnd: "",
+              skillsDevelopment: "",
+              skillsDevelopmentEnd: "",
+              participationInSeminars: "",
+              participationInSeminarsEnd: "",
+              otherJobs: "",
+              otherJobsEnd: ""
+            });
+          }}
+          style={{ marginLeft: 10 }}
+        >
+          Cancel
+        </button>
+      )}
+
     </form>
   );
 }
