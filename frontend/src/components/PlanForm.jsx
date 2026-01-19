@@ -3,6 +3,40 @@ import axios from "axios";
 
 const API = "http://localhost:8080/api";
 
+const AutoTextarea = React.memo(function AutoTextarea({
+  name,
+  value,
+  onChange,
+  placeholder
+}) {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.style.height = "auto";
+      ref.current.style.height = ref.current.scrollHeight + "px";
+    }
+  }, [value]);
+
+  return (
+    <textarea
+      ref={ref}
+      name={name}
+      value={value}
+      onChange={onChange}
+      rows={3}
+      placeholder={placeholder}
+      style={{
+        width: "95%",
+        resize: "none",
+        overflow: "hidden",
+        padding: "8px",
+        lineHeight: "1.5"
+      }}
+    />
+  );
+});
+
 export default function PlanForm({ selectedPlan, onSuccess, onCancel }) {
   //controlls inputs
   const [employees, setEmployees] = useState([]);
@@ -47,11 +81,13 @@ export default function PlanForm({ selectedPlan, onSuccess, onCancel }) {
     axios.get(`${API}/year`).then(res => setYears(res.data));
   }, []);
 
+
   useEffect(() => {
-    if (selectedPlan) {
-      setPlan(selectedPlan);
-    }
+  if (selectedPlan) {
+    setPlan({ ...selectedPlan }); //clone to avoid reference issues
+  } 
   }, [selectedPlan]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -139,35 +175,6 @@ export default function PlanForm({ selectedPlan, onSuccess, onCancel }) {
         </td>
     </tr>
    );
-
-  const AutoTextarea = ({ name, value, onChange, placeholder }) => {
-    const ref = useRef(null);
-  
-    useEffect(() => {
-      if (ref.current) {
-        ref.current.style.height = "auto";
-        ref.current.style.height = ref.current.scrollHeight + "px";
-      }
-    }, [value]);
-  
-      return (
-        <textarea
-          ref={ref}
-          name={name}
-          value={value}
-          onChange={onChange}
-          rows={3}
-          placeholder={placeholder}
-          style={{
-            width: "95%",
-            resize: "none",
-            overflow: "hidden",
-            padding: "8px",
-            lineHeight: "1.5"
-          }}
-        />
-      );
-    };
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 1100, margin: "auto" }}>
