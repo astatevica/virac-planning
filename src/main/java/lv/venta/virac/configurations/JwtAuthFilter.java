@@ -3,6 +3,9 @@ package lv.venta.virac.configurations;
 import java.io.IOException;
 
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -18,6 +21,7 @@ import lv.venta.virac.service.JwtService;
 public class JwtAuthFilter extends OncePerRequestFilter{
 	
 	private final JwtService jwtService;
+	private UserDetailsService userDetailsService;
 
 	@Override
 	protected void doFilterInternal(
@@ -34,6 +38,23 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 		}
 		jwt = authHeader.substring(7);
 		userEmail = jwtService.extractUsername(jwt);
+		if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+	      UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+//	      var isTokenValid = tokenRepository.findByToken(jwt)
+//	          .map(t -> !t.isExpired() && !t.isRevoked())
+//	          .orElse(false);
+//	      if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
+//	        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+//	            userDetails,
+//	            null,
+//	            userDetails.getAuthorities()
+//	        );
+//	        authToken.setDetails(
+//	            new WebAuthenticationDetailsSource().buildDetails(request)
+//	        );
+//	        SecurityContextHolder.getContext().setAuthentication(authToken);
+//	      }
+	    }
 	}
 
 }
