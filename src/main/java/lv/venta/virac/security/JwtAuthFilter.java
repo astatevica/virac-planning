@@ -1,4 +1,4 @@
-package lv.venta.virac.configurations;
+package lv.venta.virac.security;
 
 import java.io.IOException;
 
@@ -16,7 +16,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lv.venta.virac.service.security.JwtService;
 
 @Component
 @RequiredArgsConstructor

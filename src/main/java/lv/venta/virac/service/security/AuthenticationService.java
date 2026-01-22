@@ -12,6 +12,7 @@ import lv.venta.virac.controller.security.AuthenticationResponse;
 import lv.venta.virac.controller.security.RegisterRequest;
 import lv.venta.virac.model.security.Role;
 import lv.venta.virac.repo.security.IUserRepo;
+import lv.venta.virac.security.JwtService;
 
 @Service
 @RequiredArgsConstructor
