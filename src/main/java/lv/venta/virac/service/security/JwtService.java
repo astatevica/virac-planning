@@ -1,4 +1,4 @@
-package lv.venta.virac.service;
+package lv.venta.virac.service.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;

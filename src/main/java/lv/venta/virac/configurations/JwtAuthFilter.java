@@ -3,9 +3,11 @@ package lv.venta.virac.configurations;
 import java.io.IOException;
 
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -14,7 +16,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lv.venta.virac.service.JwtService;
+import lv.venta.virac.service.security.JwtService;
 
 @Component
 @RequiredArgsConstructor
@@ -39,21 +41,28 @@ public class JwtAuthFilter extends OncePerRequestFilter{
 		jwt = authHeader.substring(7);
 		userEmail = jwtService.extractUsername(jwt);
 		if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+			//dabūjam info par lietotāju no DB
 	      UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
 //	      var isTokenValid = tokenRepository.findByToken(jwt)
 //	          .map(t -> !t.isExpired() && !t.isRevoked())
 //	          .orElse(false);
-//	      if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {
-//	        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-//	            userDetails,
-//	            null,
-//	            userDetails.getAuthorities()
-//	        );
-//	        authToken.setDetails(
-//	            new WebAuthenticationDetailsSource().buildDetails(request)
-//	        );
-//	        SecurityContextHolder.getContext().setAuthentication(authToken);
-//	      }
+	      //Ja user ir valid, tad 
+	      if (jwtService.isTokenValid(jwt, userDetails) /*&& isTokenValid*/) {
+	    	  //tad tiek izveidots user token
+	        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+	            userDetails,
+	            null,
+	            userDetails.getAuthorities()
+	        );
+	        //tad tokenu apvieno ar detaļām, kuras mums nepieciešamas
+	        authToken.setDetails(
+	            new WebAuthenticationDetailsSource().buildDetails(request)
+	        );
+	        //un atjauno tokenu
+	        SecurityContextHolder.getContext().setAuthentication(authToken);
+	      }
+	      //jāizsauc filtrēšanas ķēde, lai tiek filtrēšana izdarīta
+	      filterChain.doFilter(request, response);
 	    }
 	}
 
