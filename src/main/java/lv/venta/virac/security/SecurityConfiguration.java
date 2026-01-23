@@ -2,16 +2,20 @@ package lv.venta.virac.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+//import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
-import lombok.RequiredArgsConstructor;
+//import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
@@ -19,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @EnableMethodSecurity
 public class SecurityConfiguration {
 	
-	private final JwtAuthFilter jwtAuthFilter; //ChatHPT & Ali_Bouali
+	private final JwtAuthFilter jwtAuthFilter; //Chat & Ali_Bouali
 	//private final AuthenticationProvider authenticationProvider; //Ali_Bouali
 	
 	public SecurityConfiguration(JwtAuthFilter jwtAuthFilter) {
@@ -31,19 +35,19 @@ public class SecurityConfiguration {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
 //Ali_Bouali
 //		http
-//			.csrf() //ChatGPT
-//			.disable()
-//			.authorizeHttpRequests()
-//			.requestMatchers("/api/auth/**")
-//			.permitAll()
-//			.anyRequest()
-//			.authenticated()
+//			.csrf() //Chat
+//			.disable() //Chat
+//			.authorizeHttpRequests() //Chat
+//			.requestMatchers("/api/auth/**") //Chat
+//			.permitAll() //Chat
+//			.anyRequest() //Chat
+//			.authenticated() //Chat
 //			.and()
 //			.sessionManagement()
-//			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//			.sessionCreationPolicy(SessionCreationPolicy.STATELESS) //Chat
 //			.and()
 //			.authenticationProvider(authenticationProvider)
-//			.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//			.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); //Chat
 //		
 		
 		http
@@ -56,10 +60,23 @@ public class SecurityConfiguration {
             .requestMatchers("/admin/api/**").hasRole("ADMIN")
             .anyRequest().authenticated()
         )
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
+	
+	//Chat
+	@Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+	//Chat
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 	
 
 }
