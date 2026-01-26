@@ -67,9 +67,9 @@ public class ViracPlaningIApplication {
 				yearRepo.saveAll((Arrays.asList(year1, year2, year3)));
 		
 				//ViracDepartmentTable DONE
-				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology");
-				ViracDepartment dep2 = new ViracDepartment("Astronomy and Astrophysics");
-				ViracDepartment dep3 = new ViracDepartment("Engineering & Technical Operations group(ETO/ETOG)");
+				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology", "Karina", "Šķirmante");
+				ViracDepartment dep2 = new ViracDepartment("Astronomy and Astrophysics", "Juris", "Kalvāns");
+				ViracDepartment dep3 = new ViracDepartment("Engineering & Technical Operations group(ETO/ETOG)", "Juris", "Freimanis");
 				
 				viracDepRepo.saveAll((Arrays.asList(dep1, dep2, dep3)));
 				

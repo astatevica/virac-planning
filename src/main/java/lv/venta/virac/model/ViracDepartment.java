@@ -46,6 +46,14 @@ public class ViracDepartment {
 	//@Size(max = 20, min = 2)
 	private String name;
 	
+	@Column(name = "headName")
+	@NotNull
+	private String headName;
+	
+	@Column(name = "headSurname")
+	@NotNull
+	private String headSurname;
+	
 	@OneToMany(mappedBy = "viracDepartment")
 	@ToString.Exclude
 	@JsonIgnore
@@ -54,7 +62,9 @@ public class ViracDepartment {
 	@Column(name = "deleted")
 	private boolean deleted = Boolean.FALSE;
 	
-	public ViracDepartment(String name){
+	public ViracDepartment(String name, String headName, String headSurname){
 		setName(name);
+		setHeadName(headName);
+		setHeadSurname(headSurname);
 	}
 }

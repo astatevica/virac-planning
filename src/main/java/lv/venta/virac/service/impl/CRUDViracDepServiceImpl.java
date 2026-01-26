@@ -49,7 +49,7 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
     }
 
     @Override
-    public void create(String name) throws Exception {
+    public void create(String name, String headName, String headSurname) throws Exception {
         ArrayList<ViracDepartment> departmets = (ArrayList<ViracDepartment>) depRepo.findAll();
         
         for (ViracDepartment dep : departmets) {
@@ -64,7 +64,7 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
     }
 
     @Override
-    public void updateById(int id, String name) throws Exception {
+    public void updateById(int id, String name, String headName, String headSurname) throws Exception {
     	ViracDepartment department = retrieveById(id);
     	if (department == null) throw new 
     		Exception("Department with (id:" + id + ") does not exist");

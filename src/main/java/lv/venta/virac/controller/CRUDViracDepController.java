@@ -42,7 +42,9 @@ public class CRUDViracDepController {
         	        departments.stream()
         	            .map(dep -> new DepartmentDTO(
         	                dep.getIdDepartment(),
-        	                dep.getName()
+        	                dep.getName(),
+        	                dep.getHeadName(),
+        	                dep.getHeadSurname()
         	            ))
         	            .toList()
         	    );
@@ -57,34 +59,34 @@ public class CRUDViracDepController {
 
         ViracDepartment dep = depService.retrieveById(id);
         return ResponseEntity.ok(
-            new DepartmentDTO(dep.getIdDepartment(), dep.getName())
+            new DepartmentDTO(dep.getIdDepartment(), dep.getName(), dep.getHeadName(),dep.getHeadSurname())
         );
     }
 
     @PostMapping
     public ResponseEntity<Void> create(
-            @Valid @RequestBody DepartmentRequestDTO dto,
+            @Valid @RequestBody DepartmentDTO dto,
             BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        depService.create(dto.getName());
+        depService.create(dto.getName(), dto.getHeadName(),dto.getHeadSurname());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
-            @Valid @RequestBody DepartmentRequestDTO dto,
+            @Valid @RequestBody DepartmentDTO dto,
             BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        depService.updateById(id, dto.getName());
+        depService.updateById(id, dto.getName(), dto.getHeadName(), dto.getHeadSurname());
         return ResponseEntity.ok().build();
     }
 
