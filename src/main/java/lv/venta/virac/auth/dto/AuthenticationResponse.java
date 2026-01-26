@@ -15,3 +15,5 @@ public class AuthenticationResponse {
 	
 
 }
+
+//public record AuthResponse(String accessToken) {}
