@@ -37,6 +37,9 @@ import lv.venta.virac.repo.IStudentWorkRepo;
 import lv.venta.virac.repo.IViracDepartmentRepo;
 import lv.venta.virac.repo.IWorkPlanRepo;
 import lv.venta.virac.repo.IYearRepo;
+import lv.venta.virac.user.IUserRepo;
+import lv.venta.virac.user.Role;
+import lv.venta.virac.user.User;
 
 @SpringBootApplication
 public class ViracPlaningIApplication {
@@ -52,7 +55,7 @@ public class ViracPlaningIApplication {
 			IPlanRepo planRepo, IProjectManagementRepo projMangRepo, 
 			IProjectPlanRepo projPlanRepo, IProjectRepo projRepo,
 			IScientificArticlesRepo scientArtRepo, IStudentWorkRepo studWorkRepo,
-			IViracDepartmentRepo viracDepRepo, IWorkPlanRepo workPlanRepo)
+			IViracDepartmentRepo viracDepRepo, IWorkPlanRepo workPlanRepo, IUserRepo userRepo)
 	{
 		return new CommandLineRunner() {
 			
@@ -79,6 +82,12 @@ public class ViracPlaningIApplication {
 				Employee emp3 = new Employee("Māra", "Klausa", dep3 , "Tehniskais speciālists");
 				
 				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3)));
+				
+				//UserTable
+				User user1 = new User("Karina", "Šķirmante","karina@venta.lv", "skirmante123", Role.ADMIN, emp1);
+				User user2 = new User("Juris", "Kalvāns","kalvans@venta.lv", "kalvans123", Role.USER, emp2);
+				
+				userRepo.saveAll((Arrays.asList(user1,user2)));
 				
 				//PlanTable DONE
 				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");

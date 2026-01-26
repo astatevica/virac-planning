@@ -56,8 +56,11 @@ public class SecurityConfiguration {
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/**").permitAll()
-            .requestMatchers("/admin/api/**").hasRole("ADMIN")
+            .requestMatchers("/api/auth/**").permitAll()
+            .requestMatchers("/api/**").hasRole("ADMIN")
+            .requestMatchers("/api/filter/plans/crud/{idDarbiniekam}").hasRole("USER")
+            .requestMatchers("/api/filter/plans/filter/{idDarbiniekam}/{gads}").hasRole("USER")
+            .requestMatchers("/api/filter/plans/filter/{idDarbiniekam}/{projekti}").hasRole("USER")
             .anyRequest().authenticated()
         )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

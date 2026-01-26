@@ -8,6 +8,6 @@ public interface IUserRepo extends JpaRepository<User, Integer> {
 
 	Optional<User> findByEmail(String email);
 	
-	public abstract User findbyId(int id);
+	public abstract User findByIdUser(int id);
 
 }

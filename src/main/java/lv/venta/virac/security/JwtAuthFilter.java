@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthFilter extends OncePerRequestFilter{
 	
 	//Chat & Ali_Bouali 
-	private final JwtService jwtService;
+	private JwtService jwtService;
 	private UserDetailsService userDetailsService;
 	
 	//Chat

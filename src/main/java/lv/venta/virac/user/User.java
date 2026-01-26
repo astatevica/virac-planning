@@ -104,12 +104,13 @@ public class User implements UserDetails{
 		return true;
 	}
 	
-	public User(String firstname, String lastname,String email, String password, Role role) {
+	public User(String firstname, String lastname,String email, String password, Role role, Employee employee) {
 		setFirstname(firstname);
 		setLastname(lastname);
 		setEmail(email);
 		setPassword(password);
 		setRole(role);
+		setEmployee(employee);
 	}
 
 

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lv.venta.virac.dto.DepartmentDTO;
-import lv.venta.virac.dto.DepartmentRequestDTO;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.service.ICRUDViracDepService;
 
