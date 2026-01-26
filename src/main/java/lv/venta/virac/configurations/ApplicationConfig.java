@@ -12,7 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lombok.RequiredArgsConstructor;
-import lv.venta.virac.repo.security.IUserRepo;
+import lv.venta.virac.user.IUserRepo;
 
 @Configuration
 @RequiredArgsConstructor

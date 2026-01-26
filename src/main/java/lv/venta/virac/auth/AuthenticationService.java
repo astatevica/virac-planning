@@ -1,4 +1,4 @@
-package lv.venta.virac.service.security;
+package lv.venta.virac.auth;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -7,12 +7,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import lv.venta.virac.controller.security.AuthenticationRequest;
-import lv.venta.virac.controller.security.AuthenticationResponse;
-import lv.venta.virac.controller.security.RegisterRequest;
-import lv.venta.virac.model.security.Role;
-import lv.venta.virac.repo.security.IUserRepo;
+import lv.venta.virac.auth.dto.AuthenticationRequest;
+import lv.venta.virac.auth.dto.AuthenticationResponse;
+import lv.venta.virac.auth.dto.RegisterRequest;
 import lv.venta.virac.security.JwtService;
+import lv.venta.virac.user.IUserRepo;
+import lv.venta.virac.user.Role;
 
 @Service
 @RequiredArgsConstructor

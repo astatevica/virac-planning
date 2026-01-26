@@ -1,4 +1,4 @@
-package lv.venta.virac.model.security;
+package lv.venta.virac.user;
 
 import java.util.List;
 import java.util.Collection;

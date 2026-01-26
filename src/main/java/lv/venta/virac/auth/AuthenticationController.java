@@ -1,4 +1,4 @@
-package lv.venta.virac.controller.security;
+package lv.venta.virac.auth;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import lv.venta.virac.service.security.AuthenticationService;
+import lv.venta.virac.auth.dto.AuthenticationResponse;
 
 @RestController
 @RequestMapping("/api/auth")
