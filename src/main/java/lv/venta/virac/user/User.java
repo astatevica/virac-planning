@@ -14,6 +14,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lv.venta.virac.model.Employee;
+import lv.venta.virac.model.ProjectManagement;
 
 @Data
 @Builder
@@ -59,6 +63,10 @@ public class User implements UserDetails{
 	@Column(name = "role", nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Role role;
+	
+	@OneToOne
+	@JoinColumn(name = "idEmployee")
+	private Employee employee;
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

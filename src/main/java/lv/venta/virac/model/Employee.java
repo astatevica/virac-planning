@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -25,6 +26,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lv.venta.virac.user.User;
 
 @Setter
 @Getter
@@ -73,6 +75,10 @@ public class Employee {
 
 	@Column(name = "deleted")
 	private boolean deleted = Boolean.FALSE;
+	
+	@OneToOne(mappedBy = "employee")
+	@ToString.Exclude
+	private User user;
 	
 	public Employee(String name, String surname,ViracDepartment viracDepartment, String position) {
 		setName(name);
