@@ -1,28 +1,45 @@
-//package lv.venta.virac.auth;
-//
-//import org.springframework.security.authentication.AuthenticationManager;
-//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-//import org.springframework.security.core.userdetails.User;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.stereotype.Service;
-//
-//import lombok.RequiredArgsConstructor;
-//import lv.venta.virac.auth.dto.AuthenticationRequest;
-//import lv.venta.virac.auth.dto.AuthenticationResponse;
-//import lv.venta.virac.auth.dto.RegisterRequest;
-//import lv.venta.virac.security.JwtService;
-//import lv.venta.virac.user.IUserRepo;
-//import lv.venta.virac.user.Role;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class AuthenticationService {
-//	
-//	private final IUserRepo repository;
-//	private final PasswordEncoder passwordEncoder; 
-//	private final JwtService jwtService;
-//	private final AuthenticationManager authenticationManager;
-//	
+package lv.venta.virac.auth;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.stereotype.Service;
+
+import lombok.RequiredArgsConstructor;
+import lv.venta.virac.auth.dto.AuthenticationRequest;
+import lv.venta.virac.auth.dto.AuthenticationResponse;
+import lv.venta.virac.security.JwtService;
+import lv.venta.virac.token.RefreshTokenService;
+import lv.venta.virac.user.IUserRepo;
+import lv.venta.virac.user.User;
+
+@Service
+@RequiredArgsConstructor
+public class AuthenticationService {
+	
+	private final IUserRepo userRepo;
+	//private final PasswordEncoder passwordEncoder; 
+	private final JwtService jwtService;
+	private final AuthenticationManager authenticationManager;
+	private final RefreshTokenService refreshTokenService;
+	
+	public AuthenticationResponse authenticate(AuthenticationRequest request) {
+
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        User user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow();
+
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+
+        return new AuthenticationResponse(accessToken, refreshToken);
+    }
+	
 //	public AuthenticationResponse register(RegisterRequest request) {
 //		var user = User.builder()
 //				.firstname(request.getFirstname())
@@ -52,4 +69,4 @@
 //				.token(jwtToken)
 //				.build();
 //	}
-//}
+}
