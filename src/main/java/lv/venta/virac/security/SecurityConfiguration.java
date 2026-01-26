@@ -78,5 +78,25 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 	
+//	@Bean
+//	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+//Ali_Bouali
+//		http
+//			.csrf() //Chat
+//			.disable() //Chat
+//			.authorizeHttpRequests() //Chat
+//			.requestMatchers("/api/auth/**") //Chat
+//			.permitAll() //Chat
+//			.anyRequest() //Chat
+//			.authenticated() //Chat
+//			.and()
+//			.sessionManagement()
+//			.sessionCreationPolicy(SessionCreationPolicy.STATELESS) //Chat
+//			.and()
+//			.authenticationProvider(authenticationProvider)
+//			.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class); //Chat
+//		
+//		return http.build();
+//	}
 
 }
