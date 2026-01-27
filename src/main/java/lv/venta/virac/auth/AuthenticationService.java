@@ -22,7 +22,7 @@ public class AuthenticationService {
 	private final AuthenticationManager authenticationManager;
 	private final RefreshTokenService refreshTokenService;
 	
-	public AuthenticationResponse authenticate(AuthenticationRequest request) {
+	public AuthenticationResponse authenticate(AuthenticationRequest request) throws Exception {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -37,7 +37,8 @@ public class AuthenticationService {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
 
-        return new AuthenticationResponse(accessToken, refreshToken);
+//        return new AuthenticationResponse(accessToken, refreshToken);
+        return new AuthenticationResponse(refreshToken);
     }
 	
 //	public AuthenticationResponse register(RegisterRequest request) {

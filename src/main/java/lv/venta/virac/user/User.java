@@ -52,10 +52,11 @@ public class User implements UserDetails{
 	@Column(name = "lastname")
 	private String lastname;
 	
-	@Column(name = "email")
+	@Column(name = "email", unique = true, nullable = false)
 	private String email;
 	
 	@Column(name = "password")
+	//@JsonIgnore (prevents accidental exposure)
 	private String password;
 	
 	@Column(name = "role", nullable = false)

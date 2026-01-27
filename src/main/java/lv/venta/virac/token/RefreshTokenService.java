@@ -25,9 +25,9 @@ public class RefreshTokenService {
         this.jwtService = jwtService;
     }
 
-    public RefreshToken createRefreshToken(int userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow();
+    public RefreshToken createRefreshToken(int idUser) throws Exception{
+        User user = userRepository.findByIdUser(idUser);
+        if (user == null) throw new Exception("There is no user with id :" + idUser);
 
         RefreshToken token = new RefreshToken();
         token.setUser(user);
@@ -57,7 +57,7 @@ public class RefreshTokenService {
         }
 
         String newAccessToken = jwtService.generateToken(refreshToken.getUser());
-        return new AuthenticationResponse(newAccessToken, token);
+        return new AuthenticationResponse(newAccessToken);
     }
 
 }

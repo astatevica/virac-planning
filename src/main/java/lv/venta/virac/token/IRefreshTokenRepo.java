@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IRefreshTokenRepo extends JpaRepository<RefreshToken, Integer>{
 
-	Optional<RefreshToken> findByToken(String token);
+	public abstract Optional<RefreshToken> findByToken(String token);
 
-    void deleteByUserId(int userId);
+	public abstract void deleteByIdUser(int idUser);
 }
