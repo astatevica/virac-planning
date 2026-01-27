@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lv.venta.virac.auth.dto.AuthenticationResponse;
+import lv.venta.virac.exception.RefreshTokenException;
 import lv.venta.virac.security.JwtService;
 import lv.venta.virac.user.User;
 
@@ -39,11 +40,11 @@ public class RefreshTokenService {
     public AuthenticationResponse refreshToken(String requestToken) {
 
         RefreshToken refreshToken = refreshTokenRepository.findByToken(requestToken)
-                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
+                .orElseThrow(() -> new RefreshTokenException("Refresh token not found"));
 
         if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
             refreshTokenRepository.delete(refreshToken);
-            throw new RuntimeException("Refresh token expired");
+            throw new RefreshTokenException("Refresh token expired");
         }
 
         // Rotate refresh token
@@ -61,6 +62,11 @@ public class RefreshTokenService {
     @Transactional
     public void deleteByUser(User user) {
         refreshTokenRepository.deleteByIdUser(user.getId());
+    }
+
+    @Transactional
+    public void deleteByUserId(int userId) {
+        refreshTokenRepository.deleteByIdUser(userId);
     }
 
 }

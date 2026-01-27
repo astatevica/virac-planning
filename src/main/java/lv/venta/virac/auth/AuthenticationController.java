@@ -8,12 +8,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.RequiredArgsConstructor;
 import lv.venta.virac.auth.dto.AuthenticationRequest;
 import lv.venta.virac.auth.dto.AuthenticationResponse;
+import lv.venta.virac.auth.dto.RegisterRequest;
 import lv.venta.virac.token.RefreshTokenService;
+import lv.venta.virac.user.IUserRepo;
+import lv.venta.virac.user.User;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
 public class AuthenticationController {
 	
@@ -26,6 +31,13 @@ public class AuthenticationController {
     ) throws Exception {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
+    
+    @PostMapping("/register")
+    public ResponseEntity<AuthenticationResponse> register(
+            @RequestBody RegisterRequest request
+    ) {
+        return ResponseEntity.ok(authenticationService.register(request));
+    }
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthenticationResponse> refresh(
@@ -34,113 +46,10 @@ public class AuthenticationController {
         return ResponseEntity.ok(refreshTokenService.refreshToken(refreshToken));
     }
     
-//	@PostMapping("/register")
-//	public ResponseEntity<AuthenticationResponse> register(
-//			@RequestBody RegisterRequest){
-//		return ResponseEntity.ok(service.register(request));
-//	}
-    
-    
-    
-//	@PostMapping("/register")
-//	public ResponseEntity<AuthenticationResponse> register(
-//			@RequestBody RegisterRequest){
-//		return ResponseEntity.ok(service.register(request));
-//	}
-	
-//	private final AuthenticationManager authenticationManager;
-//    private final JwtService jwtService;
-//    private final RefreshTokenService refreshTokenService;
-//    private final IRefreshTokenRepo refreshTokenRepository;
-//
-//    public AuthenticationController(
-//            AuthenticationManager authenticationManager,
-//            JwtService jwtService,
-//            RefreshTokenService refreshTokenService,
-//            IRefreshTokenRepo refreshTokenRepository) {
-//        this.authenticationManager = authenticationManager;
-//        this.jwtService = jwtService;
-//        this.refreshTokenService = refreshTokenService;
-//        this.refreshTokenRepository = refreshTokenRepository;
-//    }
-//
-//    @PostMapping("/login")
-//    public AuthenticationResponse login(
-//            @RequestBody AuthenticationRequest request,
-//            HttpServletResponse response) {
-//
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        request.getUsername(),
-//                        request.getPassword()
-//                )
-//        );
-//
-//        var user = (User) authentication.getPrincipal();
-//
-//        String accessToken = jwtService.generateToken(user);
-//
-//        RefreshToken refreshToken =
-//                refreshTokenService.createRefreshToken(
-//                        Integer.valueOf(user.getUsername()) // adapt to your user ID logic
-//                );
-//
-//        Cookie cookie = new Cookie("refreshToken", refreshToken.getToken());
-//        cookie.setHttpOnly(true);
-//        cookie.setPath("/auth");
-//        cookie.setMaxAge(7 * 24 * 60 * 60);
-//        response.addCookie(cookie);
-//
-//        return new AuthenticationResponse(accessToken);
-//    }
-//
-//    @PostMapping("/refresh")
-//    public AuthenticationResponse refresh(
-//            @CookieValue("refreshToken") String refreshToken) {
-//
-//        RefreshToken token = refreshTokenRepository
-//                .findByToken(refreshToken)
-//                .map(refreshTokenService::verifyExpiration)
-//                .orElseThrow();
-//
-//        String newAccessToken =
-//                jwtService.generateToken(
-//                        token.getUser()
-//                );
-//
-//        return new AuthenticationResponse(newAccessToken);
-//    }
-//
-//    @PostMapping("/logout")
-//    public void logout(
-//            @CookieValue("refreshToken") String refreshToken,
-//            HttpServletResponse response) {
-//
-//        refreshTokenRepository
-//                .findByToken(refreshToken)
-//                .ifPresent(refreshTokenRepository::delete);
-//
-//        Cookie cookie = new Cookie("refreshToken", null);
-//        cookie.setHttpOnly(true);
-//        cookie.setMaxAge(0);
-//        cookie.setPath("/auth");
-//        response.addCookie(cookie);
-//    }
-	
-	
-	//Ali-Bouali
-//	private final AuthenticationService service;
-//
-//	@PostMapping("/register")
-//	public ResponseEntity<AuthenticationResponse> register(
-//			@RequestBody RegisterRequest){
-//		return ResponseEntity.ok(service.register(request));
-//	}
-//	
-//	@PostMapping("/authenticate")
-//	public ResponseEntity<AuthenticationResponse> authenticate(
-//			@RequestBody AuthenticationRequest){
-//		return ResponseEntity.ok(service.authenticate(request));
-//	}
-	
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestParam int userId) {
+        refreshTokenService.deleteByUserId(userId);
+        return ResponseEntity.ok().build();
+    }
+
 }
