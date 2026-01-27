@@ -61,12 +61,12 @@ public class RefreshTokenService {
 
     @Transactional
     public void deleteByUser(User user) {
-        refreshTokenRepository.deleteByIdUser(user.getId());
+        refreshTokenRepository.deleteByUser_IdUser(user.getIdUser());
     }
 
     @Transactional
     public void deleteByUserId(int userId) {
-        refreshTokenRepository.deleteByIdUser(userId);
+        refreshTokenRepository.deleteByUser_IdUser(userId);
     }
 
 }

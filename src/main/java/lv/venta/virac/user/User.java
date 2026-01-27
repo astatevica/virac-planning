@@ -44,7 +44,7 @@ public class User implements UserDetails{
 	@Column(name = "idUser")
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Setter(value = AccessLevel.NONE)
-	private Integer id;
+	private Integer idUser;
 	
 	@Column(name = "firstname")
 	private String firstname;

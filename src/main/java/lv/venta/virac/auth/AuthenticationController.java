@@ -16,12 +16,17 @@ import lv.venta.virac.token.RefreshTokenService;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
 public class AuthenticationController {
 	
 	private AuthenticationService authenticationService;
     private RefreshTokenService refreshTokenService;
+    
+    public public AuthenticationController(AuthenticationService authenticationService,
+            RefreshTokenService refreshTokenService) {
+    			this.authenticationService = authenticationService;
+    			this.refreshTokenService = refreshTokenService;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(

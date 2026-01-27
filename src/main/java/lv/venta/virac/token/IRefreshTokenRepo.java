@@ -8,5 +8,5 @@ public interface IRefreshTokenRepo extends JpaRepository<RefreshToken, Integer>{
 
 	public abstract Optional<RefreshToken> findByToken(String token);
 
-	public abstract void deleteByIdUser(int idUser);
+	public abstract void deleteByUser_IdUser(int idUser);
 }
