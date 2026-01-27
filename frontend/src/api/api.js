@@ -1,3 +1,4 @@
+// src/api/api.js
 import axios from "axios";
 
 const api = axios.create({
@@ -17,10 +18,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (
-      error.response?.status === 401 &&
-      !originalRequest._retry
-    ) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
       try {
@@ -39,7 +37,7 @@ api.interceptors.response.use(
           `Bearer ${res.data.accessToken}`;
 
         return api(originalRequest);
-      } catch (err) {
+      } catch {
         localStorage.clear();
         window.location.href = "/login";
       }

@@ -13,8 +13,6 @@ import lv.venta.virac.auth.dto.AuthenticationRequest;
 import lv.venta.virac.auth.dto.AuthenticationResponse;
 import lv.venta.virac.auth.dto.RegisterRequest;
 import lv.venta.virac.token.RefreshTokenService;
-import lv.venta.virac.user.IUserRepo;
-import lv.venta.virac.user.User;
 
 @RestController
 @RequestMapping("/api/auth")
