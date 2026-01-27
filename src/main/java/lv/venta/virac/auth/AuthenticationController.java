@@ -33,6 +33,20 @@ public class AuthenticationController {
     ) {
         return ResponseEntity.ok(refreshTokenService.refreshToken(refreshToken));
     }
+    
+//	@PostMapping("/register")
+//	public ResponseEntity<AuthenticationResponse> register(
+//			@RequestBody RegisterRequest){
+//		return ResponseEntity.ok(service.register(request));
+//	}
+    
+    
+    
+//	@PostMapping("/register")
+//	public ResponseEntity<AuthenticationResponse> register(
+//			@RequestBody RegisterRequest){
+//		return ResponseEntity.ok(service.register(request));
+//	}
 	
 //	private final AuthenticationManager authenticationManager;
 //    private final JwtService jwtService;

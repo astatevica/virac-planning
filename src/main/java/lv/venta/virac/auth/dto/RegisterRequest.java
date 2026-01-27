@@ -18,7 +18,4 @@ public class RegisterRequest {
 	private String idRole;
 	private int idEmployee;
 	
-	
-	
-
 }
