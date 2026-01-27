@@ -23,7 +23,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(
             @RequestBody AuthenticationRequest request
-    ) {
+    ) throws Exception {
         return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
@@ -31,7 +31,7 @@ public class AuthenticationController {
     public ResponseEntity<AuthenticationResponse> refresh(
             @RequestParam String refreshToken
     ) {
-        return ResponseEntity.ok(refreshTokenService.refresh(refreshToken));
+        return ResponseEntity.ok(refreshTokenService.refreshToken(refreshToken));
     }
 	
 //	private final AuthenticationManager authenticationManager;

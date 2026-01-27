@@ -2,14 +2,19 @@ package lv.venta.virac.auth;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import lv.venta.virac.auth.dto.AuthenticationRequest;
 import lv.venta.virac.auth.dto.AuthenticationResponse;
+import lv.venta.virac.auth.dto.RegisterRequest;
+import lv.venta.virac.repo.IEmployeeRepo;
 import lv.venta.virac.security.JwtService;
+import lv.venta.virac.token.RefreshToken;
 import lv.venta.virac.token.RefreshTokenService;
 import lv.venta.virac.user.IUserRepo;
+import lv.venta.virac.user.Role;
 import lv.venta.virac.user.User;
 
 @Service
@@ -17,7 +22,8 @@ import lv.venta.virac.user.User;
 public class AuthenticationService {
 	
 	private final IUserRepo userRepo;
-	//private final PasswordEncoder passwordEncoder; 
+	private final IEmployeeRepo employeeRepo;
+	private final PasswordEncoder passwordEncoder; 
 	private final JwtService jwtService;
 	private final AuthenticationManager authenticationManager;
 	private final RefreshTokenService refreshTokenService;
@@ -32,29 +38,31 @@ public class AuthenticationService {
         );
 
         User user = userRepo.findByEmail(request.getEmail())
-                .orElseThrow();
+                .orElseThrow() ;
 
         String accessToken = jwtService.generateToken(user);
-        String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
-//        return new AuthenticationResponse(accessToken, refreshToken);
-        return new AuthenticationResponse(refreshToken);
+        return new AuthenticationResponse(accessToken, refreshToken.getToken());
     }
 	
-//	public AuthenticationResponse register(RegisterRequest request) {
-//		var user = User.builder()
-//				.firstname(request.getFirstname())
-//				.lastname(request.getLastname())
-//				.email(request.getEmail())
-//				.password(passwordEncoder.encode(request.getPassword()))
-//				.role(Role.USER)
-//				.build();
-//		repository.save(user);
-//		var jwtToken = jwtService.generateToken(user); 
+	public AuthenticationResponse register(RegisterRequest request) {
+		var user = User.builder()
+				.firstname(request.getFirstname())
+				.lastname(request.getLastname())
+				.email(request.getEmail())
+				.password(passwordEncoder.encode(request.getPassword()))
+				.role(Role.valueOf(request.getIdRole()))
+				.employee(employeeRepo.findById(request.getIdEmployee()).get())
+				.build();
+		userRepo.save(user);
+		String accessToken = jwtService.generateToken(user); 
+		RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 //		return AuthenticationResponse.builder().build()
 //				.token(jwtToken)
 //				.build();
-//	}
+		return new AuthenticationResponse(accessToken, refreshToken.getToken());
+	}
 //	
 //	public AuthenticationResponse authenticate(AuthenticationRequest request) {
 //		authenticationManager.authenticate(
