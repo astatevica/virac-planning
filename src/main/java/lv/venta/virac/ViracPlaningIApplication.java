@@ -84,8 +84,8 @@ public class ViracPlaningIApplication {
 				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3)));
 				
 				//UserTable
-				User user1 = new User("Karina", "Šķirmante","karina@venta.lv", "skirmante123", Role.ADMIN, emp1);
-				User user2 = new User("Juris", "Kalvāns","kalvans@venta.lv", "kalvans123", Role.USER, emp2);
+				User user1 = new User("Karina", "Šķirmante","karina@venta.lv", "skirmante123", Role.ROLE_ADMIN, emp1);
+				User user2 = new User("Juris", "Kalvāns","kalvans@venta.lv", "kalvans123", Role.ROLE_USER, emp2);
 				
 				userRepo.saveAll((Arrays.asList(user1,user2)));
 				

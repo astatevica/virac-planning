@@ -3,6 +3,10 @@ package lv.venta.virac.user;
 import java.util.List;
 import java.util.Collection;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,25 +25,19 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lv.venta.virac.model.Employee;
-import lv.venta.virac.model.ProjectManagement;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Setter
-@Getter
-@ToString
 @Table(name = "user_table")
-//@SQLDelete(sql = "UPDATE user_table SET deleted = true WHERE id_user=?")
-//@FilterDef(name = "deletedUserFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
-//@Filter(name = "deletedUserFilter", condition = "deleted = :isDeleted")
+@SQLDelete(sql = "UPDATE user_table SET deleted = true WHERE id_user=?")
+@FilterDef(name = "deletedUserFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
+@Filter(name = "deletedUserFilter", condition = "deleted = :isDeleted")
 public class User implements UserDetails{
 
 	@Id
@@ -67,12 +65,23 @@ public class User implements UserDetails{
 	@OneToOne
 	@JoinColumn(name = "idEmployee")
 	private Employee employee;
+
+	@Column(name = "deleted")
+	private boolean deleted = Boolean.FALSE;
+	
+	public User(String firstname, String lastname,String email, String password, Role role, Employee employee) {
+		setFirstname(firstname);
+		setLastname(lastname);
+		setEmail(email);
+		setPassword(password);
+		setRole(role);
+		setEmployee(employee);
+	}
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return List.of(new SimpleGrantedAuthority(role.name()));
 	}
-	
 	
 	@Override
 	public String getPassword() {
@@ -101,16 +110,7 @@ public class User implements UserDetails{
 	
 	@Override
 	public boolean isEnabled() {
-		return true;
-	}
-	
-	public User(String firstname, String lastname,String email, String password, Role role, Employee employee) {
-		setFirstname(firstname);
-		setLastname(lastname);
-		setEmail(email);
-		setPassword(password);
-		setRole(role);
-		setEmployee(employee);
+		return !deleted;
 	}
 
 

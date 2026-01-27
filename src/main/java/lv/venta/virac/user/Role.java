@@ -1,5 +1,9 @@
 package lv.venta.virac.user;
 
 public enum Role {
-	USER, ADMIN, USER_DEPART, USER_PROJECT, DIRECTOR
+	ROLE_USER, 
+	ROLE_ADMIN, 
+	ROLE_USER_DEPART, 
+	ROLE_USER_PROJECT, 
+	ROLE_DIRECTOR
 }
