@@ -13,7 +13,7 @@ import lv.venta.virac.user.User;
 @Service
 public class RefreshTokenService {
 	
-    private long refreshExpirationMs = 604800000; //7 days
+    private static final long refreshExpirationMs = 604800000; //7 days
 
     private final IRefreshTokenRepo refreshTokenRepository;
     private final JwtService jwtService;
