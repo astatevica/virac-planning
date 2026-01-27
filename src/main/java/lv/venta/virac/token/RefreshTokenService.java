@@ -4,10 +4,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lv.venta.virac.auth.dto.AuthenticationResponse;
 import lv.venta.virac.security.JwtService;
-import lv.venta.virac.user.IUserRepo;
 import lv.venta.virac.user.User;
 
 @Service
@@ -16,48 +16,51 @@ public class RefreshTokenService {
     private long refreshExpirationMs = 604800000; //7 days
 
     private final IRefreshTokenRepo refreshTokenRepository;
-    private final IUserRepo userRepository;
     private final JwtService jwtService;
 
-    public RefreshTokenService(IRefreshTokenRepo refreshTokenRepository,IUserRepo userRepository, JwtService jwtService) {
+    public RefreshTokenService(IRefreshTokenRepo refreshTokenRepository, JwtService jwtService) {
         this.refreshTokenRepository = refreshTokenRepository;
-        this.userRepository = userRepository;
         this.jwtService = jwtService;
     }
-
-    public RefreshToken createRefreshToken(int idUser) throws Exception{
-        User user = userRepository.findByIdUser(idUser);
-        if (user == null) throw new Exception("There is no user with id :" + idUser);
-
+    
+    //Paskatīties to user padošanu vai kā objektu vai kā int id
+    public RefreshToken createRefreshToken(User user) {
         RefreshToken token = new RefreshToken();
-        token.setUser(user);
-        token.setToken(UUID.randomUUID().toString());
-        token.setExpiryDate(
-                Instant.now().plusMillis(refreshExpirationMs)
+	        token.setUser(user);
+	        token.setToken(UUID.randomUUID().toString());
+	        token.setExpiryDate(
+	                Instant.now().plusMillis(refreshExpirationMs)
         );
 
         return refreshTokenRepository.save(token);
     }
-
-    public RefreshToken verifyExpiration(RefreshToken token) {
-        if (token.isExpired()) {
-            refreshTokenRepository.delete(token);
-            throw new RuntimeException("Refresh token expired");
-        }
-        return token;
-    }
     
-    public AuthenticationResponse refresh(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token"));
+    @Transactional
+    public AuthenticationResponse refreshToken(String requestToken) {
+
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(requestToken)
+                .orElseThrow(() -> new RuntimeException("Refresh token not found"));
 
         if (refreshToken.getExpiryDate().isBefore(Instant.now())) {
-        	refreshTokenRepository.delete(refreshToken);
+            refreshTokenRepository.delete(refreshToken);
             throw new RuntimeException("Refresh token expired");
         }
 
+        // Rotate refresh token
+        refreshTokenRepository.delete(refreshToken);
+
+        RefreshToken newRefreshToken = createRefreshToken(refreshToken.getUser());
         String newAccessToken = jwtService.generateToken(refreshToken.getUser());
-        return new AuthenticationResponse(newAccessToken);
+
+        return AuthenticationResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken.getToken())
+                .build();
+    }
+
+    @Transactional
+    public void deleteByUser(User user) {
+        refreshTokenRepository.deleteByIdUser(user.getId());
     }
 
 }
