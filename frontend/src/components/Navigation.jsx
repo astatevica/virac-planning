@@ -1,12 +1,31 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import AuthService from "../auth/AuthService";
 
 const Navigation = () => {
+
+  const navigate = useNavigate();
+  const isLoggedIn = AuthService.isAuthenticated();
+
+  const logout = () => {
+    AuthService.logout().then(() => {
+      navigate("/login");
+      window.location.reload();
+    });
+  };
+
+
   return (
     <nav style={styles.nav}>
       <h3 style={styles.logo}>VIRAC</h3>
+      
 
       <ul style={styles.ul}>
+        <li>
+          {isLoggedIn && (
+            <button onClick={logout}>Logout</button>
+          )}
+        </li>
         <li>
           <NavLink to="/" style={styles.link}>
             Home

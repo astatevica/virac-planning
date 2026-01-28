@@ -22,6 +22,7 @@ public class JwtService {
     //BOTH
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    	
     }
 
     //BOTH

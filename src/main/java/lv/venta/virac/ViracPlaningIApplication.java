@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lv.venta.virac.model.ArticlePlan;
 import lv.venta.virac.model.Course;
@@ -55,7 +56,8 @@ public class ViracPlaningIApplication {
 			IPlanRepo planRepo, IProjectManagementRepo projMangRepo, 
 			IProjectPlanRepo projPlanRepo, IProjectRepo projRepo,
 			IScientificArticlesRepo scientArtRepo, IStudentWorkRepo studWorkRepo,
-			IViracDepartmentRepo viracDepRepo, IWorkPlanRepo workPlanRepo, IUserRepo userRepo)
+			IViracDepartmentRepo viracDepRepo, IWorkPlanRepo workPlanRepo, IUserRepo userRepo,
+			PasswordEncoder encoder)
 	{
 		return new CommandLineRunner() {
 			
@@ -84,8 +86,12 @@ public class ViracPlaningIApplication {
 				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3)));
 				
 				//UserTable
-				User user1 = new User("Karina", "Šķirmante","karina@venta.lv", "skirmante123", Role.ROLE_ADMIN, emp1);
-				User user2 = new User("Juris", "Kalvāns","kalvans@venta.lv", "kalvans123", Role.ROLE_USER, emp2);
+				User user1 = User.builder()
+						.firstname("Karina").lastname("Šķirmante").email("karina@venta.lv").
+						password(encoder.encode("skirmante123")).role(Role.ADMIN).employee(emp1).build();
+				User user2 = User.builder()
+						.firstname("Juris").lastname("Kalvāns").email("kalvans@venta.lv").
+						password(encoder.encode("kalvans123")).role(Role.USER).employee(emp2).build();
 				
 				userRepo.saveAll((Arrays.asList(user1,user2)));
 				

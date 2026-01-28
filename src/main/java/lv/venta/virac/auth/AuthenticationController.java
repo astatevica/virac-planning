@@ -1,6 +1,7 @@
 package lv.venta.virac.auth;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.RequiredArgsConstructor;
 import lv.venta.virac.auth.dto.AuthenticationRequest;
 import lv.venta.virac.auth.dto.AuthenticationResponse;
 import lv.venta.virac.auth.dto.RegisterRequest;
 import lv.venta.virac.token.RefreshTokenService;
+import lv.venta.virac.user.User;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -22,7 +23,7 @@ public class AuthenticationController {
 	private AuthenticationService authenticationService;
     private RefreshTokenService refreshTokenService;
     
-    public public AuthenticationController(AuthenticationService authenticationService,
+    public AuthenticationController(AuthenticationService authenticationService,
             RefreshTokenService refreshTokenService) {
     			this.authenticationService = authenticationService;
     			this.refreshTokenService = refreshTokenService;
@@ -49,9 +50,18 @@ public class AuthenticationController {
         return ResponseEntity.ok(refreshTokenService.refreshToken(refreshToken));
     }
     
+//    @PostMapping("/logout")
+//    public ResponseEntity<Void> logout(@RequestParam int userId) {
+//        refreshTokenService.deleteByUserId(userId);
+//        return ResponseEntity.ok().build();
+//    }
+    
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestParam int userId) {
-        refreshTokenService.deleteByUserId(userId);
+    public ResponseEntity<Void> logout(Authentication authentication) {
+
+        User user = (User) authentication.getPrincipal();
+        refreshTokenService.deleteByUser(user);
+
         return ResponseEntity.ok().build();
     }
 

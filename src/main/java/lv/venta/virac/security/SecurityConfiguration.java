@@ -3,12 +3,16 @@ package lv.venta.virac.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-//import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,31 +28,61 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 	
 	private final JwtAuthFilter jwtAuthFilter; //Chat & Ali_Bouali
+	private final UserDetailsService userDetailsService;
+	
 	//private final AuthenticationProvider authenticationProvider; //Ali_Bouali
 	
-	public SecurityConfiguration(JwtAuthFilter jwtAuthFilter) {
+	public SecurityConfiguration(JwtAuthFilter jwtAuthFilter, UserDetailsService userDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.userDetailsService = userDetailsService;
     }
-
+	
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-		http
-        .csrf(csrf -> csrf.disable())
-        .sessionManagement(session ->
-            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        )
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**").permitAll()
-            .requestMatchers("/api/**").hasRole("ADMIN")
-            .requestMatchers("/api/filter/plans/crud/{idDarbiniekam}").hasRole("USER")
-            .requestMatchers("/api/filter/plans/filter/{idDarbiniekam}/{gads}").hasRole("USER")
-            .requestMatchers("/api/filter/plans/filter/{idDarbiniekam}/{projekti}").hasRole("USER")
-            .anyRequest().authenticated()
-        )
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-		return http.build();
-	}
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(Customizer.withDefaults())
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authorizeHttpRequests(auth -> auth
+                // 🔓 PUBLIC ENDPOINTS
+                .requestMatchers("/api/auth/**","/error").permitAll()
+
+                // 🔐 ADMIN
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/auth/logout").authenticated()
+
+                // 🔐 EVERYTHING ELSE
+                .anyRequest().authenticated()
+                
+            )
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+	
+//	@Bean
+//	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+//		http
+//        .csrf(csrf -> csrf.disable())
+//        .sessionManagement(session ->
+//            session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//        )
+//        .authorizeHttpRequests(auth -> auth
+//            .requestMatchers("/api/auth/**").permitAll()
+//            .requestMatchers("/api/**").hasRole("ROLE_ADMIN")
+//            .requestMatchers("/api/filter/plans/crud/{idDarbiniekam}").hasRole("ROLE_USER")
+//            .requestMatchers("/api/filter/plans/filter/{idDarbiniekam}/{gads}").hasRole("ROLE_USER")
+//            .requestMatchers("/api/filter/plans/filter/{idDarbiniekam}/{projekti}").hasRole("ROLE_USER")
+//            .anyRequest().authenticated()
+//        )
+//        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+//
+//		return http.build();
+//	}
 	
 	//Chat
 	@Bean
@@ -62,6 +96,15 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
 	
 //	@Bean
 //	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
