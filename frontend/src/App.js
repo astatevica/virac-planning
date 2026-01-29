@@ -41,21 +41,21 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<h2>Welcome to VIRAC</h2>} />
 
-              <Route path="/departments" element={<DepartmentList />} />
-              <Route path="/employee" element={<EmployeeList />} />
-              <Route path="/project-management" element={<ProjectManagementList />} />
-              <Route path="/project" element={<ProjectList />} />
-              <Route path="/project-plan" element={<ProjectPlanList />} />
-              <Route path="/student-work" element={<StudentWorkList />} />
-              <Route path="/work-plan" element={<WorkPlanList />} />
-              <Route path="/journal" element={<JournalList />} />
-              <Route path="/scientific-articles" element={<ScientificArticlesList />} />
-              <Route path="/article-plan" element={<ArticlePlanList />} />
-              <Route path="/course" element={<CourseList />} />
-              <Route path="/course-plan" element={<CoursePlanList />} />
-              <Route path="/year" element={<YearList />} />
-              <Route path="/plan" element={<PlanList />} />
-              <Route path="/plans/:id" element={<PlanView />} />
+              <Route path="/admin/departments" element={<DepartmentList />} />
+              <Route path="/admin/employee" element={<EmployeeList />} />
+              <Route path="/admin/project-management" element={<ProjectManagementList />} />
+              <Route path="/admin/project" element={<ProjectList />} />
+              <Route path="/admin/project-plan" element={<ProjectPlanList />} />
+              <Route path="/admin/student-work" element={<StudentWorkList />} />
+              <Route path="/admin/work-plan" element={<WorkPlanList />} />
+              <Route path="/admin/journal" element={<JournalList />} />
+              <Route path="/admin/scientific-articles" element={<ScientificArticlesList />} />
+              <Route path="/admin/article-plan" element={<ArticlePlanList />} />
+              <Route path="/admin/course" element={<CourseList />} />
+              <Route path="/admin/course-plan" element={<CoursePlanList />} />
+              <Route path="/admin/year" element={<YearList />} />
+              <Route path="/admin/plan" element={<PlanList />} />
+              <Route path="/admin/plans/:id" element={<PlanView />} />
             </Route>
 
           </Routes>

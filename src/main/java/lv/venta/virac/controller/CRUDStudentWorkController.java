@@ -21,7 +21,7 @@ import lv.venta.virac.model.StudentWork;
 import lv.venta.virac.service.ICRUDStudentWorkService;
 
 @RestController
-@RequestMapping("/api/student-work")
+@RequestMapping("/api/admin/student-work")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDStudentWorkController {
 	

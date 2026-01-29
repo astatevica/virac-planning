@@ -21,7 +21,7 @@ import lv.venta.virac.model.Year;
 import lv.venta.virac.service.ICRUDYearService;
 
 @RestController
-@RequestMapping("/api/year")
+@RequestMapping("/api/admin/year")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDYearController {
 

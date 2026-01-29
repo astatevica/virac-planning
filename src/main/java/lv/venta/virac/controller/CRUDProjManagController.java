@@ -20,7 +20,7 @@ import lv.venta.virac.model.ProjectManagement;
 import lv.venta.virac.service.ICRUDProjManagService;
 
 @RestController
-@RequestMapping("/api/project-management")
+@RequestMapping("/api/admin/project-management")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDProjManagController {
 	

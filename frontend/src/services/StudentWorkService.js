@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/student-work";
+const API_URL = "http://localhost:8080/api/admin/student-work";
 
 const StudentWorkService = {
   // ===== CRUD =====

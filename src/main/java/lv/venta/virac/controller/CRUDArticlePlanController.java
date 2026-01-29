@@ -21,7 +21,7 @@ import lv.venta.virac.model.ArticlePlan;
 import lv.venta.virac.service.ICRUDArticlePlanService;
 
 @RestController
-@RequestMapping("/api/article-plan")
+@RequestMapping("/api/admin/article-plan")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDArticlePlanController {
 

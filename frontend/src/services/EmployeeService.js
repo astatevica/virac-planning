@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/employee";
+const API_URL = "http://localhost:8080/api/admin/employee";
 
 const EmployeeService = {
   getAll() {

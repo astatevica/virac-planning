@@ -21,7 +21,7 @@ import lv.venta.virac.model.Employee;
 import lv.venta.virac.service.ICRUDEmployeeService;
 
 @RestController
-@RequestMapping("/api/employee")
+@RequestMapping("/api/admin/employee")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDEmployeeController {
 	

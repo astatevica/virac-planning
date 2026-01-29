@@ -21,7 +21,7 @@ import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.service.ICRUDScientificArticlesService;
 
 @RestController
-@RequestMapping("/api/scientific-articles")
+@RequestMapping("/api/admin/scientific-articles")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDScientificArticlesController {
 	

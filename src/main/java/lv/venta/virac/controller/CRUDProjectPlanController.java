@@ -21,7 +21,7 @@ import lv.venta.virac.model.ProjectPlan;
 import lv.venta.virac.service.ICRUDProjectPlanService;
 
 @RestController
-@RequestMapping("/api/project-plan")
+@RequestMapping("/api/admin/project-plan")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDProjectPlanController {
 	

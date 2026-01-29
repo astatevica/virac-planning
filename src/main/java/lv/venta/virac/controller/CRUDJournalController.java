@@ -21,7 +21,7 @@ import lv.venta.virac.model.Journal;
 import lv.venta.virac.service.ICRUDJournalService;
 
 @RestController
-@RequestMapping("/api/journal")
+@RequestMapping("/api/admin/journal")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDJournalController {
 	

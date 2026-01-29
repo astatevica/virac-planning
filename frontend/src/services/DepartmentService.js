@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/department";
+const API_URL = "http://localhost:8080/api/admin/department";
 
 class DepartmentService {
 

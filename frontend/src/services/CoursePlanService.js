@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/course-plan";
+const API_URL = "http://localhost:8080/api/admin/course-plan";
 
 const CoursePlanService = {
   getAll() {

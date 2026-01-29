@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/plan";
+const API_URL = "http://localhost:8080/api/admin/plan";
 
 const PlanService = {
   getAll() {

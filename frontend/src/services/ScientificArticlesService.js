@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/scientific-articles";
+const API_URL = "http://localhost:8080/api/admin/scientific-articles";
 
 const ScientificArticlesService = {
   getAll: () => axios.get(API_URL),

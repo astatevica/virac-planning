@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/project-management";
+const API_URL = "http://localhost:8080/api/admin/project-management";
 
 class ProjectManagementService {
 

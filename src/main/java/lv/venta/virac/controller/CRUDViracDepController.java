@@ -21,7 +21,7 @@ import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.service.ICRUDViracDepService;
 
 @RestController
-@RequestMapping("/api/department")
+@RequestMapping("/api/admin/department")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDViracDepController {
 

@@ -47,10 +47,10 @@ public class SecurityConfiguration {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests(auth -> auth
-                // 🔓 PUBLIC ENDPOINTS
+                //PUBLIC ENDPOINTS
                 .requestMatchers("/api/auth/**","/error").permitAll()
 
-                // 🔐 ADMIN
+                //ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/auth/logout").authenticated()
 

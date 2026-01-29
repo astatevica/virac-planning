@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/project-plan";
+const API_URL = "http://localhost:8080/api/admin/project-plan";
 
 const ProjectPlanService = {
   // ===== CRUD =====

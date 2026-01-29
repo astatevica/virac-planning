@@ -21,7 +21,7 @@ import lv.venta.virac.model.WorkPlan;
 import lv.venta.virac.service.ICRUDWorkPlanService;
 
 @RestController
-@RequestMapping("/api/work-plan")
+@RequestMapping("/api/admin/work-plan")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDWorkPlanController {
 	

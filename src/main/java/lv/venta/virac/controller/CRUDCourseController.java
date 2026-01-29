@@ -21,7 +21,7 @@ import lv.venta.virac.model.Course;
 import lv.venta.virac.service.ICRUDCourseService;
 
 @RestController
-@RequestMapping("/api/course")
+@RequestMapping("/api/admin/course")
 @CrossOrigin(origins = "http://localhost:3000")
 public class CRUDCourseController {
 	
