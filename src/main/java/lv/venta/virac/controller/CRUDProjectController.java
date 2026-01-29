@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,7 @@ public class CRUDProjectController {
 	}
 	
 	@GetMapping
+	@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ArrayList<ProjectDTO>> getAll()
             throws Exception {
 
@@ -53,6 +55,7 @@ public class CRUDProjectController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProjectDTO> getById(
             @PathVariable("id") int id) throws Exception {
 
@@ -72,6 +75,7 @@ public class CRUDProjectController {
     }
     
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> create(
             @RequestBody ProjectDTO dto) throws Exception {
 
@@ -96,6 +100,7 @@ public class CRUDProjectController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
             @RequestBody ProjectDTO dto) throws Exception {
@@ -114,6 +119,7 @@ public class CRUDProjectController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable("id") int id) throws Exception {
 
@@ -122,6 +128,7 @@ public class CRUDProjectController {
     }
 
     @GetMapping("/number/{number}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ArrayList<ProjectDTO>>
     filterByNumber(@PathVariable("number") int number) throws Exception {
 
@@ -132,6 +139,7 @@ public class CRUDProjectController {
     }
 
     @GetMapping("/start-date/{startDate}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ArrayList<ProjectDTO>>
     filterByStartDate(@PathVariable("startDate") LocalDate date) throws Exception {
 
@@ -141,6 +149,7 @@ public class CRUDProjectController {
     }
 
     @GetMapping("/end-date/{endDate}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ArrayList<ProjectDTO>>
     filterByEndDate(@PathVariable("endDate") LocalDate date) throws Exception {
 

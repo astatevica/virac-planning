@@ -1,6 +1,6 @@
-import api from "./api";
+import api from "../api/api";
 
-const API_URL = "admin/article-plan";
+const API_URL = "/admin/article-plan";
 
 const ArticlePlanService = {
   getAll: () => api.get(API_URL),

@@ -1,4 +1,5 @@
 import api from "../api/api";
+import { jwtDecode } from "jwt-decode";
 
 class AuthService {
 
@@ -35,6 +36,25 @@ class AuthService {
 
   getToken() {
     return localStorage.getItem("accessToken");
+  }
+
+  getRole() {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+
+    try {
+      const decoded = jwtDecode(token);
+
+      // depends how you generate JWT
+      // most common:
+      return decoded.role 
+        || decoded.authorities?.[0]?.replace("ROLE_", "") 
+        || null;
+
+    } catch (e) {
+      console.error("Invalid token", e);
+      return null;
+    }
   }
 }
 

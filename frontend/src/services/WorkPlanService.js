@@ -1,38 +1,38 @@
-import axios from "axios";
+import api from "../api/api";
 
-const API_URL = "http://localhost:8080/api/admin/work-plan";
+const API_URL = "/admin/work-plan";
 
 const WorkPlanService = {
   // ===== CRUD =====
 
   getAll() {
-    return axios.get(API_URL);
+    return api.get(API_URL);
   },
 
   getById(id) {
-    return axios.get(`${API_URL}/${id}`);
+    return api.get(`${API_URL}/${id}`);
   },
 
   create(data) {
-    return axios.post(API_URL, data);
+    return api.post(API_URL, data);
   },
 
   update(id, data) {
-    return axios.put(`${API_URL}/${id}`, data);
+    return api.put(`${API_URL}/${id}`, data);
   },
 
   delete(id) {
-    return axios.delete(`${API_URL}/${id}`);
+    return api.delete(`${API_URL}/${id}`);
   },
 
   // ===== FILTERS =====
 
   getByStudentWork(idStudentWork) {
-    return axios.get(`${API_URL}/filter/student-work/${idStudentWork}`);
+    return api.get(`${API_URL}/filter/student-work/${idStudentWork}`);
   },
 
   getByPlan(idPlan) {
-    return axios.get(`${API_URL}/filter/plan/${idPlan}`);
+    return api.get(`${API_URL}/filter/plan/${idPlan}`);
   }
 };
 

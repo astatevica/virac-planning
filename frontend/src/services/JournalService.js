@@ -1,17 +1,17 @@
-import axios from "axios";
+import api from "../api/api";
 
-const API_URL = "http://localhost:8080/api/admin/journal";
+const API_URL = "/admin/journal";
 
 const JournalService = {
-  getAll: () => axios.get(API_URL),
+  getAll: () => api.get(API_URL),
 
-  getById: (id) => axios.get(`${API_URL}/${id}`),
+  getById: (id) => api.get(`${API_URL}/${id}`),
 
-  create: (journal) => axios.post(API_URL, journal),
+  create: (journal) => api.post(API_URL, journal),
 
-  update: (id, journal) => axios.put(`${API_URL}/${id}`, journal),
+  update: (id, journal) => api.put(`${API_URL}/${id}`, journal),
 
-  delete: (id) => axios.delete(`${API_URL}/${id}`)
+  delete: (id) => api.delete(`${API_URL}/${id}`)
 };
 
 export default JournalService;

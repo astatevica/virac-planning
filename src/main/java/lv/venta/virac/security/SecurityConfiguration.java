@@ -54,7 +54,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/auth/logout").authenticated()
 
-                // 🔐 EVERYTHING ELSE
+                //EVERYTHING ELSE
                 .anyRequest().authenticated()
                 
             )

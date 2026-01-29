@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import PlanService from "../services/PlanService";
 import PlanForm from "./PlanForm";
-import axios from "axios";
+import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 
 
-const API = "http://localhost:8080/api";
+const API = "/admin";
 
 const PlanList = () => {
   const navigate = useNavigate();
@@ -44,17 +44,17 @@ const PlanList = () => {
   };
 
   // const loadFilters = () => {
-  //   axios.get(`${API}/employee`).then(res => setEmployees(res.data));
-  //   axios.get(`${API}/year`).then(res => setYears(res.data));
-  //   axios.get(`${API}/department`).then(res => setDepartments(res.data));
+  //   api.get(`${API}/employee`).then(res => setEmployees(res.data));
+  //   api.get(`${API}/year`).then(res => setYears(res.data));
+  //   api.get(`${API}/department`).then(res => setDepartments(res.data));
   // };
 
   const loadFilters = async () => {
     try {
       const [empRes, yearRes, depRes] = await Promise.all([
-        axios.get(`${API}/employee`),
-        axios.get(`${API}/year`),
-        axios.get(`${API}/department`)
+        api.get(`${API}/employee`),
+        api.get(`${API}/year`),
+        api.get(`${API}/department`)
       ]);
 
       setEmployees(empRes.data);
