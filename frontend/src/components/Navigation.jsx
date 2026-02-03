@@ -1,13 +1,16 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import AuthService from "../auth/AuthService";
+import EmployeeService from "../services/EmployeeService";
 
 const Navigation = () => {
 
   const navigate = useNavigate();
   const isLoggedIn = AuthService.isAuthenticated();
-  const role = AuthService.getRole(); // from JWT
+  const role = localStorage.getItem("role"); // from JWT
   const isAdmin = role === "ADMIN";
+  console.log(role);
+  console.log(localStorage.getItem("role"));
 
   const logout = () => {
     AuthService.logout().then(() => {
@@ -15,6 +18,12 @@ const Navigation = () => {
       window.location.reload();
     });
   };
+
+  const employee = () =>{
+    //navigate("/admin/employee");
+    EmployeeService.getAll();
+    console.log(EmployeeService.getAll());
+  }
 
 
   return (
@@ -24,10 +33,17 @@ const Navigation = () => {
 
       <ul style={styles.ul}>
         <li>
+          {/* <NavLink to="admin/employee" style={styles.link}>
+            Employee
+          </NavLink> */}
+          {<button onClick={employee}>Employee</button>}
+        </li>
+        <li>
           {isLoggedIn && (
             <button onClick={logout}>Logout</button>
           )}
         </li>
+        
         {isAdmin && (
           <NavLink to="admin/plan" style={styles.link}>Plan</NavLink>
         )}

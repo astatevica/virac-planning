@@ -42,8 +42,9 @@ public class AuthenticationService {
 
         String accessToken = jwtService.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+        System.out.println(user.getRole().name());
 
-        return new AuthenticationResponse(accessToken, refreshToken.getToken());
+        return new AuthenticationResponse(accessToken, refreshToken.getToken(), user.getRole().name());
     }
 	
 	public AuthenticationResponse register(RegisterRequest request) {
@@ -55,13 +56,14 @@ public class AuthenticationService {
 				.role(Role.valueOf(request.getIdRole()))
 				.employee(employeeRepo.findById(request.getIdEmployee()).get())
 				.build();
-		userRepo.save(user);
+		
+		User new_user = userRepo.save(user);
 		String accessToken = jwtService.generateToken(user); 
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 //		return AuthenticationResponse.builder().build()
 //				.token(jwtToken)
 //				.build();
-		return new AuthenticationResponse(accessToken, refreshToken.getToken());
+		return new AuthenticationResponse(accessToken, refreshToken.getToken(), new_user.getRole().name());
 	}
 //	
 //	public AuthenticationResponse authenticate(AuthenticationRequest request) {

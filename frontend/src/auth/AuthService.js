@@ -8,6 +8,7 @@ class AuthService {
 
     localStorage.setItem("accessToken", res.data.accessToken);
     localStorage.setItem("refreshToken", res.data.refreshToken);
+    localStorage.setItem("role", res.data.role);
 
     return res.data;
   }
@@ -17,6 +18,7 @@ class AuthService {
 
     localStorage.setItem("accessToken", res.data.accessToken);
     localStorage.setItem("refreshToken", res.data.refreshToken);
+    localStorage.setItem("role", res.data.role);
 
     return res.data;
   }

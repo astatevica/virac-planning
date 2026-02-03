@@ -92,8 +92,11 @@ public class ViracPlaningIApplication {
 				User user2 = User.builder()
 						.firstname("Juris").lastname("Kalvāns").email("kalvans@venta.lv").
 						password(encoder.encode("kalvans123")).role(Role.USER).employee(emp2).build();
+				User user3 = User.builder()
+						.firstname("Annija").lastname("Developer").email("dev@venta.lv").
+						password(encoder.encode("dev123")).role(Role.ADMIN).employee(emp3).build();
 				
-				userRepo.saveAll((Arrays.asList(user1,user2)));
+				userRepo.saveAll((Arrays.asList(user1,user2,user3)));
 				
 				//PlanTable DONE
 				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
