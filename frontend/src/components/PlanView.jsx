@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import PlanService from "../services/PlanService";
-import axios from "axios";
+import api from "../api/api";
 
-const API = "http://localhost:8080/api";
+const API = "/admin";
 
 export default function PlanView() {
   const { id } = useParams();
@@ -15,8 +15,8 @@ export default function PlanView() {
 
   useEffect(() => {
     PlanService.getById(id).then(res => setPlan(res.data));
-    axios.get(`${API}/employee`).then(res => setEmployees(res.data));
-    axios.get(`${API}/year`).then(res => setYears(res.data));
+    api.get(`${API}/employee`).then(res => setEmployees(res.data));
+    api.get(`${API}/year`).then(res => setYears(res.data));
   }, [id]);
 
   if (!plan) return <p>Loading...</p>;
@@ -66,7 +66,7 @@ export default function PlanView() {
 
       <br />
 
-      <button onClick={() => navigate("/plan")}>
+      <button onClick={() => navigate("/admin/plan")}>
         ← Back to Plans
       </button>
     </div>

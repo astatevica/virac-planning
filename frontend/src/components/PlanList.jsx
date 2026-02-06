@@ -203,7 +203,7 @@ const PlanList = () => {
                 <td>
                   <button onClick={() => setEditingPlan(pl)}>Edit</button> 
                   <button onClick={() => deletePlan(pl.idPlan)}>Delete</button>
-                  <button onClick={() => navigate(`/plans/${pl.idPlan}`)}>View</button>
+                  <button onClick={() => navigate(`/admin/plans/${pl.idPlan}`)}>View</button>
                 </td>
               </tr>
             ))

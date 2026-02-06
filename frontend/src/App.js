@@ -24,6 +24,7 @@ import ArticlePlanList from "./components/ArticlePlanList";
 import CoursePlanList from "./components/CoursePlanList";
 import WorkPlanList from "./components/WorkPlanList";
 import PlanView from "./components/PlanView";
+import Home from "./pages/Home";
 
 function App() {
   return (
@@ -37,10 +38,11 @@ function App() {
             {/*PUBLIC ROUTES*/}
             <Route path="/login" element={<Login />} />
 
-            {/*PROTECTED ROUTES*/}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<h2>Welcome to VIRAC</h2>} />
+            {/*Authenticated-only route (any role) */}
+            <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
 
+            {/*PROTECTED ROUTES*/}
+            <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
               <Route path="/admin/departments" element={<DepartmentList />} />
               <Route path="/admin/employee" element={<EmployeeList />} />
               <Route path="/admin/project-management" element={<ProjectManagementList />} />

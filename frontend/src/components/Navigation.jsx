@@ -1,7 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import AuthService from "../auth/AuthService";
-import EmployeeService from "../services/EmployeeService";
 
 const Navigation = () => {
 
@@ -19,110 +18,129 @@ const Navigation = () => {
     });
   };
 
-  const employee = () =>{
-    //navigate("/admin/employee");
-    EmployeeService.getAll();
-    console.log(EmployeeService.getAll());
-  }
+  // const employee = () =>{
+  //   navigate("/admin/employee");
+  //   EmployeeService.getAll();
+  //   console.log(EmployeeService.getAll());
+  // }
 
 
   return (
     <nav style={styles.nav}>
       <h3 style={styles.logo}>VIRAC</h3>
       
-
       <ul style={styles.ul}>
-        <li>
-          {/* <NavLink to="admin/employee" style={styles.link}>
-            Employee
-          </NavLink> */}
-          {<button onClick={employee}>Employee</button>}
-        </li>
         <li>
           {isLoggedIn && (
             <button onClick={logout}>Logout</button>
           )}
-        </li>
+        </li>        
         
-        {isAdmin && (
-          <NavLink to="admin/plan" style={styles.link}>Plan</NavLink>
-        )}
-        
-        {/* <li>
-          <NavLink to="/" style={styles.link}>
-            Home
-          </NavLink>
+        <li>
+          {isAdmin &&(
+            <NavLink to="/" style={styles.link}>
+              Home
+            </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/departments" style={styles.link}>
             Departments
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/employee" style={styles.link}>
             Employee
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/project-management" style={styles.link}>
             Project Management
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/project" style={styles.link}>
             Project
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/project-plan" style={styles.link}>
             Project Plan
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/student-work" style={styles.link}>
             Student Work
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/work-plan" style={styles.link}>
             Work Plan
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/journal" style={styles.link}>
             Journal
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/scientific-articles" style={styles.link}>
             Scientific Articles
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/article-plan" style={styles.link}>
             Article Plan
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/course" style={styles.link}>
             Course
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/course-plan" style={styles.link}>
             Course Plan
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/year" style={styles.link}>
             Year
           </NavLink>
+          )}
         </li>
         <li>
+          {isAdmin &&(
           <NavLink to="admin/plan" style={styles.link}>
             Plan
           </NavLink>
-        </li> */}
+          )}
+        </li>
       </ul>
     </nav>
   );
