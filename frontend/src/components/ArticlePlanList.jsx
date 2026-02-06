@@ -2,44 +2,44 @@ import React, { useEffect, useState } from "react";
 import ProjectPlanService from "../services/ProjectPlanService";
 import ProjectService from "../services/ProjectService";
 import PlanService from "../services/PlanService"; // assumes you already have this
+import ArticlePlanService from "../services/ArticlePlanService";
 
-const ProjectPlanList = () => {
+const ArticlePlanList = () => {
 
-  const [projectPlans, setProjectPlans] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [plans, setPlans] = useState([]);
+  const [articlePlans, setArticlePlans] = useState([]);
+  const [plan, setPlan] = useState([]);
+  const [article, setArticle] = useState([]);
 
   // ===== FORM =====
   const [idPlan, setIdPlan] = useState("");
-  const [idProject, setIdProject] = useState("");
-  const [tasks, setTasks] = useState("");
-  const [workDone, setWorkDone] = useState("");
+  const [idScientificArticles, setIdScientificArticles] = useState("");
+  const [articleComments, setArticleComments] = useState("");
+  const [publicationLink, setPublicationLink] = useState("");
 
   // EDIT
   const [editId, setEditId] = useState(null);
 
   // FILTERS
   const [filterPlanId, setFilterPlanId] = useState("");
-  const [filterProjectId, setFilterProjectId] = useState("");
 
   useEffect(() => {
     loadAll();
-    loadProjects();
+    loadArticles();
     loadPlans();
   }, []);
 
   /* ================= LOAD ================= */
 
   const loadAll = () => {
-    ProjectPlanService.getAll()
-      .then(res => setProjectPlans(res.data))
-      .catch(() => alert("Failed to load project plans"));
+    ArticlePlanService.getAll()
+      .then(res => setArticlePlans(res.data))
+      .catch(() => alert("Failed to load article plans"));
   };
 
-  const loadProjects = () => {
+  const loadArticles = () => {
     ProjectService.getAll()
-      .then(res => setProjects(res.data))
-      .catch(() => alert("Failed to load projects"));
+      .then(res => setArticle(res.data))
+      .catch(() => alert("Failed to load articles"));
   };
 
   const loadPlans = () => {
