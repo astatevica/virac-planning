@@ -60,6 +60,8 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
 
         ViracDepartment department = new ViracDepartment();
         department.setName(name);
+        department.setHeadName(headName);
+        department.setHeadSurname(headSurname);
         depRepo.save(department);
     }
 
@@ -70,6 +72,8 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
     		Exception("Department with (id:" + id + ") does not exist");
     	
         department.setName(name);
+        department.setHeadName(headName);
+        department.setHeadSurname(headSurname);
         depRepo.save(department);
     }
 

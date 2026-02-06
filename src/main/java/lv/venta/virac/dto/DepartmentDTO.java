@@ -6,6 +6,10 @@ public class DepartmentDTO {
     private String name;
     private String headName;
     private String headSurname;
+    
+    public DepartmentDTO() {
+    	
+    }
 
     public DepartmentDTO(int id, String name, String headName, String headSurname) {
         this.id = id;

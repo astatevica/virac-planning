@@ -51,7 +51,7 @@ const ProjectPlanList = () => {
   /* ================= CREATE ================= */
 
   const addProjectPlan = () => {
-    if (!idPlan || !idProject || !tasks || !workDone) {
+    if (!idPlan || !idProject) {
       alert("All fields are required");
       return;
     }

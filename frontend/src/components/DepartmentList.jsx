@@ -6,10 +6,14 @@ const DepartmentList = () => {
 
   // ADD
   const [newName, setNewName] = useState("");
+  const [newHeadName, setNewHeadName] = useState("");
+  const [newHeadSurname, setNewHeadSurname] = useState("");
 
   // UPDATE
   const [editId, setEditId] = useState(null);
   const [editName, setEditName] = useState("");
+  const [editHeadName, setEditHeadName] = useState("");
+  const [editHeadSurname, setEditHeadSurname] = useState("");
 
   useEffect(() => {
     loadDepartments();
@@ -27,9 +31,15 @@ const DepartmentList = () => {
       return;
     }
 
-    DepartmentService.create({ name: newName })
+    DepartmentService.create({ 
+      name: newName,
+      headName: newHeadName,
+      headSurname: newHeadSurname 
+    })
       .then(() => {
         setNewName("");
+        setNewHeadName("");
+        setNewHeadSurname("");
         loadDepartments();
       })
       .catch(err => alert(err.response?.data || "Add failed"));
@@ -46,11 +56,15 @@ const DepartmentList = () => {
   const startEdit = (dep) => {
     setEditId(dep.id);
     setEditName(dep.name);
+    setEditHeadName(dep.headName);
+    setEditHeadSurname(dep.headSurname);
   };
 
   const cancelEdit = () => {
     setEditId(null);
     setEditName("");
+    setEditHeadName("");
+    setEditHeadSurname("");
   };
 
   const saveEdit = () => {
@@ -59,7 +73,8 @@ const DepartmentList = () => {
       return;
     }
 
-    DepartmentService.update(editId, { name: editName })
+    DepartmentService.update(editId, { name: editName, headName: editHeadName,
+      headSurname: editHeadSurname  })
       .then(() => {
         cancelEdit();
         loadDepartments();
@@ -78,6 +93,16 @@ const DepartmentList = () => {
           value={newName}
           onChange={e => setNewName(e.target.value)}
         />
+        <input
+          placeholder="New head name"
+          value={newHeadName}
+          onChange={e => setNewHeadName(e.target.value)}
+        />
+        <input
+          placeholder="New head surname"
+          value={newHeadSurname}
+          onChange={e => setNewHeadSurname(e.target.value)}
+        />
         <button onClick={addDepartment}>Add</button>
       </div>
 
@@ -91,12 +116,22 @@ const DepartmentList = () => {
                   value={editName}
                   onChange={e => setEditName(e.target.value)}
                 />
+                <input
+                  value={editHeadName}
+                  onChange={e => setEditHeadName(e.target.value)}
+                />
+                <input
+                  value={editHeadSurname}
+                  onChange={e => setEditHeadSurname(e.target.value)}
+                />
                 <button onClick={saveEdit}>Save</button>
                 <button onClick={cancelEdit}>Cancel</button>
               </>
             ) : (
               <>
-                {dep.name}
+                {dep.name} |{" "}
+                {dep.headName || "Add: NAME |"}{" "}  
+                {dep.headSurname || "Add: SURNAME"} {" "}
                 <button onClick={() => startEdit(dep)}>Update</button>
                 <button onClick={() => deleteDepartment(dep.id)}>Delete</button>
               </>
