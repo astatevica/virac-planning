@@ -1,55 +1,55 @@
 import React, { useEffect, useState } from "react";
-import DepartmentService from "../services/DepartmentService";
+import JournalService from "../services/JournalService";
 
-const DepartmentList = () => {
-  const [departments, setDepartments] = useState([]);
+const JournalList = () => {
+  const [journals, setJournals] = useState([]);
 
   // ADD
   const [newName, setNewName] = useState("");
 
   // UPDATE
-  const [editId, setEditId] = useState(null);
+  const [editidJournal, setEditidJournal] = useState(null);
   const [editName, setEditName] = useState("");
 
   useEffect(() => {
-    loadDepartments();
+    loadJournals();
   }, []);
 
-  const loadDepartments = () => {
-    DepartmentService.getAll()
-      .then(res => setDepartments(res.data));
+  const loadJournals = () => {
+    JournalService.getAll()
+      .then(res => setJournals(res.data));
   };
 
   // CREATE
-  const addDepartment = () => {
+  const addJournal = () => {
     if (!newName.trim()) {
-      alert("Department name cannot be empty");
+      alert("Journal name cannot be empty");
       return;
     }
 
-    DepartmentService.create({ name: newName })
+    JournalService.create({ name: newName })
       .then(() => {
         setNewName("");
-        loadDepartments();
+        loadJournals();
       })
       .catch(err => alert(err.response?.data || "Add failed"));
   };
 
   // DELETE
-  const deleteDepartment = (id) => {
-    DepartmentService.delete(id)
-      .then(loadDepartments)
+  const deleteJournals = (idJournal) => {
+    JournalService.delete(idJournal)
+      .then(loadJournals)
       .catch(err => alert(err.response?.data || "Delete failed"));
   };
 
   // UPDATE
   const startEdit = (dep) => {
-    setEditId(dep.id);
+    setEditidJournal(dep.idJournal);
     setEditName(dep.name);
   };
 
   const cancelEdit = () => {
-    setEditId(null);
+    setEditidJournal(null);
     setEditName("");
   };
 
@@ -59,33 +59,32 @@ const DepartmentList = () => {
       return;
     }
 
-    DepartmentService.update(editId, { name: editName })
+    JournalService.update(editidJournal, { name: editName })
       .then(() => {
         cancelEdit();
-        loadDepartments();
+        loadJournals();
       })
       .catch(err => alert(err.response?.data || "Update failed"));
   };
 
   return (
     <div>
-      <h2>Departments</h2>
+      <h2>Journals</h2>
 
-      {/* ➕ ADD DEPARTMENT */}
       <div style={{ marginBottom: "15px" }}>
         <input
-          placeholder="New department name"
+          placeholder="New journal name"
           value={newName}
           onChange={e => setNewName(e.target.value)}
         />
-        <button onClick={addDepartment}>Add</button>
+        <button onClick={addJournal}>Add</button>
       </div>
 
       {/* 📄 LIST */}
       <ul>
-        {departments.map(dep => (
-          <li key={dep.id}>
-            {editId === dep.id ? (
+        {journals.map(dep => (
+          <li key={dep.idJournal}>
+            {editidJournal === dep.idJournal ? (
               <>
                 <input
                   value={editName}
@@ -98,7 +97,7 @@ const DepartmentList = () => {
               <>
                 {dep.name}
                 <button onClick={() => startEdit(dep)}>Update</button>
-                <button onClick={() => deleteDepartment(dep.id)}>Delete</button>
+                <button onClick={() => deleteJournals(dep.idJournal)}>Delete</button>
               </>
             )}
           </li>
@@ -108,4 +107,4 @@ const DepartmentList = () => {
   );
 };
 
-export default DepartmentList;
+export default JournalList;

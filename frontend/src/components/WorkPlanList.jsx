@@ -50,7 +50,7 @@ const WorkPlanList = () => {
   /* ================= CREATE ================= */
 
   const addWorkPlan = () => {
-    if (!idStudWork || !idPlan || !workDone) {
+    if (!idStudWork || !idPlan) {
       alert("All fields are required");
       return;
     }
