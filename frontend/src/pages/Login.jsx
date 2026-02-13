@@ -12,14 +12,23 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await login(email, password);
+  e.preventDefault();
+  try {
+    await login(email, password);
+
+    const role = localStorage.getItem("role");
+
+    if (role === "ADMIN") {
+      navigate("/admin/dashboard");
+    } else {
       navigate("/");
-    } catch {
-      setError("Invalid credentials");
     }
-  };
+
+  } catch {
+    setError("Invalid credentials");
+  }
+};
+
 
   return (
     <form onSubmit={handleSubmit}>

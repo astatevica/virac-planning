@@ -104,15 +104,15 @@ const Admin = () => {
     setForm({
       firstname: user.firstname,
       lastname: user.lastname,
-      password: user.password,
-      email: user.email,
+      password: user.email,
+      email: user.password,
       role: user.role,
       idEmployee: user.idEmployee
     });
   };
 
   const deleteUser = async (id) => {
-    if (!window.confirm("Deactivate user?")) return;
+    if (!window.confirm("Delete user?")) return;
 
     try {
       await api.delete(`${API}/delete/${id}`);
@@ -136,7 +136,7 @@ const Admin = () => {
             {user.firstname} {user.lastname} | {user.password} | {user.role}
             <button onClick={() => startEdit(user)}>Update</button>
             <button onClick={() => deleteUser(user.idUser)}>
-              Deactivate
+              Delete
             </button>
           </li>
         ))}
@@ -165,7 +165,7 @@ const Admin = () => {
         <input
           name="email"
           placeholder="Email"
-          value={form.password}
+          value={form.email}
           onChange={handleChange}
         />
 
@@ -173,7 +173,7 @@ const Admin = () => {
           type="password"
           name="password"
           placeholder="Password"
-          value={form.email}
+          value={form.password}
           onChange={handleChange}
         />
 
