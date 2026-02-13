@@ -72,8 +72,15 @@ public class CRUDYearServiceImpl implements ICRUDYearService{
 	@Override
 	public void updateById(int id, int yearNumber) throws Exception {
 		Year year = retrieveById(id);
+		ArrayList<Year> years = (ArrayList<Year>) yearRepo.findAll();
     	if (year == null) throw new 
-    		Exception("Year with (id:" + id + ") does not exist");    	
+    		Exception("Year with (id:" + id + ") does not exist");    
+    	
+    	for (Year ye : years) {
+            if (ye.getYearNumber() == yearNumber & ye.isDeleted( )== false) {
+                throw new Exception("Year: " + ye.getYearNumber() + " already exists");
+            }
+        }
     	
         year.setYearNumber(yearNumber);
         yearRepo.save(year);

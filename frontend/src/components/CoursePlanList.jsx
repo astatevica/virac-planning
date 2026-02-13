@@ -82,8 +82,8 @@ const CoursePlanList = () => {
 
   const startEdit = (cp) => {
     setEditId(cp.idCoursePlan);
-    setIdCourse(cp.idCourse);
-    setIdPlan(cp.idPlan);
+    setIdCourse(String(cp.idCourse));
+    setIdPlan(String(cp.idPlan));
     setWorkDone(cp.workDone || "");
   };
 

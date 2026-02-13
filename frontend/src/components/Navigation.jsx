@@ -29,16 +29,10 @@ const Navigation = () => {
     <nav style={styles.nav}>
       <h3 style={styles.logo}>VIRAC</h3>
       
-      <ul style={styles.ul}>
-        <li>
-          {isLoggedIn && (
-            <button onClick={logout}>Logout</button>
-          )}
-        </li>        
-        
+      <ul style={styles.ul}>      
         <li>
           {isAdmin &&(
-            <NavLink to="/" style={styles.link}>
+            <NavLink to="admin/dashboard" style={styles.link}>
               Home
             </NavLink>
           )}
@@ -141,6 +135,12 @@ const Navigation = () => {
           </NavLink>
           )}
         </li>
+
+        <li>
+          {isLoggedIn && (
+            <button onClick={logout}>Logout</button>
+          )}
+        </li>
       </ul>
     </nav>
   );
@@ -149,7 +149,7 @@ const Navigation = () => {
 const styles = {
   nav: {
     display: "flex",
-    alignItems: "center",
+    alignItems: "stretch",
     justifyContent: "space-between",
     padding: "10px 20px",
     background: "#282c34",
@@ -160,9 +160,9 @@ const styles = {
   },
   ul: {
     listStyle: "none",
-    display: "flex",
+    display: "contents",
     gap: "15px",
-    margin: 0,
+    margin: 0.1,
     padding: 0,
   },
   link: {

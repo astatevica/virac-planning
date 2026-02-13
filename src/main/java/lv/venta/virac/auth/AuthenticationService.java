@@ -53,7 +53,7 @@ public class AuthenticationService {
 				.lastname(request.getLastname())
 				.email(request.getEmail())
 				.password(passwordEncoder.encode(request.getPassword()))
-				.role(Role.valueOf(request.getIdRole()))
+				.role(Role.valueOf(request.getRole()))
 				.employee(employeeRepo.findById(request.getIdEmployee()).get())
 				.build();
 		
@@ -80,4 +80,19 @@ public class AuthenticationService {
 //				.token(jwtToken)
 //				.build();
 //	}
+	
+	public void createUserByAdmin(RegisterRequest request) {
+
+	    var user = User.builder()
+	            .firstname(request.getFirstname())
+	            .lastname(request.getLastname())
+	            .email(request.getEmail())
+	            .password(passwordEncoder.encode(request.getPassword()))
+	            .role(Role.valueOf(request.getRole()))
+	            .employee(employeeRepo.findById(request.getIdEmployee()).orElseThrow())
+	            .build();
+
+	    userRepo.save(user);
+	}
+
 }

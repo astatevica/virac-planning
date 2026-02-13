@@ -25,6 +25,7 @@ import CoursePlanList from "./components/CoursePlanList";
 import WorkPlanList from "./components/WorkPlanList";
 import PlanView from "./components/PlanView";
 import Home from "./pages/Home";
+import Admin from "./pages/Admin";
 
 function App() {
   return (
@@ -43,6 +44,7 @@ function App() {
 
             {/*PROTECTED ROUTES*/}
             <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+              <Route path="/admin/dashboard" element={<Admin />} />
               <Route path="/admin/departments" element={<DepartmentList />} />
               <Route path="/admin/employee" element={<EmployeeList />} />
               <Route path="/admin/project-management" element={<ProjectManagementList />} />

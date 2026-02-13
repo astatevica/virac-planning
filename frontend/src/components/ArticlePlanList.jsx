@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
-import ProjectPlanService from "../services/ProjectPlanService";
-import ProjectService from "../services/ProjectService";
-import PlanService from "../services/PlanService"; // assumes you already have this
 import ArticlePlanService from "../services/ArticlePlanService";
+import PlanService from "../services/PlanService";
+import ScientificArticlesService from "../services/ScientificArticlesService";
 
 const ArticlePlanList = () => {
 
   const [articlePlans, setArticlePlans] = useState([]);
-  const [plan, setPlan] = useState([]);
-  const [article, setArticle] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [articles, setArticles] = useState([]);
 
   // ===== FORM =====
   const [idPlan, setIdPlan] = useState("");
@@ -19,13 +18,13 @@ const ArticlePlanList = () => {
   // EDIT
   const [editId, setEditId] = useState(null);
 
-  // FILTERS
+  // FILTER
   const [filterPlanId, setFilterPlanId] = useState("");
 
   useEffect(() => {
     loadAll();
-    loadArticles();
     loadPlans();
+    loadArticles();
   }, []);
 
   /* ================= LOAD ================= */
@@ -36,31 +35,31 @@ const ArticlePlanList = () => {
       .catch(() => alert("Failed to load article plans"));
   };
 
-  const loadArticles = () => {
-    ProjectService.getAll()
-      .then(res => setArticle(res.data))
-      .catch(() => alert("Failed to load articles"));
-  };
-
   const loadPlans = () => {
     PlanService.getAll()
       .then(res => setPlans(res.data))
       .catch(() => alert("Failed to load plans"));
   };
 
+  const loadArticles = () => {
+    ScientificArticlesService.getAll()
+      .then(res => setArticles(res.data))
+      .catch(() => alert("Failed to load articles"));
+  };
+
   /* ================= CREATE ================= */
 
-  const addProjectPlan = () => {
-    if (!idPlan || !idProject || !tasks || !workDone) {
-      alert("All fields are required");
+  const addArticlePlan = () => {
+    if (!idPlan || !idScientificArticles) {
+      alert("Plan and article are required");
       return;
     }
 
-    ProjectPlanService.create({
+    ArticlePlanService.create({
       idPlan: Number(idPlan),
-      idProject: Number(idProject),
-      tasks,
-      workDone
+      idScientificArticles: Number(idScientificArticles),
+      articleComments,
+      publicationLink
     })
       .then(() => {
         clearForm();
@@ -71,21 +70,21 @@ const ArticlePlanList = () => {
 
   /* ================= UPDATE ================= */
 
-  const startEdit = (pp) => {
-    setEditId(pp.idProjectPlan);
-    setIdPlan(pp.idPlan);
-    setIdProject(pp.idProject);
-    setTasks(pp.tasks);
-    setWorkDone(pp.workDone);
+  const startEdit = (ap) => {
+    setEditId(ap.idArticlePlan);
+    setIdPlan(ap.idPlan);
+    setIdScientificArticles(ap.idScientificArticles);
+    setArticleComments(ap.articleComments);
+    setPublicationLink(ap.publicationLink);
   };
 
   const saveEdit = () => {
-    ProjectPlanService.update(editId, {
-      idProjectPlan: editId,
+    ArticlePlanService.update(editId, {
+      idArticlePlan: editId,
       idPlan: Number(idPlan),
-      idProject: Number(idProject),
-      tasks,
-      workDone
+      idScientificArticles: Number(idScientificArticles),
+      articleComments,
+      publicationLink
     })
       .then(() => {
         cancelEdit();
@@ -101,15 +100,15 @@ const ArticlePlanList = () => {
 
   /* ================= DELETE ================= */
 
-  const deleteProjectPlan = (id) => {
-    if (!window.confirm("Delete project plan?")) return;
+  const deleteArticlePlan = (id) => {
+    if (!window.confirm("Delete article plan?")) return;
 
-    ProjectPlanService.delete(id)
+    ArticlePlanService.delete(id)
       .then(loadAll)
       .catch(err => alert(err.response?.data || "Delete failed"));
   };
 
-  /* ================= FILTERS ================= */
+  /* ================= FILTER ================= */
 
   const filterByPlan = () => {
     if (!filterPlanId) {
@@ -117,19 +116,8 @@ const ArticlePlanList = () => {
       return;
     }
 
-    ProjectPlanService.getByPlan(Number(filterPlanId))
-      .then(res => setProjectPlans(res.data))
-      .catch(() => alert("No records found"));
-  };
-
-  const filterByProject = () => {
-    if (!filterProjectId) {
-      loadAll();
-      return;
-    }
-
-    ProjectPlanService.getByProject(Number(filterProjectId))
-      .then(res => setProjectPlans(res.data))
+    ArticlePlanService.filterByPlan(Number(filterPlanId))
+      .then(res => setArticlePlans(res.data))
       .catch(() => alert("No records found"));
   };
 
@@ -137,16 +125,16 @@ const ArticlePlanList = () => {
 
   const clearForm = () => {
     setIdPlan("");
-    setIdProject("");
-    setTasks("");
-    setWorkDone("");
+    setIdScientificArticles("");
+    setArticleComments("");
+    setPublicationLink("");
   };
 
   /* ================= RENDER ================= */
 
   return (
     <div>
-      <h2>Project Plans</h2>
+      <h2>Article Plans</h2>
 
       {/* ADD / UPDATE */}
       <div style={{ marginBottom: "20px" }}>
@@ -159,25 +147,28 @@ const ArticlePlanList = () => {
           ))}
         </select>
 
-        <select value={idProject} onChange={e => setIdProject(e.target.value)}>
-          <option value="">Select project</option>
-          {projects.map(pr => (
-            <option key={pr.idProject} value={pr.idProject}>
-              {pr.name}
+        <select
+          value={idScientificArticles}
+          onChange={e => setIdScientificArticles(e.target.value)}
+        >
+          <option value="">Select article</option>
+          {articles.map(a => (
+            <option key={a.idScientificArticles} value={a.idArticle}>
+              {a.name}idArticle
             </option>
           ))}
         </select>
 
         <input
-          placeholder="Tasks"
-          value={tasks}
-          onChange={e => setTasks(e.target.value)}
+          placeholder="Article comments"
+          value={articleComments}
+          onChange={e => setArticleComments(e.target.value)}
         />
 
         <input
-          placeholder="Work done"
-          value={workDone}
-          onChange={e => setWorkDone(e.target.value)}
+          placeholder="Publication link"
+          value={publicationLink}
+          onChange={e => setPublicationLink(e.target.value)}
         />
 
         {editId ? (
@@ -186,11 +177,11 @@ const ArticlePlanList = () => {
             <button onClick={cancelEdit}>Cancel</button>
           </>
         ) : (
-          <button onClick={addProjectPlan}>Add</button>
+          <button onClick={addArticlePlan}>Add</button>
         )}
       </div>
 
-      {/* FILTERS */}
+      {/* FILTER */}
       <div style={{ marginBottom: "15px" }}>
         <select value={filterPlanId} onChange={e => setFilterPlanId(e.target.value)}>
           <option value="">All plans</option>
@@ -203,26 +194,20 @@ const ArticlePlanList = () => {
         <button onClick={filterByPlan}>Filter by plan</button>
       </div>
 
-      <div style={{ marginBottom: "15px" }}>
-        <select value={filterProjectId} onChange={e => setFilterProjectId(e.target.value)}>
-          <option value="">All projects</option>
-          {projects.map(pr => (
-            <option key={pr.idProject} value={pr.idProject}>
-              {pr.name}
-            </option>
-          ))}
-        </select>
-        <button onClick={filterByProject}>Filter by project</button>
-      </div>
-
       {/* LIST */}
       <ul>
-        {projectPlans.map(pp => (
-          <li key={pp.idProjectPlan}>
-            Plan {pp.idPlan} | Project {pp.idProject} |
-            Tasks: {pp.tasks} | Work done: {pp.workDone}
-            <button onClick={() => startEdit(pp)}>Update</button>
-            <button onClick={() => deleteProjectPlan(pp.idProjectPlan)}>Delete</button>
+        {articlePlans.map(ap => (
+          <li key={ap.idArticlePlan}>
+            Plan {ap.idPlan} | Article {ap.idScientificArticles} |
+            Comments: {ap.articleComments || "-"} |
+            Link:{" "}{ap.publicationLink ? (
+                  <a href={ap.publicationLink} target="_blank" rel="noopener noreferrer">
+                    {ap.publicationLink}
+                  </a>) : ("-")}
+            <button onClick={() => startEdit(ap)}>Update</button>
+            <button onClick={() => deleteArticlePlan(ap.idArticlePlan)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>
@@ -230,4 +215,4 @@ const ArticlePlanList = () => {
   );
 };
 
-export default ProjectPlanList;
+export default ArticlePlanList;
