@@ -5,7 +5,7 @@ import { useAuth } from "./AuthContext";
 const ProtectedRoute = ({ allowedRoles }) => {
   const { isAuth, role, loading } = useAuth();
 
-  if (loading) return null; // or spinner
+  if (loading) return null;
 
   if (!isAuth) {
     return <Navigate to="/login" replace />;

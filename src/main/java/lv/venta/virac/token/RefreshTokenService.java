@@ -24,7 +24,6 @@ public class RefreshTokenService {
         this.jwtService = jwtService;
     }
     
-    //Paskatīties to user padošanu vai kā objektu vai kā int id
     public RefreshToken createRefreshToken(User user) {
         RefreshToken token = new RefreshToken();
 	        token.setUser(user);

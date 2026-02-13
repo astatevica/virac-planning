@@ -60,26 +60,8 @@ public class AuthenticationService {
 		User new_user = userRepo.save(user);
 		String accessToken = jwtService.generateToken(user); 
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-//		return AuthenticationResponse.builder().build()
-//				.token(jwtToken)
-//				.build();
 		return new AuthenticationResponse(accessToken, refreshToken.getToken(), new_user.getRole().name());
 	}
-//	
-//	public AuthenticationResponse authenticate(AuthenticationRequest request) {
-//		authenticationManager.authenticate(
-//			new UsernamePasswordAuthenticationToken(
-//					request.getEmail(),
-//					request.getPassword())
-//			);
-//		var user = repository.findByEmail(request.getEmail())
-//				.orElseThrow();
-//		
-//		var jwtToken = jwtService.generateToken(user); 
-//		return AuthenticationResponse.builder().build()
-//				.token(jwtToken)
-//				.build();
-//	}
 	
 	public void createUserByAdmin(RegisterRequest request) {
 

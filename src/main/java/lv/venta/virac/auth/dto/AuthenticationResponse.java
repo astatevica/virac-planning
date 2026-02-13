@@ -14,8 +14,4 @@ public class AuthenticationResponse {
 	private String accessToken;
 	private String refreshToken;
 	private String role;
-	
-
 }
-
-//public record AuthResponse(String accessToken) {}

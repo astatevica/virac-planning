@@ -5,7 +5,7 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// 👉 Attach access token
+//Attach access token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -17,7 +17,7 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 👉 Auto refresh on 401
+//Auto refresh on 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {

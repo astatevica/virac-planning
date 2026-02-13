@@ -23,5 +23,4 @@ public interface ICRUDProjectService extends ICRUDBase<Project>{
 	//Filter by End Date
 	public abstract ArrayList<Project> selectAllProjectsByEndDate(LocalDate endDate) throws Exception;
 
-	//TODO: varbūt vajag vēl kādu filtrāciju?
 }

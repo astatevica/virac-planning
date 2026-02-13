@@ -47,8 +47,6 @@ class AuthService {
     try {
       const decoded = jwtDecode(token);
 
-      // depends how you generate JWT
-      // most common:
       return decoded.role 
         || decoded.authorities?.[0]?.replace("ROLE_", "") 
         || null;
@@ -60,8 +58,6 @@ class AuthService {
   }
 }
 
-// ✅ create named instance
 const authService = new AuthService();
 
-// ✅ export named instance
 export default authService;

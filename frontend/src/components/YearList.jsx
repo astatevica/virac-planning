@@ -72,7 +72,7 @@ const YearList = () => {
     <div>
       <h2>Years</h2>
 
-      {/* ➕ ADD YEAR */}
+      {/* ADD YEAR */}
       <div style={{ marginBottom: "15px" }}>
         <input
           type="number"
@@ -83,7 +83,7 @@ const YearList = () => {
         <button onClick={addYear}>Add</button>
       </div>
 
-      {/* 📄 LIST */}
+      {/* LIST */}
       <ul>
         {years.map(y => (
           <li key={y.idYear}>

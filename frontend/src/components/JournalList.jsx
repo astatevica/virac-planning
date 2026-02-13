@@ -80,7 +80,7 @@ const JournalList = () => {
         <button onClick={addJournal}>Add</button>
       </div>
 
-      {/* 📄 LIST */}
+      {/* LIST */}
       <ul>
         {journals.map(dep => (
           <li key={dep.idJournal}>

@@ -35,8 +35,6 @@ public class CRUDViracDepServiceImpl implements ICRUDViracDepService{
         session.disableFilter("deletedDepartmentFilter");
         return departmets;
     }
-    
-    //Something mby needed with pagable
 
     @Override
     public ViracDepartment retrieveById(int id) throws Exception {

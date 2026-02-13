@@ -10,7 +10,6 @@ public interface ICRUDCourseService extends ICRUDBase<Course>{
 					
 	//U - update
 	public abstract void updateById(int id, String name, int ectsCredits, String semester, String faculty) throws Exception;
-	
-	//TODO: paskatīties vai nepieciešama filtrēšana
+
 
 }

@@ -14,7 +14,7 @@ public class ProjectManagementDTO {
 	}
 	
 	public ProjectManagementDTO(int idProjectManag, int employeeId, LocalDate startDate, LocalDate endDate) {
-		this.setIdProjectManag(idProjectManag); //Vai šeit ir paredzēts id setot?
+		this.setIdProjectManag(idProjectManag);
 		this.setEmployeeId(employeeId);
 		this.setStartDate(startDate);
 		this.setEndDate(endDate);

@@ -53,7 +53,6 @@ public class CRUDUserServiceImpl implements ICRUDUserService{
 		
 	}
 
-
 	@Override
 	public void updateById(int id, String firstname, String lastname, String email, String password, String role,
 			int idEmployee) throws Exception {

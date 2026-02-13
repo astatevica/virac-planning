@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ProjectPlanService from "../services/ProjectPlanService";
 import ProjectService from "../services/ProjectService";
-import PlanService from "../services/PlanService"; // assumes you already have this
+import PlanService from "../services/PlanService";
 
 const ProjectPlanList = () => {
 

@@ -108,7 +108,7 @@ const ScientificArticlesList = () => {
     <div>
       <h2>Scientific Articles</h2>
 
-      {/* 🔍 FILTER */}
+      {/* FILTER */}
       <div style={{ marginBottom: "15px" }}>
         <input
           placeholder="Filter by co-author"
@@ -119,7 +119,7 @@ const ScientificArticlesList = () => {
         <button onClick={loadArticles}>Clear</button>
       </div>
 
-      {/* ➕ ADD */}
+      {/* ADD */}
       <div style={{ marginBottom: "15px" }}>
         <input
           placeholder="Article name"
@@ -145,7 +145,7 @@ const ScientificArticlesList = () => {
         <button onClick={addArticle}>Add</button>
       </div>
 
-      {/* 📄 TABLE */}
+      {/* TABLE */}
       <table border="1" cellPadding="5">
         <thead>
           <tr>

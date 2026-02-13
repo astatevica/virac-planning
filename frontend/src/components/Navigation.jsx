@@ -17,14 +17,7 @@ const Navigation = () => {
       window.location.reload();
     });
   };
-
-  // const employee = () =>{
-  //   navigate("/admin/employee");
-  //   EmployeeService.getAll();
-  //   console.log(EmployeeService.getAll());
-  // }
-
-
+  
   return (
     <nav style={styles.nav}>
       <h3 style={styles.logo}>VIRAC</h3>

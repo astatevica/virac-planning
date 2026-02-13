@@ -57,7 +57,6 @@ public class CRUDStudentWorkServiceImpl implements ICRUDStudentWorkService{
 	public void create(String name, String studentName, String studentSurname, String degree) throws Exception {
 		ArrayList<StudentWork> studentWork = (ArrayList<StudentWork>) studWorkRepo.findAll();
         
-		//TODO: nokaidrot par degree
         if(name == null || studentName == null  || studentSurname == null || degree == null){
 			throw new Exception("The input parameters are incorrect");
 		}

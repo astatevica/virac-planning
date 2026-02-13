@@ -56,7 +56,6 @@ public class User implements UserDetails{
 	private String email;
 	
 	@Column(name = "password")
-	//@JsonIgnore (prevents accidental exposure)
 	private String password;
 	
 	@Column(name = "role", nullable = false)

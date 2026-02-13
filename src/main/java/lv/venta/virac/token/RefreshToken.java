@@ -35,14 +35,12 @@ public class RefreshToken {
     @Column(name = "expiryDate", nullable = false)
     private Instant expiryDate;
 
-    @ManyToOne //(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "idUser", nullable = false)
     private User user;
 
     public boolean isExpired() {
         return expiryDate.isBefore(Instant.now());
     }
-    
-    //TODO: getters & setters
 
 }

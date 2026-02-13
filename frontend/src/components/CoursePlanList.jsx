@@ -129,7 +129,7 @@ const CoursePlanList = () => {
     <div>
       <h2>Course Plans</h2>
 
-      {/* 🔍 FILTER */}
+      {/* FILTER */}
       <div style={{ marginBottom: "15px" }}>
         <select
           value={filterPlanId}
@@ -146,7 +146,7 @@ const CoursePlanList = () => {
         <button onClick={loadAll}>Clear</button>
       </div>
 
-      {/* ➕ ADD / ✏️ EDIT */}
+      {/* ADD / EDIT */}
       <div style={{ marginBottom: "20px" }}>
         <select value={idPlan} onChange={e => setIdPlan(e.target.value)}>
           <option value="">Select plan</option>

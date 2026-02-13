@@ -86,7 +86,7 @@ const DepartmentList = () => {
     <div>
       <h2>Departments</h2>
 
-      {/* ➕ ADD DEPARTMENT */}
+      {/* ADD DEPARTMENT */}
       <div style={{ marginBottom: "15px" }}>
         <input
           placeholder="New department name"
@@ -106,7 +106,7 @@ const DepartmentList = () => {
         <button onClick={addDepartment}>Add</button>
       </div>
 
-      {/* 📄 LIST */}
+      {/* LIST */}
       <ul>
         {departments.map(dep => (
           <li key={dep.id}>

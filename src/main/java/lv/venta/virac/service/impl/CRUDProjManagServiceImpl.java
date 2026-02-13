@@ -31,7 +31,7 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
 	@Override
 	public ArrayList<ProjectManagement> retrieveAll() throws Exception {
 		
-		Session session = entityManager.unwrap(Session.class);  //EntityManager.unwrap(Session.class);
+		Session session = entityManager.unwrap(Session.class);
         Filter filter = session.enableFilter("deletedManagementFilter");
         filter.setParameter("isDeleted", false);
 		ArrayList<ProjectManagement> projectManag = (ArrayList<ProjectManagement>) managRepo.findAll();

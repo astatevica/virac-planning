@@ -89,7 +89,7 @@ const CourseList = () => {
     <div>
       <h2>Courses</h2>
 
-      {/* ➕ ADD / ✏️ UPDATE */}
+      {/* ADD / UPDATE */}
       <div style={{ marginBottom: "15px" }}>
         <input
           placeholder="Course name"
@@ -123,7 +123,7 @@ const CourseList = () => {
         )}
       </div>
 
-      {/* 📄 LIST */}
+      {/* LIST */}
       <ul>
         {courses.map(course => (
           <li key={course.idCourse}>
