@@ -25,7 +25,7 @@ public class UserController {
 		this.planService = planService;
 	}
 	
-	@GetMapping("/filter/plans/crud/{idEmployee}")
+	@GetMapping("/filter/plans/all")
 	@PreAuthorize("hasRole('USER')")
     public ResponseEntity<ArrayList<PlanDTO>> selectAllPlansByEmployee(
     		Authentication authentication) throws Exception {
@@ -55,7 +55,7 @@ public class UserController {
 	@GetMapping("/filter/plans/{idYear}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<ArrayList<PlanDTO>> selectPlansByLoggedUserAndYear(
-	        @PathVariable int idYear,
+	        @PathVariable("idYear") int idYear,
 	        Authentication authentication) throws Exception {
 
 	    User user = (User) authentication.getPrincipal(); 
@@ -83,7 +83,7 @@ public class UserController {
 	@GetMapping("/plans/project/{projectId}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<ArrayList<PlanDTO>> getPlansByProject(
-	        @PathVariable int projectId, Authentication authentication) throws Exception {
+	        @PathVariable("projectId") int projectId, Authentication authentication) throws Exception {
 
 	    User user = (User) authentication.getPrincipal();
 	    int employeeId = user.getEmployee().getIdEmployee();

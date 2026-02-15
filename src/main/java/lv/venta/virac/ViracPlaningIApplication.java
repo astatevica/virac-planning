@@ -88,7 +88,7 @@ public class ViracPlaningIApplication {
 				//UserTable
 				User user1 = User.builder()
 						.firstname("Karina").lastname("Šķirmante").email("karina@venta.lv").
-						password(encoder.encode("skirmante123")).role(Role.ADMIN).employee(emp1).build();
+						password(encoder.encode("skirmante123")).role(Role.USER).employee(emp1).build();
 				User user2 = User.builder()
 						.firstname("Juris").lastname("Kalvāns").email("kalvans@venta.lv").
 						password(encoder.encode("kalvans123")).role(Role.USER).employee(emp2).build();

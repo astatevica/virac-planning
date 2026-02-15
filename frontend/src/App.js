@@ -26,6 +26,8 @@ import WorkPlanList from "./components/WorkPlanList";
 import PlanView from "./components/PlanView";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
+import UserDashboard from "./pages/UserDashboard";
+import UserAllPlans from "./pages/UserAllPlans";
 
 function App() {
   return (
@@ -61,6 +63,13 @@ function App() {
               <Route path="/admin/plan" element={<PlanList />} />
               <Route path="/admin/plans/:id" element={<PlanView />} />
             </Route>
+
+            {/*PROTECTED ROUTES*/}
+            <Route element={<ProtectedRoute allowedRoles={["USER"]} />}>
+              <Route path="/user/dashboard" element={<UserDashboard />} />
+              <Route path="/user/plans" element={<UserAllPlans />} />
+            </Route>
+
 
           </Routes>
         </div>
