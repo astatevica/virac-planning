@@ -178,4 +178,22 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 		return result;
 	}
 
+	@Override
+	public ArrayList<Plan> selectAllPlansByEmployeeAndYear(int idEmployee, int idYear) throws Exception {
+		ArrayList<Plan> result = planRepo.findByEmployee_IdEmployeeAndYear_IdYear(idEmployee, idYear);
+		if(result.isEmpty()) {
+			throw new Exception("Plan with ID Emplyee: " + idEmployee + " and ID Year: "+ idYear + " does not exist");
+		}
+		return result;
+	}
+
+	@Override
+	public ArrayList<Plan> selectAllPlansByEmployeeAndProject(int idEmployee, int idProject) throws Exception {
+		ArrayList<Plan> result = planRepo.findByEmployeeAndProject(idEmployee, idProject);
+		if(result.isEmpty()) {
+			throw new Exception("Plan with ID Emplyee: " + idEmployee + " and ID Project: "+ idProject + " does not exist");
+		}
+		return result;
+	}
+
 }

@@ -12,4 +12,5 @@ public interface IProjectPlanRepo extends CrudRepository<ProjectPlan, Integer>{
 	
 	public abstract ArrayList<ProjectPlan> findByProject_IdProject(int idProject);
 	
+	
 }

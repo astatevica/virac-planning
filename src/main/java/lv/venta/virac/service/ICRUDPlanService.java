@@ -28,5 +28,11 @@ public interface ICRUDPlanService extends ICRUDBase<Plan>{
 	//Filter by Department
 	public abstract ArrayList<Plan> selectAllPlansByDepartment(String nameDepartment) throws Exception;
 	
+	//Filter by Employee and Year
+	public abstract ArrayList<Plan> selectAllPlansByEmployeeAndYear(int idEmployee, int idYear) throws Exception;
+	
+	//Filter by Employee and Project
+	public abstract ArrayList<Plan> selectAllPlansByEmployeeAndProject(int idEmployee, int idProject) throws Exception;
+	
 
 }
