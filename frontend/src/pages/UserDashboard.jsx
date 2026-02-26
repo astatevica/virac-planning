@@ -4,45 +4,49 @@ import UserPlanService from "../services/UserPlanService";
 import api from "../api/api";
 
 export default function UserDashboard() {
-
   const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [currentYearId, setCurrentYearId] = useState(null);
   const [years, setYears] = useState([]);
-  const currentYear = new Date().getFullYear(); // 2026
+  const currentYear = new Date().getFullYear(); // e.g., 2026
 
   useEffect(() => {
     const loadCurrentYearPlans = async () => {
-        try {
-        const yearsRes = await api.get("/user/filter/plans/"); // instead of /admin/year
+      try {
+        // 1️⃣ Load available years
+        const yearsRes = await api.get("/year"); // endpoint returning all years
         setYears(yearsRes.data);
 
-        const year = yearsRes.data.find(y => y.yearNumber === currentYear);
-
-        if (!year) {
-            alert(`Year ${currentYear} not found`);
-            return;
+        // 2️⃣ Find the year object matching current year
+        const yearObj = yearsRes.data.find(y => y.yearNumber === currentYear);
+        if (!yearObj) {
+          alert(`Year ${currentYear} not found`);
+          return;
         }
 
-        const yearId = year.idYear;
+        const yearId = yearObj.idYear;
         setCurrentYearId(yearId);
 
+        // 3️⃣ Load plans for that year
         const plansRes = await UserPlanService.getByYear(yearId);
         setPlans(plansRes.data);
 
-        } catch (err) {
+      } catch (err) {
+        console.error(err);
         alert("Failed loading dashboard");
-        }
+      }
     };
 
     loadCurrentYearPlans();
-    }, [currentYear]); // ✅ add currentYear here
-
+  }, [currentYear]);
 
   return (
     <div>
       <h2>User Dashboard</h2>
-      <h3>Current Year Plans ({currentYear}) {currentYearId && `(ID: ${currentYearId})`}</h3>
+      <h3>
+        Current Year Plans ({currentYear})
+        {currentYearId && ` (ID: ${currentYearId})`}
+      </h3>
 
       <table border="1" cellPadding="5">
         <thead>

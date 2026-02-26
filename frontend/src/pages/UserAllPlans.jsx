@@ -74,7 +74,7 @@ export default function UserAllPlans() {
   );
 
   const projectMap = Object.fromEntries(
-    projects.map(p => [p.idProject, p.name])
+    projects.map(p => [p.idProject.toString(), p.name])
   );
 
   // Filter logic
@@ -208,7 +208,7 @@ export default function UserAllPlans() {
                   {planProjects[pl.idPlan]?.length > 0 ? (
                     planProjects[pl.idPlan].map(p => (
                       <div key={p.idProjectPlan}>
-                        {projectMap[Number(p.idProject)] || `Project ${p.idProject}`}
+                        {projectMap[Number(p.idProject.toString())] || `Project ${p.idProject}`}
                       </div>
                     ))
                   ) : (
@@ -225,7 +225,7 @@ export default function UserAllPlans() {
                 </td>
               </tr>
             ))
-          )}
+          )} 
         </tbody>
       </table>
 

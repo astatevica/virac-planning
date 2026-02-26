@@ -52,7 +52,7 @@ public class SecurityConfiguration {
                 
                 //USER & ADMIN
                 .requestMatchers("/api/year/**").hasAnyRole("ADMIN","USER")
-                                
+                                                
                 //EVERYTHING ELSE
                 .requestMatchers("/api/auth/logout").authenticated()
                 .anyRequest().authenticated()

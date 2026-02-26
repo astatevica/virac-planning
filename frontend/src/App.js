@@ -28,6 +28,7 @@ import Home from "./pages/Home";
 import Admin from "./pages/Admin";
 import UserDashboard from "./pages/UserDashboard";
 import UserAllPlans from "./pages/UserAllPlans";
+import UserPlanView from "./pages/UserPlanView";
 
 function App() {
   return (
@@ -68,6 +69,7 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={["USER"]} />}>
               <Route path="/user/dashboard" element={<UserDashboard />} />
               <Route path="/user/plans" element={<UserAllPlans />} />
+              <Route path="/user/plans/:id" element={<UserPlanView />} />
             </Route>
 
 

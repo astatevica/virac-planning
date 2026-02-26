@@ -163,6 +163,24 @@ public class UserController {
 
 	    return ResponseEntity.ok(response);
     }
+	
+	@GetMapping("/plan/{id}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<PlanDTO> getById(
+            @PathVariable("id") int id) throws Exception {
+
+        Plan pl = planService.retrieveById(id);
+        System.out.println(pl);
+        return ResponseEntity.ok(
+        		new PlanDTO(
+     	               pl.getIdPlan(), pl.getEmployee().getIdEmployee(), pl.getYear().getIdYear(),pl.getNumOfProjects(),
+     	               pl.getNumOfArticles(),pl.getPartInConf(),pl.getPartInConfEnd(),pl.getComAbConf(),
+     	               pl.getComAbConfEnd(),pl.getNumOfCourses(),pl.getNumOfStudWork(),pl.getPromoOfResearch(),
+     	               pl.getPromoOfResearchEnd(),pl.getAdminWork(),pl.getAdminWorkEnd(), pl.getProjApplicSub(),
+     	               pl.getProjApplicSubEnd(),pl.getSkillsDevelopment(),pl.getSkillsDevelopmentEnd(),
+     	               pl.getParticipationInSeminars(),pl.getParticipationInSeminarsEnd(),pl.getOtherJobs(),pl.getOtherJobsEnd()
+     	            ));
+    }
 
 
 	

@@ -8,6 +8,7 @@ const Navigation = () => {
   const isLoggedIn = AuthService.isAuthenticated();
   const role = localStorage.getItem("role"); // from JWT
   const isAdmin = role === "ADMIN";
+  const isUser = role === "USER";
   console.log(role);
   console.log(localStorage.getItem("role"));
 
@@ -129,6 +130,21 @@ const Navigation = () => {
           )}
         </li>
 
+
+        <li>
+          {isUser &&(
+          <NavLink to="user/dashboard" style={styles.link}>
+            Dashboard
+          </NavLink>
+          )}
+        </li>
+        <li>
+          {isUser &&(
+          <NavLink to="user/plans" style={styles.link}>
+            Archive
+          </NavLink>
+          )}
+        </li>
         <li>
           {isLoggedIn && (
             <button onClick={logout}>Logout</button>
