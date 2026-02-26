@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,6 +106,10 @@ public class CRUDProjectPlanController {
 
         ArrayList<ProjectPlan> projectPlans =
                 projPlanService.selectAllProjectPlanByPlan(idPlan);
+        
+        if (projectPlans == null) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
 
         ArrayList<ProjectPlanDTO> response = new ArrayList<>(
         		projectPlans.stream()

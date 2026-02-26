@@ -12,8 +12,18 @@ const getByYear = (idYear) =>
 const getByProject = (projectId) =>
   api.get(`${API}/plans/project/${projectId}`);
 
-export default {
+const getByPlan = (idPlan) =>
+  api.get(`${API}/project-plan/filter/plan/${idPlan}`); 
+
+const getAllProjects = () =>
+  api.get(`${API}/all/projects`); 
+
+const UserPlanService = {
   getAll,
-  getByYear,
-  getByProject
+  getByYear,   
+  getByProject,
+  getByPlan,
+  getAllProjects
 };
+
+export default UserPlanService;

@@ -11,8 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lv.venta.virac.dto.PlanDTO;
+import lv.venta.virac.dto.ProjectDTO;
+import lv.venta.virac.dto.ProjectPlanDTO;
 import lv.venta.virac.model.Plan;
+import lv.venta.virac.model.Project;
+import lv.venta.virac.model.ProjectPlan;
 import lv.venta.virac.service.ICRUDPlanService;
+import lv.venta.virac.service.ICRUDProjectPlanService;
+import lv.venta.virac.service.ICRUDProjectService;
 import lv.venta.virac.user.User;
 
 @RestController
@@ -20,9 +26,13 @@ import lv.venta.virac.user.User;
 public class UserController {
 	
 	private ICRUDPlanService planService;
+	private ICRUDProjectPlanService projPlanService;
+	private ICRUDProjectService projService;
 	
-	public UserController(ICRUDPlanService planService) {
+	public UserController(ICRUDPlanService planService, ICRUDProjectPlanService projPlanService, ICRUDProjectService projService) {
 		this.planService = planService;
+		this.projPlanService = projPlanService;
+		this.projService = projService;
 	}
 	
 	@GetMapping("/filter/plans/all")
@@ -104,6 +114,55 @@ public class UserController {
         	    );
 	    return ResponseEntity.ok(response);
 	}
+	
+	@GetMapping("/project-plan/filter/plan/{idPlan}")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ArrayList<ProjectPlanDTO>> selectAllProjectPlanByPlan(
+            @PathVariable("idPlan") int idPlan) throws Exception {
+
+        ArrayList<ProjectPlan> projectPlans =
+                projPlanService.selectAllProjectPlanByPlan(idPlan);
+        
+        if (projectPlans == null) {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+
+        ArrayList<ProjectPlanDTO> response = new ArrayList<>(
+        		projectPlans.stream()
+	            .map(projPlan -> new ProjectPlanDTO(
+	            	projPlan.getIdProjectPlan(),
+	            	projPlan.getPlan().getIdPlan(),
+	            	projPlan.getProject().getIdProject(),
+	            	projPlan.getTasks(),
+	            	projPlan.getWorkDone()
+	            ))
+	            .toList());
+        
+        return ResponseEntity.ok(response);
+    }
+	
+	@GetMapping("/all/projects")
+	@PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ArrayList<ProjectDTO>> getAll()
+            throws Exception {
+
+        ArrayList<Project> list = projService.retrieveAll();
+
+        ArrayList<ProjectDTO> response =
+	            new ArrayList<>(list.stream()
+	                .map(pr -> new ProjectDTO(
+	                		pr.getIdProject(),
+	                		pr.getName(),
+	                		pr.getNumber(),
+	                        pr.getProjectManagement().getIdProjectManag(),
+	                        pr.getStartDate(),
+	                        pr.getEndDate(),
+	                        pr.getAcronym()
+	                ))
+	                .toList());
+
+	    return ResponseEntity.ok(response);
+    }
 
 
 	

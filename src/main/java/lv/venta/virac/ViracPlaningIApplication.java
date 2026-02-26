@@ -189,8 +189,11 @@ public class ViracPlaningIApplication {
 				//ProjectPlanTable
 				ProjectPlan projPlan1 = new ProjectPlan(plan1, proj1, "Task1, Task 2", null);
 				ProjectPlan projPlan2 = new ProjectPlan(plan1, proj2, null, "Done");
+				ProjectPlan projPlan3 = new ProjectPlan(plan3, proj2, null, "Done");
+				ProjectPlan projPlan4 = new ProjectPlan(plan4, proj1, null, "Done");
+				ProjectPlan projPlan5 = new ProjectPlan(plan4, proj2, null, "Done");
 				
-				projPlanRepo.saveAll(Arrays.asList(projPlan1,projPlan2));
+				projPlanRepo.saveAll(Arrays.asList(projPlan1,projPlan2,projPlan3,projPlan4, projPlan5));
 				
 			}
 		};

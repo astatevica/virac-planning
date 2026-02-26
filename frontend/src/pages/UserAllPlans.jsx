@@ -9,10 +9,11 @@ export default function UserAllPlans() {
 
   const [plans, setPlans] = useState([]);
   const [years, setYears] = useState([]);
-  //const [projects, setProjects] = useState([]);
 
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedProject, setSelectedProject] = useState("");
+  const [planProjects, setPlanProjects] = useState({});
+  const [projects, setProjects] = useState([]);
 
   const [filterError, setFilterError] = useState("");
   const [noResults, setNoResults] = useState(false);
@@ -20,37 +21,34 @@ export default function UserAllPlans() {
   useEffect(() => {
     loadPlans();
     loadFilters();
+    loadProjects();
   }, []);
 
-  const loadPlans = () => {
-    UserPlanService.getAll()
-      .then(res => {
-        setPlans(res.data);
-        setNoResults(res.data.length === 0);
-      })
-      .catch(() => setFilterError("Failed to load plans"));
+  const loadPlans = async () => {
+    try {
+      const res = await UserPlanService.getAll();
+      setPlans(res.data);
+
+      // ielādē projektus katram plānam
+      const projectData = {};
+
+      for (let plan of res.data) {
+        const projectRes = await UserPlanService.getByPlan(plan.idPlan);
+        projectData[plan.idPlan] = projectRes.data;
+      }
+
+      setPlanProjects(projectData);
+
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  // const loadFilters = async () => {
-  //   try {
-  //     const [yearRes, projectRes] = await Promise.all([
-  //       api.get("/year"),
-  //       api.get("/project")
-  //     ]);
+  const loadProjects = async () => {
+    const res = await api.get("/user/all/projects");
+    setProjects(res.data);
+  };
 
-  //     setYears(yearRes.data);
-  //     setProjects(projectRes.data);
-
-  //     if (yearRes.data.length === 0 && projectRes.data.length === 0) {
-  //       setFilterError("No filter data available.");
-  //     } else {
-  //       setFilterError("");
-  //     }
-
-  //   } catch (err) {
-  //     setFilterError("Failed to load filter data.");
-  //   }
-  // };
   const loadFilters = async () => {
     try {
       const [yearRes] = await Promise.all([
@@ -75,33 +73,48 @@ export default function UserAllPlans() {
     years.map(y => [y.idYear, y.yearNumber])
   );
 
+  const projectMap = Object.fromEntries(
+    projects.map(p => [p.idProject, p.name])
+  );
+
   // Filter logic
   useEffect(() => {
 
-    let request;
+  let request;
 
-    if (selectedYear) {
-      request = UserPlanService.getByYear(selectedYear);
-    } 
-    // else if (selectedProject) {
-    //   request = UserPlanService.getByProject(selectedProject);
-    // } 
-    else {
-      loadPlans();
-      return;
-    }
+  if (selectedYear) {
+    request = UserPlanService.getByYear(selectedYear);
+  } 
+  else if (selectedProject) {
+    request = UserPlanService.getByProject(selectedProject);
+  } 
+  else {
+    loadPlans();
+    return;
+  }
 
-    request
-      .then(res => {
-        setPlans(res.data);
-        setNoResults(res.data.length === 0);
-      })
-      .catch(() => {
-        setPlans([]);
-        setNoResults(true);
-      });
-  //}, [selectedYear, selectedProject]);
-  }, [selectedYear]);
+  request
+    .then(async res => {
+      setPlans(res.data);
+      setNoResults(res.data.length === 0);
+
+      // ⚠ svarīgi: pārlādē arī planProjects
+      const projectData = {};
+
+      for (let plan of res.data) {
+        const projectRes = await UserPlanService.getByPlan(plan.idPlan);
+        projectData[plan.idPlan] = projectRes.data;
+      }
+
+      setPlanProjects(projectData);
+
+    })
+    .catch(() => {
+      setPlans([]);
+      setNoResults(true);
+    });
+
+}, [selectedYear, selectedProject]);
 
   return (
     <div>
@@ -130,7 +143,7 @@ export default function UserAllPlans() {
         ))}
       </select>
 
-      {/* <label style={{ marginLeft: 10 }}>Project:</label>
+      <label style={{ marginLeft: 15 }}>Project:</label>
       <select
         value={selectedProject}
         onChange={e => {
@@ -141,10 +154,10 @@ export default function UserAllPlans() {
         <option value="">All</option>
         {projects.map(p => (
           <option key={p.idProject} value={p.idProject}>
-            {p.title}
+            {p.name}
           </option>
         ))}
-      </select> */}
+      </select>
 
       <button
         onClick={() => {
@@ -170,7 +183,8 @@ export default function UserAllPlans() {
           <tr>
             <th>ID</th>
             <th>Year</th>
-            <th>Projects</th>
+            <th>Projects count</th>
+            <th>Project name</th>
             <th>Articles</th>
             <th>Courses</th>
             <th>Student Work</th>
@@ -190,6 +204,17 @@ export default function UserAllPlans() {
                 <td>{pl.idPlan}</td>
                 <td>{yearMap[pl.idYear] || pl.idYear}</td>
                 <td>{pl.numOfProjects}</td>
+                <td>
+                  {planProjects[pl.idPlan]?.length > 0 ? (
+                    planProjects[pl.idPlan].map(p => (
+                      <div key={p.idProjectPlan}>
+                        {projectMap[Number(p.idProject)] || `Project ${p.idProject}`}
+                      </div>
+                    ))
+                  ) : (
+                    ""
+                  )}
+                </td>
                 <td>{pl.numOfArticles}</td>
                 <td>{pl.numOfCourses}</td>
                 <td>{pl.numOfStudWork}</td>

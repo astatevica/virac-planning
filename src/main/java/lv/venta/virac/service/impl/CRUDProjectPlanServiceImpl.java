@@ -118,7 +118,8 @@ public class CRUDProjectPlanServiceImpl implements ICRUDProjectPlanService{
 	public ArrayList<ProjectPlan> selectAllProjectPlanByPlan(int idPlan) throws Exception {
 		ArrayList<ProjectPlan> result = projPlanRepo.findByPlan_IdPlan(idPlan);
 		if(result.isEmpty()) {
-			throw new Exception("Project-Plan with PLAN ID: " + idPlan + " does not exist");
+			result = null;
+			//throw new Exception("Project-Plan with PLAN ID: " + idPlan + " does not exist");
 		}
 		
 		return result;
