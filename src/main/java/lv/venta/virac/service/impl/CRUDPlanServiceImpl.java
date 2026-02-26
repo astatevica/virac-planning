@@ -154,7 +154,7 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 		if(result.isEmpty()) {
 			throw new Exception("Plan with Employee ID: " + idEmployee + " does not exist");
 		}
-		
+		System.out.println(result);
 		return result;
 	}
 
@@ -184,6 +184,7 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 		if(result.isEmpty()) {
 			throw new Exception("Plan with ID Emplyee: " + idEmployee + " and ID Year: "+ idYear + " does not exist");
 		}
+		System.out.println(result);
 		return result;
 	}
 
@@ -193,6 +194,7 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 		if(result.isEmpty()) {
 			throw new Exception("Plan with ID Emplyee: " + idEmployee + " and ID Project: "+ idProject + " does not exist");
 		}
+		System.out.println(result);
 		return result;
 	}
 

@@ -68,22 +68,26 @@ public class ViracPlaningIApplication {
 				Year year1 = new Year(2023);
 				Year year2 = new Year(2024);
 				Year year3 = new Year(2025);
+				Year year4 = new Year(2026);
 				
-				yearRepo.saveAll((Arrays.asList(year1, year2, year3)));
+				yearRepo.saveAll((Arrays.asList(year1, year2, year3, year4)));
 		
 				//ViracDepartmentTable DONE
 				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology", "Karina", "Šķirmante");
 				ViracDepartment dep2 = new ViracDepartment("Astronomy and Astrophysics", "Juris", "Kalvāns");
 				ViracDepartment dep3 = new ViracDepartment("Engineering & Technical Operations group(ETO/ETOG)", "Juris", "Freimanis");
+				ViracDepartment dep4 = new ViracDepartment("Test", "Test", "Test");
 				
-				viracDepRepo.saveAll((Arrays.asList(dep1, dep2, dep3)));
+				viracDepRepo.saveAll((Arrays.asList(dep1, dep2, dep3, dep4)));
 				
 				//EmployeeTable DONE
 				Employee emp1 = new Employee("Karina", "Šķirmante", dep1 , "Pētnieks");
 				Employee emp2 = new Employee("Juris", "Kalvāns", dep2 , "Nodaļas vadītājs, Vadošais pētnieks");
 				Employee emp3 = new Employee("Māra", "Klausa", dep3 , "Tehniskais speciālists");
+				Employee emp4 = new Employee("ADMIN", "TEST", dep4 , "ADMIN test profile");
+				Employee emp5 = new Employee("USER", "TEST", dep4 , "USER test profile");
 				
-				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3)));
+				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3, emp4, emp5)));
 				
 				//UserTable
 				User user1 = User.builder()
@@ -96,12 +100,24 @@ public class ViracPlaningIApplication {
 						.firstname("Annija").lastname("Developer").email("dev@venta.lv").
 						password(encoder.encode("dev123")).role(Role.ADMIN).employee(emp3).build();
 				
-				userRepo.saveAll((Arrays.asList(user1,user2,user3)));
+				User user4 = User.builder()
+						.firstname("ADMIN").lastname("TEST").email("admin@venta.lv").
+						password(encoder.encode("admin123")).role(Role.ADMIN).employee(emp4).build();
+				
+				User user5 = User.builder()
+						.firstname("USER").lastname("TEST").email("user@venta.lv").
+						password(encoder.encode("user123")).role(Role.USER).employee(emp5).build();
+				
+				userRepo.saveAll((Arrays.asList(user1,user2,user3,user4,user5)));
 				
 				//PlanTable DONE
 				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
+				Plan plan2 = new Plan(emp5, year4, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
+				Plan plan3 = new Plan(emp5, year3, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
+				Plan plan4 = new Plan(emp5, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
 				
-				planRepo.save(plan1);
+				
+				planRepo.saveAll(Arrays.asList(plan1, plan2, plan3, plan4));
 				
 				//CourseTable DONE
 				Course c1 = new Course("Programmēšanas inženierija I", 4, "rudens", "ITF");

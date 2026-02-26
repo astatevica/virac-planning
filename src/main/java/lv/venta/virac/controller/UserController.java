@@ -76,7 +76,6 @@ public class UserController {
         	            ))
         	            .toList()
         	    );
-
 	    return ResponseEntity.ok(response);
 	}
 	
@@ -103,7 +102,6 @@ public class UserController {
         	            ))
         	            .toList()
         	    );
-
 	    return ResponseEntity.ok(response);
 	}
 

@@ -1,21 +1,19 @@
+// src/services/UserPlanService.js
+
 import api from "../api/api";
 
-const BASE = "/user";
+const API = "/user";
 
-const UserPlanService = {
+const getAll = () => api.get(`${API}/filter/plans/all`);
 
-  getAll() {
-    return api.get(`${BASE}/filter/plans/all`);
-  },
+const getByYear = (idYear) =>
+  api.get(`${API}/filter/plans/${idYear}`);
 
-  getByYear(yearId) {
-    return api.get(`${BASE}/filter/plans/${yearId}`);
-  },
+const getByProject = (projectId) =>
+  api.get(`${API}/plans/project/${projectId}`);
 
-  getByProject(projectId) {
-    return api.get(`${BASE}/plans/project/${projectId}`);
-  }
-
+export default {
+  getAll,
+  getByYear,
+  getByProject
 };
-
-export default UserPlanService;
