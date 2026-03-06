@@ -9,6 +9,8 @@ import org.hibernate.annotations.SQLDelete;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,6 +24,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lv.venta.virac.model.enums.PlanStatus;
 
 @Setter
 @Getter
@@ -143,6 +146,12 @@ public class Plan {
 	
 	@Column(name = "deleted")
 	private boolean deleted = Boolean.FALSE;
+	
+	//PlanStatus
+	@NotNull
+	@Column(name = "planStatus", nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PlanStatus planStatus;
 	
 	public Plan(Employee employee, Year year, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd,
 			String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
