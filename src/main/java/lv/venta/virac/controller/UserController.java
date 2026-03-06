@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ProjectPlanDTO;
@@ -181,6 +182,18 @@ public class UserController {
      	               pl.getParticipationInSeminars(),pl.getParticipationInSeminarsEnd(),pl.getOtherJobs(),pl.getOtherJobsEnd()
      	            ));
     }
+	
+	@GetMapping("/full-plan/{id}")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<FullPlanDTO> getFullPlan(@PathVariable("id") int idPlan, Authentication authentication) throws Exception {
+
+	    User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+
+	    FullPlanDTO dto = planService.getFullPlanForUser(employeeId, idPlan);
+
+	    return ResponseEntity.ok(dto);
+	}
 
 
 	

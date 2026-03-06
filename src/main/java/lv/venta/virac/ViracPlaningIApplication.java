@@ -24,6 +24,7 @@ import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.model.WorkPlan;
 import lv.venta.virac.model.Year;
 import lv.venta.virac.model.enums.Degree;
+import lv.venta.virac.model.enums.PlanStatus;
 import lv.venta.virac.repo.IArticlePlanRepo;
 import lv.venta.virac.repo.ICoursePlanRepo;
 import lv.venta.virac.repo.ICourseRepo;
@@ -111,10 +112,10 @@ public class ViracPlaningIApplication {
 				userRepo.saveAll((Arrays.asList(user1,user2,user3,user4,user5)));
 				
 				//PlanTable DONE
-				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
-				Plan plan2 = new Plan(emp5, year4, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
-				Plan plan3 = new Plan(emp5, year3, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
-				Plan plan4 = new Plan(emp5, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event");
+				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.plan_open);
+				Plan plan2 = new Plan(emp5, year4, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.plan_open);
+				Plan plan3 = new Plan(emp5, year3, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.done_frozen);
+				Plan plan4 = new Plan(emp5, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.done_frozen);
 				
 				
 				planRepo.saveAll(Arrays.asList(plan1, plan2, plan3, plan4));
@@ -130,8 +131,9 @@ public class ViracPlaningIApplication {
 				CoursePlan cp1 = new CoursePlan(plan1, c3, null);
 				CoursePlan cp2 = new CoursePlan(plan1, c1, null);
 				CoursePlan cp3 = new CoursePlan(plan1, c2, "Novadīts veiksmīgi");
+				CoursePlan cp4 = new CoursePlan(plan2, c2, "Novadīts veiksmīgi");
 				
-				courPlanRepo.saveAll((Arrays.asList(cp1,cp2,cp3)));
+				courPlanRepo.saveAll((Arrays.asList(cp1,cp2,cp3,cp4)));
 				
 				//JournalTable DONE
 				Journal journ1 = new Journal("IET Software");

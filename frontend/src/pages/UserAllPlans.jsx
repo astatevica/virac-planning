@@ -219,7 +219,7 @@ export default function UserAllPlans() {
                 <td>{pl.numOfCourses}</td>
                 <td>{pl.numOfStudWork}</td>
                 <td>
-                  <button onClick={() => navigate(`/user/plans/${pl.idPlan}`)}>
+                  <button onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)}>
                     View
                   </button>
                 </td>

@@ -71,6 +71,11 @@ export default function UserDashboard() {
                 <td>{pl.numOfArticles}</td>
                 <td>{pl.numOfCourses}</td>
                 <td>{pl.numOfStudWork}</td>
+                <td>
+                  <button onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)}>
+                    Open
+                  </button>
+                </td>
               </tr>
             ))
           )}

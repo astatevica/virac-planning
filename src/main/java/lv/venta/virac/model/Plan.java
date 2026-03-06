@@ -156,7 +156,8 @@ public class Plan {
 	public Plan(Employee employee, Year year, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd,
 			String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
 			String adminWork, String adminWorkEnd, String projApplicSub, String projApplicSubEnd, String skillsDevelopment, 
-			String skillsDevelopmentEnd,String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd) {
+			String skillsDevelopmentEnd,String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd,
+			PlanStatus planStatus) {
 		setEmployee(employee);
 		setYear(year);
 		setNumOfProjects(numOfProjects);
@@ -179,6 +180,7 @@ public class Plan {
 		setParticipationInSeminarsEnd(participationInSeminarsEnd);
 		setOtherJobs(otherJobs);
 		setOtherJobsEnd(otherJobsEnd);
+		setPlanStatus(planStatus);
 		
 	}
 }

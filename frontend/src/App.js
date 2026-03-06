@@ -69,7 +69,7 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={["USER"]} />}>
               <Route path="/user/dashboard" element={<UserDashboard />} />
               <Route path="/user/plans" element={<UserAllPlans />} />
-              <Route path="/user/plans/:id" element={<UserPlanView />} />
+              <Route path="/user/full-plan/:id" element={<UserPlanView />} />
             </Route>
 
 

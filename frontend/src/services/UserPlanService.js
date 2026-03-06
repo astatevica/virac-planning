@@ -21,13 +21,17 @@ const getAllProjects = () =>
 const getPlanView = (idPlan) =>
   api.get(`${API}/plan/${idPlan}`);
 
+const getFullPlan = (idPlan) =>
+  api.get(`${API}/full-plan/${idPlan}`);
+
 const UserPlanService = {
   getAll,
   getByYear,   
   getByProject,
   getByPlan,
   getAllProjects,
-  getPlanView
+  getPlanView,
+  getFullPlan
 };
 
 export default UserPlanService;

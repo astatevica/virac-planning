@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import UserPlanService from "../services/UserPlanService";
 import api from "../api/api";
 
 
@@ -8,61 +7,137 @@ export default function UserPlanView() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [plan, setPlan] = useState(null);
-  const [years, setYears] = useState([]);
+  const [fullPlan, setFullPlan] = useState(null);
 
   useEffect(() => {
-    UserPlanService.getPlanView(id).then(res => setPlan(res.data));
-    api.get(`/year`).then(res => setYears(res.data));
+    const loadFullPlan = async () => {
+      try {
+        const fullPlanRes = await api.get(`/user/full-plan/${id}`);
+        setFullPlan(fullPlanRes.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadFullPlan();
   }, [id]);
 
-  if (!plan) return <p>Loading...</p>;
-
-  const year = years.find(y => y.idYear === plan.idYear);
+  if (!fullPlan) return <p>Loading...</p>;
 
   return (
     <div style={{ maxWidth: 1100, margin: "auto" }}>
-      <h2>Plan Details</h2>
+      {fullPlan && (
+      <>
+        <h3>Full Plan</h3>
 
-      <p><strong>Year:</strong> {year?.yearNumber}</p>
+        <table border="1" cellPadding="5">
+          <thead>
+            <tr>
+              <th>Activity</th>
+              <th>Planned</th>
+              <th>Done</th>
+            </tr>
+          </thead>
 
-      <hr />
+          <tbody>
 
-      <h3>Quantitative Indicators</h3>
-      <ul>
-        <li>Projects: {plan.numOfProjects}</li>
-        <li>Articles: {plan.numOfArticles}</li>
-        <li>Courses: {plan.numOfCourses}</li>
-        <li>Student Works: {plan.numOfStudWork}</li>
-      </ul>
+            <tr>
+              <td>Projects</td>
+              <td>{fullPlan.numOfProjects}</td>
+              <td>
+                {fullPlan.projects?.map(p => (
+                  <div key={p.idProject}>{p.name}</div>
+                ))}
+              </td>
+            </tr>
 
-      <hr />
+            <tr>
+              <td>Articles</td>
+              <td>{fullPlan.numOfArticles}</td>
+              <td>
+                {fullPlan.articles?.map(a => (
+                  <div key={a.idScientificArticles}>{a.title}</div>
+                ))}
+              </td>
+            </tr>
 
-      <h3>Planned vs Completed</h3>
-      <table border="1" width="100%" cellPadding="8">
-        <thead>
-          <tr>
-            <th>Activity</th>
-            <th>Planned</th>
-            <th>Completed</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>Conference Participation</td><td>{plan.partInConf}</td><td>{plan.partInConfEnd}</td></tr>
-          <tr><td>Conference Abstracts</td><td>{plan.comAbConf}</td><td>{plan.comAbConfEnd}</td></tr>
-          <tr><td>Research Promotion</td><td>{plan.promoOfResearch}</td><td>{plan.promoOfResearchEnd}</td></tr>
-          <tr><td>Project Applications</td><td>{plan.projApplicSub}</td><td>{plan.projApplicSubEnd}</td></tr>
-          <tr><td>Skill Development</td><td>{plan.skillsDevelopment}</td><td>{plan.skillsDevelopmentEnd}</td></tr>
-          <tr><td>Seminars</td><td>{plan.participationInSeminars}</td><td>{plan.participationInSeminarsEnd}</td></tr>
-          <tr><td>Administrative Work</td><td>{plan.adminWork}</td><td>{plan.adminWorkEnd}</td></tr>
-          <tr><td>Other Duties</td><td>{plan.otherJobs}</td><td>{plan.otherJobsEnd}</td></tr>
-        </tbody>
-      </table>
+            <tr>
+              <td>Courses</td>
+              <td>{fullPlan.numOfCourses}</td>
+              <td>
+                {fullPlan.courses?.map(c => (
+                  <div key={c.idCourse}>{c.name}</div>
+                ))}
+              </td>
+            </tr>
 
-      <br />
+            <tr>
+              <td>Student Work</td>
+              <td>{fullPlan.numOfStudWork}</td>
+              <td>
+                {fullPlan.studentWork?.map(sw => (
+                  <div key={sw.idStudentWork}>{sw.title}</div>
+                ))}
+              </td>
+            </tr>
 
+            <tr>
+              <td>Participation in Conferences</td>
+              <td>{fullPlan.partInConf}</td>
+              <td>{fullPlan.partInConfEnd}</td>
+            </tr>
+
+            <tr>
+              <td>Committee Abroad Conferences</td>
+              <td>{fullPlan.comAbConf}</td>
+              <td>{fullPlan.comAbConfEnd}</td>
+            </tr>
+
+            <tr>
+              <td>Promotion of Research</td>
+              <td>{fullPlan.promoOfResearch}</td>
+              <td>{fullPlan.promoOfResearchEnd}</td>
+            </tr>
+
+            <tr>
+              <td>Administrative Work</td>
+              <td>{fullPlan.adminWork}</td>
+              <td>{fullPlan.adminWorkEnd}</td>
+            </tr>
+
+            <tr>
+              <td>Project Applications Submitted</td>
+              <td>{fullPlan.projApplicSub}</td>
+              <td>{fullPlan.projApplicSubEnd}</td>
+            </tr>
+
+            <tr>
+              <td>Skills Development</td>
+              <td>{fullPlan.skillsDevelopment}</td>
+              <td>{fullPlan.skillsDevelopmentEnd}</td>
+            </tr>
+
+            <tr>
+              <td>Participation in Seminars</td>
+              <td>{fullPlan.participationInSeminars}</td>
+              <td>{fullPlan.participationInSeminarsEnd}</td>
+            </tr>
+
+            <tr>
+              <td>Other Jobs</td>
+              <td>{fullPlan.otherJobs}</td>
+              <td>{fullPlan.otherJobsEnd}</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </>
+    )}
+    
       <button onClick={() => navigate("/user/plans")}>
-        ← Back to Plans
+        Back to Dashboard
+      </button>
+      <button onClick={() => navigate("/user/plans")}>
+        Back to Archive
       </button>
     </div>
   );

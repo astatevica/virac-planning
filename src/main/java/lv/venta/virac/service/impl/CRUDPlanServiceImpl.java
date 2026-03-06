@@ -1,20 +1,32 @@
 package lv.venta.virac.service.impl;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 import org.hibernate.Filter;
 import org.hibernate.Session;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lv.venta.virac.dto.CourseDTO;
+import lv.venta.virac.dto.FullPlanDTO;
+import lv.venta.virac.dto.ProjectDTO;
+import lv.venta.virac.dto.ScientificArticlesDTO;
+import lv.venta.virac.dto.StudentWorkDTO;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Year;
+import lv.venta.virac.model.enums.PlanStatus;
+import lv.venta.virac.repo.IArticlePlanRepo;
+import lv.venta.virac.repo.ICoursePlanRepo;
 import lv.venta.virac.repo.IEmployeeRepo;
 import lv.venta.virac.repo.IPlanRepo;
+import lv.venta.virac.repo.IProjectPlanRepo;
 import lv.venta.virac.repo.IViracDepartmentRepo;
+import lv.venta.virac.repo.IWorkPlanRepo;
 import lv.venta.virac.repo.IYearRepo;
 import lv.venta.virac.service.ICRUDPlanService;
 
@@ -35,6 +47,21 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	
 	@PersistenceContext
     private EntityManager entityManager;
+	
+	@Autowired
+	private ModelMapper modelMapper;
+
+	@Autowired
+	private IProjectPlanRepo projectPlanRepo;
+
+	@Autowired
+	private ICoursePlanRepo coursePlanRepo;
+
+	@Autowired
+	private IArticlePlanRepo articlePlanRepo;
+
+	@Autowired
+	private IWorkPlanRepo studentWorkPlanRepo;
 
 	@Override
 	public ArrayList<Plan> retrieveAll() throws Exception {
@@ -96,7 +123,7 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 
         Plan plan = new Plan(employee, year, numOfProjects, numOfArticles, partInConf,partInConfEnd, comAbConf, comAbConfEnd, numOfCourses, 
         		numOfStudWork, promoOfResearch, promoOfResearchEnd, adminWork, adminWorkEnd, projApplicSub, projApplicSubEnd, skillsDevelopment,
-        		skillsDevelopmentEnd, participationInSeminars, participationInSeminarsEnd, otherJobs, otherJobsEnd);
+        		skillsDevelopmentEnd, participationInSeminars, participationInSeminarsEnd, otherJobs, otherJobsEnd,PlanStatus.plan_open);
         planRepo.save(plan);
 		
 	}
@@ -196,6 +223,51 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 		}
 		System.out.println(result);
 		return result;
+	}
+
+	@Override
+	public FullPlanDTO getFullPlanForUser(int idEmployee, int idPlan) throws Exception {
+		Plan plan = planRepo.findByEmployee_IdEmployeeAndIdPlan(idEmployee,idPlan);
+	    if(plan == null) {
+	    	throw new Exception("All plans currently is closed");
+	    }
+	    
+	    FullPlanDTO dto = modelMapper.map(plan, FullPlanDTO.class);
+	    
+	    // PROJECTS
+	    ArrayList<ProjectDTO> projects =
+	            projectPlanRepo.findByPlan_IdPlan(plan.getIdPlan())
+	                    .stream()
+	                    .map(pp -> modelMapper.map(pp.getProject(), ProjectDTO.class))
+	                    .collect(Collectors.toCollection(ArrayList::new));
+
+	    // ARTICLES
+	    ArrayList<ScientificArticlesDTO> articles =
+	            articlePlanRepo.findByPlan_IdPlan(plan.getIdPlan())
+	                    .stream()
+	                    .map(ap -> modelMapper.map(ap.getScientificArticles(), ScientificArticlesDTO.class))
+	                    .collect(Collectors.toCollection(ArrayList::new));
+
+	    // COURSES
+	    ArrayList<CourseDTO> courses =
+	            coursePlanRepo.findByPlan_IdPlan(plan.getIdPlan())
+	                    .stream()
+	                    .map(cp -> modelMapper.map(cp.getCourse(), CourseDTO.class))
+	                    .collect(Collectors.toCollection(ArrayList::new));
+
+	    // STUDENT WORK
+	    ArrayList<StudentWorkDTO> studentWork =
+	            studentWorkPlanRepo.findByPlan_IdPlan(plan.getIdPlan())
+	                    .stream()
+	                    .map(sw -> modelMapper.map(sw.getStudentWork(), StudentWorkDTO.class))
+	                    .collect(Collectors.toCollection(ArrayList::new));
+
+	    dto.setProjects(projects);
+	    dto.setArticles(articles);
+	    dto.setCourses(courses);
+	    dto.setStudentWork(studentWork);
+	    
+		return dto;
 	}
 
 }

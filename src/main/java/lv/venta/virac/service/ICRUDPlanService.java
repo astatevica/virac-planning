@@ -2,6 +2,7 @@ package lv.venta.virac.service;
 
 import java.util.ArrayList;
 
+import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.model.Plan;
 
 public interface ICRUDPlanService extends ICRUDBase<Plan>{
@@ -28,11 +29,26 @@ public interface ICRUDPlanService extends ICRUDBase<Plan>{
 	//Filter by Department
 	public abstract ArrayList<Plan> selectAllPlansByDepartment(String nameDepartment) throws Exception;
 	
-	//Filter by Employee and Year
+	//Filter by Employee and Year (User/Archive)
 	public abstract ArrayList<Plan> selectAllPlansByEmployeeAndYear(int idEmployee, int idYear) throws Exception;
 	
-	//Filter by Employee and Project
+	//Filter by Employee and Project (User/Archive)
 	public abstract ArrayList<Plan> selectAllPlansByEmployeeAndProject(int idEmployee, int idProject) throws Exception;
+	
+	//Get full plan for user
+	//TODO: te nevajag FullPlanDTO => ArrayList<Plan>?
+	public abstract FullPlanDTO getFullPlanForUser(int idEmployee, int idPlan) throws Exception;
+	
+	
+	//updatePlanForUser -> useris var editot sava plāna laukus redzot visu visu FullPlanDTO
+	//addProjectToPlan
+	//removeProjectFromPlan
+	//addArticelToPlan
+	//removeArticleFromPlan
+	//addCourseToPlan
+	//removeCourseFromPlan
+	//addStudentWorkToPlan
+	//removeStudentWorkFromPlan
 	
 
 }
