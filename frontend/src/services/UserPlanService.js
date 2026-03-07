@@ -24,6 +24,20 @@ const getPlanView = (idPlan) =>
 const getFullPlan = (idPlan) =>
   api.get(`${API}/full-plan/${idPlan}`);
 
+const updatePlanForUserByOpenPlan = (planDto) =>
+  api.put(`${API}/update/current-year/plan`, planDto);
+
+const searchCoursesAutocomplete = (keyword) =>
+  api.get(`${API}/courses/autocomplete/${encodeURIComponent(keyword)}`);
+
+const saveCoursePlan = (idCourse, idPlan, workDone) =>
+  api.get(
+    `${API}/courses/autocomplete/${idCourse}/${idPlan}/${encodeURIComponent(workDone)}`
+  );
+
+const createCourseForPlan = (idPlan, workDone, courseDto) =>
+  api.post(`${API}/add/course/${idPlan}/${encodeURIComponent(workDone)}`, courseDto);
+
 const UserPlanService = {
   getAll,
   getByYear,   
@@ -31,7 +45,11 @@ const UserPlanService = {
   getByPlan,
   getAllProjects,
   getPlanView,
-  getFullPlan
+  getFullPlan,
+  updatePlanForUserByOpenPlan,
+  searchCoursesAutocomplete,
+  saveCoursePlan,
+  createCourseForPlan
 };
 
 export default UserPlanService;

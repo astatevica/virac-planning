@@ -215,7 +215,7 @@ public class UserController {
 	
 	//Update planDTO 
 	@PutMapping("/update/current-year/plan")
-    public ResponseEntity<Void> update(@Valid @RequestBody UpdatePlanDTO pl,
+    public ResponseEntity<Void> updatePlanForUserByOpenPlan(@Valid @RequestBody UpdatePlanDTO pl,
             BindingResult result, Authentication authentication) throws Exception {
 			
 		//User user = (User) authentication.getPrincipal();
