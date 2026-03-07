@@ -39,7 +39,11 @@ public interface ICRUDPlanService extends ICRUDBase<Plan>{
 	//TODO: te nevajag FullPlanDTO => ArrayList<Plan>?
 	public abstract FullPlanDTO getFullPlanForUser(int idEmployee, int idPlan) throws Exception;
 	
-	//updatePlanForUserById -> useris var editot sava plāna laukus redzot visu visu FullPlanDTO
+	//User can edit planDTO fields according plan status (plan_open, planned_frozen, done_frozen)
+	public abstract void updatePlanForUserByOpenPlan(int idEmployee, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd, 
+			String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
+			String adminWork, String adminWorkEnd, String projApplicSub, String projApplicSubEnd, String skillsDevelopment,
+			String skillsDevelopmentEnd, String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd) throws Exception;
 	
 	//addProjectToPlan
 	//removeProjectFromPlan

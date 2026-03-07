@@ -23,7 +23,7 @@ public interface IPlanRepo extends CrudRepository<Plan, Integer>{
 	
 	//Filter by Employee and Year
 	public abstract ArrayList<Plan> findByEmployee_IdEmployeeAndYear_IdYear(int idEmplyee, int idYear);
-	
+		
 	//Filter by Employee and Project
 	@Query("""
 	        SELECT DISTINCT p
@@ -44,6 +44,10 @@ public interface IPlanRepo extends CrudRepository<Plan, Integer>{
 	
 	//Filter by Employee and Plan
 	public abstract Plan findByEmployee_IdEmployeeAndIdPlan(int idEmplyee, int idPlan);
+	
+	//Filter by Employee and Year
+	public abstract Plan findFirstByEmployee_IdEmployeeAndYear_IdYear(int idEmployee, int idYear);
+		
 	
 	
 }

@@ -1,5 +1,6 @@
 package lv.venta.virac.service.impl;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -268,6 +269,76 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	    dto.setStudentWork(studentWork);
 	    
 		return dto;
+	}
+
+	@Override
+	public void updatePlanForUserByOpenPlan(int idEmployee, int numOfProjects, int numOfArticles,
+			String partInConf, String partInConfEnd, String comAbConf, String comAbConfEnd, int numOfCourses,
+			int numOfStudWork, String promoOfResearch, String promoOfResearchEnd, String adminWork, String adminWorkEnd,
+			String projApplicSub, String projApplicSubEnd, String skillsDevelopment, String skillsDevelopmentEnd,
+			String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd)
+			throws Exception {
+		
+		//Finds current year and input year
+		int currentYear = LocalDate.now().getYear();
+		Year year = yearRepo.findByYearNumber(currentYear);
+		
+		//Find plan by year and idEmployee
+		Plan plan = planRepo.findFirstByEmployee_IdEmployeeAndYear_IdYear(idEmployee,year.getIdYear());
+	
+    	if (plan == null) throw new 
+    		Exception("Plan with (Year:" + currentYear + ") does not exist for current user");    	
+    	
+    	Employee employee = employeeRepo.findById(idEmployee).get();
+        if(employee == null) {
+        	throw new Exception("Employee not found");
+        }
+        
+        if(year.getIdYear() == 0) {
+        	throw new Exception("Year not found");
+        }
+        
+        PlanStatus status = plan.getPlanStatus();
+        
+        if(status == PlanStatus.plan_open) {
+            plan.setNumOfProjects(numOfProjects);
+            plan.setNumOfArticles(numOfArticles);
+            plan.setPartInConf(partInConf);
+            plan.setPartInConfEnd(partInConfEnd);
+            plan.setComAbConf(comAbConf);
+            plan.setComAbConfEnd(comAbConfEnd);
+            plan.setNumOfCourses(numOfCourses);
+            plan.setNumOfStudWork(numOfStudWork);
+            plan.setPromoOfResearch(promoOfResearch);
+            plan.setPromoOfResearchEnd(promoOfResearchEnd);
+            plan.setAdminWork(adminWork);
+            plan.setAdminWorkEnd(adminWorkEnd);
+            plan.setProjApplicSub(projApplicSub);
+            plan.setProjApplicSubEnd(projApplicSubEnd);
+            plan.setSkillsDevelopment(skillsDevelopment);
+            plan.setSkillsDevelopmentEnd(skillsDevelopmentEnd);
+            plan.setParticipationInSeminars(participationInSeminars);
+            plan.setParticipationInSeminarsEnd(participationInSeminarsEnd);
+            plan.setOtherJobs(otherJobs);
+            plan.setOtherJobsEnd(otherJobsEnd);
+            planRepo.save(plan);
+            System.out.println(plan);
+        }else if (status == PlanStatus.planned_frozen) {
+            plan.setPartInConfEnd(partInConfEnd);
+            plan.setComAbConfEnd(comAbConfEnd);
+            plan.setPromoOfResearchEnd(promoOfResearchEnd);
+            plan.setAdminWorkEnd(adminWorkEnd);
+            plan.setProjApplicSubEnd(projApplicSubEnd);
+            plan.setSkillsDevelopmentEnd(skillsDevelopmentEnd);
+            plan.setParticipationInSeminarsEnd(participationInSeminarsEnd);
+            plan.setOtherJobsEnd(otherJobsEnd);
+            planRepo.save(plan);
+            System.out.println(plan);
+        }else {
+        	throw new Exception("Current plan is closed");
+        }
+	
+		
 	}
 
 }

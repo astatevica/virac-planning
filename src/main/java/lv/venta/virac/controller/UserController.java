@@ -6,19 +6,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lv.venta.virac.dto.CourseDTO;
 import lv.venta.virac.dto.CoursePlanDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ProjectPlanDTO;
+import lv.venta.virac.dto.UpdatePlanDTO;
 import lv.venta.virac.model.Course;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Project;
@@ -208,6 +212,28 @@ public class UserController {
 
 	    return ResponseEntity.ok(dto);
 	}
+	
+	//Update planDTO 
+	@PutMapping("/update/current-year/plan")
+    public ResponseEntity<Void> update(@Valid @RequestBody UpdatePlanDTO pl,
+            BindingResult result, Authentication authentication) throws Exception {
+			
+		//User user = (User) authentication.getPrincipal();
+	    int employeeId = 5;//user.getEmployee().getIdEmployee();
+
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        planService.updatePlanForUserByOpenPlan(employeeId,pl.getNumOfProjects(),
+	               pl.getNumOfArticles(),pl.getPartInConf(),pl.getPartInConfEnd(),pl.getComAbConf(),
+	               pl.getComAbConfEnd(),pl.getNumOfCourses(),pl.getNumOfStudWork(),pl.getPromoOfResearch(),
+	               pl.getPromoOfResearchEnd(),pl.getAdminWork(),pl.getAdminWorkEnd(), pl.getProjApplicSub(),
+	               pl.getProjApplicSubEnd(),pl.getSkillsDevelopment(),pl.getSkillsDevelopmentEnd(),
+	               pl.getParticipationInSeminars(),pl.getParticipationInSeminarsEnd(),pl.getOtherJobs(),pl.getOtherJobsEnd());
+        return ResponseEntity.ok().build();
+    }
+	
 	
 	//Gets from frontend autocomplete for course name
 	@GetMapping("/courses/autocomplete/{keyword}")
