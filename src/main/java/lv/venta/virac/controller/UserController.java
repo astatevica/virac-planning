@@ -10,17 +10,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import lv.venta.virac.dto.CourseDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ProjectPlanDTO;
+import lv.venta.virac.model.Course;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectPlan;
+import lv.venta.virac.service.ICRUDCourseService;
 import lv.venta.virac.service.ICRUDPlanService;
 import lv.venta.virac.service.ICRUDProjectPlanService;
 import lv.venta.virac.service.ICRUDProjectService;
 import lv.venta.virac.user.User;
+
 
 @RestController
 @RequestMapping("/api/user")
@@ -29,11 +33,14 @@ public class UserController {
 	private ICRUDPlanService planService;
 	private ICRUDProjectPlanService projPlanService;
 	private ICRUDProjectService projService;
+	private ICRUDCourseService courseService;
 	
-	public UserController(ICRUDPlanService planService, ICRUDProjectPlanService projPlanService, ICRUDProjectService projService) {
+	public UserController(ICRUDPlanService planService, ICRUDProjectPlanService projPlanService, 
+			ICRUDProjectService projService, ICRUDCourseService courseService) {
 		this.planService = planService;
 		this.projPlanService = projPlanService;
 		this.projService = projService;
+		this.courseService = courseService;
 	}
 	
 	@GetMapping("/filter/plans/all")
@@ -194,6 +201,28 @@ public class UserController {
 
 	    return ResponseEntity.ok(dto);
 	}
+	
+	@GetMapping("/courses/autocomplete/{keyword}")
+	public ResponseEntity<ArrayList<CourseDTO>> selectNameAutocomplete(@PathVariable("keyword") String keyword) throws Exception{
+		
+		ArrayList<Course> list = courseService.selectNameAutocomplete(keyword);
+		System.out.println("UserController_1: " + list);
+		ArrayList<CourseDTO> response =
+	            new ArrayList<>(list.stream()
+	                .map(dto -> new CourseDTO(
+	                		dto.getIdCourse(),
+	                		dto.getName(),
+	                		dto.getEctsCredits(),
+	                		dto.getSemester(),
+	                		dto.getFaculty()	
+	                ))
+	                .toList());
+		
+		System.out.println("UserController_2: "+ response);
+	    return ResponseEntity.ok(response);
+	   		
+	}
+	
 
 
 	

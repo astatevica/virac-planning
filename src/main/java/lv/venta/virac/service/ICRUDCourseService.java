@@ -1,5 +1,7 @@
 package lv.venta.virac.service;
 
+import java.util.ArrayList;
+
 import lv.venta.virac.model.Course;
 
 public interface ICRUDCourseService extends ICRUDBase<Course>{
@@ -10,6 +12,9 @@ public interface ICRUDCourseService extends ICRUDBase<Course>{
 					
 	//U - update
 	public abstract void updateById(int id, String name, int ectsCredits, String semester, String faculty) throws Exception;
+	
+	//Select all courses by autocomplete
+	public abstract ArrayList<Course> selectNameAutocomplete(String keyword) throws Exception;
 
 
 }

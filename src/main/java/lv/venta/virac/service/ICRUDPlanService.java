@@ -39,8 +39,8 @@ public interface ICRUDPlanService extends ICRUDBase<Plan>{
 	//TODO: te nevajag FullPlanDTO => ArrayList<Plan>?
 	public abstract FullPlanDTO getFullPlanForUser(int idEmployee, int idPlan) throws Exception;
 	
+	//updatePlanForUserById -> useris var editot sava plāna laukus redzot visu visu FullPlanDTO
 	
-	//updatePlanForUser -> useris var editot sava plāna laukus redzot visu visu FullPlanDTO
 	//addProjectToPlan
 	//removeProjectFromPlan
 	//addArticelToPlan

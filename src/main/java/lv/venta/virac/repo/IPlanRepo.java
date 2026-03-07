@@ -1,12 +1,14 @@
 package lv.venta.virac.repo;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import lv.venta.virac.model.Plan;
+import lv.venta.virac.model.enums.PlanStatus;
 
 public interface IPlanRepo extends CrudRepository<Plan, Integer>{
 	
@@ -37,8 +39,8 @@ public interface IPlanRepo extends CrudRepository<Plan, Integer>{
 	            @Param("projectId") int projectId
 	    );
 	
-	//Filter by Employee and status
-//	public abstract Plan findByEmployee_IdEmployeeAndPlanStatusIn(int idEmplyee, List<PlanStatus> statuses);
+	//Filter by Plan and Status
+	public abstract Plan findByIdPlanAndPlanStatusIn(int idEmplyee, List<PlanStatus> statuses);
 	
 	//Filter by Employee and Plan
 	public abstract Plan findByEmployee_IdEmployeeAndIdPlan(int idEmplyee, int idPlan);

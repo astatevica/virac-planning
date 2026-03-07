@@ -133,7 +133,7 @@ export default function UserPlanView() {
       </>
     )}
     
-      <button onClick={() => navigate("/user/plans")}>
+      <button onClick={() => navigate("/user/dashboard")}>
         Back to Dashboard
       </button>
       <button onClick={() => navigate("/user/plans")}>

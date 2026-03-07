@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserPlanService from "../services/UserPlanService";
+import CourseAutocomplete from "../components/CourseAutocomplete";
 import api from "../api/api";
 
 export default function UserDashboard() {
@@ -86,6 +87,11 @@ export default function UserDashboard() {
       <button onClick={() => navigate("/user/plans")}>
         View All Plans
       </button>
+
+      <h2>Add Course</h2>
+
+      <CourseAutocomplete />
     </div>
+
   );
 }
