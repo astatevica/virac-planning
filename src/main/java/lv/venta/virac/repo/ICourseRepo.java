@@ -1,7 +1,6 @@
 package lv.venta.virac.repo;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -14,11 +13,29 @@ public interface ICourseRepo extends CrudRepository<Course, Integer>{
 	// Case-insensitive search
 	//public abstract ArrayList<Course> findByNameContainingIgnoreCase(String keyword);
 	
-	@Query("""
+	// Case-sensitive search
+	//public abstract ArrayList<Course> findByNameContaining(String keyword);
+	
+	/*@Query("""
 			SELECT c 
 			FROM Course c 
 			WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+			AND c.deleted = false
 			""")
-			ArrayList<Course> searchByName(@Param("keyword") String keyword);
+			ArrayList<Course> searchByKeyword(@Param("keyword") String keyword);*/
+	
+	/*@Query(value = """
+			SELECT *
+			FROM course_table
+			WHERE LOWER(name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+			""", nativeQuery = true)
+			ArrayList<Course> searchNative(@Param("keyword") String keyword);*/
+	
+	@Query(value = """
+			SELECT *
+			FROM course_table
+			WHERE LOWER(name) LIKE LOWER(CONCAT('%', :keyword, '%'))
+			""", nativeQuery = true)
+			ArrayList<Course> searchCourses(@Param("keyword")String keyword);
 
 }

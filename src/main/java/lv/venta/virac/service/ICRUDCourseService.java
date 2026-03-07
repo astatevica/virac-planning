@@ -16,5 +16,4 @@ public interface ICRUDCourseService extends ICRUDBase<Course>{
 	//Select all courses by autocomplete
 	public abstract ArrayList<Course> selectNameAutocomplete(String keyword) throws Exception;
 
-
 }

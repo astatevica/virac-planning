@@ -2,15 +2,19 @@ package lv.venta.virac.controller;
 
 import java.util.ArrayList;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lv.venta.virac.dto.CourseDTO;
+import lv.venta.virac.dto.CoursePlanDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
@@ -19,6 +23,7 @@ import lv.venta.virac.model.Course;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectPlan;
+import lv.venta.virac.service.ICRUDCoursePlanService;
 import lv.venta.virac.service.ICRUDCourseService;
 import lv.venta.virac.service.ICRUDPlanService;
 import lv.venta.virac.service.ICRUDProjectPlanService;
@@ -34,13 +39,15 @@ public class UserController {
 	private ICRUDProjectPlanService projPlanService;
 	private ICRUDProjectService projService;
 	private ICRUDCourseService courseService;
+	private ICRUDCoursePlanService coursePlanService;
 	
 	public UserController(ICRUDPlanService planService, ICRUDProjectPlanService projPlanService, 
-			ICRUDProjectService projService, ICRUDCourseService courseService) {
+			ICRUDProjectService projService, ICRUDCourseService courseService,ICRUDCoursePlanService coursePlanService) {
 		this.planService = planService;
 		this.projPlanService = projPlanService;
 		this.projService = projService;
 		this.courseService = courseService;
+		this.coursePlanService = coursePlanService;
 	}
 	
 	@GetMapping("/filter/plans/all")
@@ -202,6 +209,7 @@ public class UserController {
 	    return ResponseEntity.ok(dto);
 	}
 	
+	//Gets from frontend autocomplete for course name
 	@GetMapping("/courses/autocomplete/{keyword}")
 	public ResponseEntity<ArrayList<CourseDTO>> selectNameAutocomplete(@PathVariable("keyword") String keyword) throws Exception{
 		
@@ -223,8 +231,23 @@ public class UserController {
 	   		
 	}
 	
+	//TODO: vai tas nebūs tas pats kas create?
+	//Gets from frontend autocomplete course and plan to save in repo
+	@GetMapping("/courses/autocomplete/{idCourse}/{idPlan}/{workDone}")
+	public ResponseEntity<Void> saveCoursePlan(@PathVariable("idCourse") int idCourse,@PathVariable("idPlan") int idPlan,
+	        @PathVariable("workDone") String workDone) throws Exception{
+		System.out.println(" idPlan: " + idPlan + " idCourse: " + idCourse + " WorkDone: " + workDone);
+		coursePlanService.create(idPlan, idCourse, workDone);
 
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+	}
 
-	
+	//Post endpoint to get all new course data and idPlan to save in repo
+	@PostMapping("/add/course/{idPlan}/{workDone}")
+	public ResponseEntity<CoursePlanDTO> createCourseForPlan(@PathVariable("idPlan") int idPlan, 
+			@PathVariable("workDone") String workDone, @RequestBody CourseDTO courseDTO) throws Exception{
+		CoursePlanDTO result = coursePlanService.createCourseAndAttachToPlan(idPlan, courseDTO, workDone);
+	    return ResponseEntity.ok(result);
+	}
 
 }

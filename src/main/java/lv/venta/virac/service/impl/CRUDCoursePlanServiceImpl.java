@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lv.venta.virac.dto.CourseDTO;
+import lv.venta.virac.dto.CoursePlanDTO;
 import lv.venta.virac.model.Course;
 import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Plan;
@@ -79,7 +81,7 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
         }
         
         for (CoursePlan cp : coursePlans) {
-            if (cp.getPlan().getIdPlan() == idPlan & cp.getCourse().getIdCourse() == idCourse & cp.isDeleted( )== false) {
+            if (cp.getPlan().getIdPlan() == idPlan && cp.getCourse().getIdCourse() == idCourse && cp.isDeleted( )== false) {
                 throw new Exception("Course-plan with paln id: " + cp.getPlan().getIdPlan() + " and course id: " 
             + cp.getCourse().getIdCourse() + " already exists");
             }
@@ -87,6 +89,7 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 
         CoursePlan coursePlan = new CoursePlan(plan, course, workDone);
         coursePlanRepo.save(coursePlan);
+        System.out.println("idCoursePlan: " + coursePlan.getIdCoursePlan() + " idPlan: " + idPlan + " idCourse: " + idCourse + " WorkDone: " + workDone);
 		
 	}
 
@@ -121,6 +124,64 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 		}
 		
 		return result;
+	}
+
+	@Override
+	public CoursePlanDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone) throws Exception {
+		//variables for easier use
+		String name = courseDTO.getName();
+		int ectsCredits = courseDTO.getEctsCredits();
+		String semester = courseDTO.getSemester();
+		String faculty = courseDTO.getFaculty();
+		System.out.println("Name: " + name + " ECTS: " + ectsCredits + " Semester: " + semester + " Faculty: " + faculty);
+		
+		//reads already made courses
+		ArrayList<Course> courses = (ArrayList<Course>) courseRepo.findAll();
+        
+		//verifies that course and idPlan input parameters are not empty
+        if(name == null || ectsCredits == 0 || semester == null || faculty == null || idPlan == 0){
+			throw new Exception("The input parameters are incorrect");
+		}
+        
+        //verifies that course already is not made
+        for (Course co : courses) {
+            if (co.getName().equals(name) & co.getEctsCredits()==ectsCredits & co.getSemester().equals(semester) & co.getFaculty().equals(faculty) & co.isDeleted( )== false) {
+                throw new Exception("Course: " + co.getName() + " already exists");
+            }
+        }
+        
+        //verifies that plan is correct
+        Plan plan = planRepo.findById(idPlan).get();
+        if(plan == null) {
+        	throw new Exception("Plan not found");
+        }        
+	    
+        //Makes new Course after veryfing
+		Course c = new Course();
+	    c.setName(name);
+	    c.setEctsCredits(ectsCredits);
+	    c.setSemester(semester);
+	    c.setFaculty(faculty);
+	    Course newCourse = courseRepo.save(c);
+	    System.out.println("New course: " + newCourse);
+	    
+	    //Creates new Plan-Course relation
+	    CoursePlan cp = new CoursePlan();
+	    cp.setPlan(planRepo.findById(idPlan).get());
+	    cp.setCourse(newCourse);
+	    cp.setDeleted(false);
+	    cp.setWorkDone(workDone);
+	    coursePlanRepo.save(cp);
+	    System.out.println("New Course-Plan: " + cp);
+	    
+	    //Returns CoursePlan dto for frontend
+	    CoursePlanDTO dto = new CoursePlanDTO();
+	    dto.setIdPlan(idPlan);
+	    dto.setIdCourse(newCourse.getIdCourse());
+	    dto.setWorkDone(workDone);
+
+	    return dto;
+		
 	}
 
 }
