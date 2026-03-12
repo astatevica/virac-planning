@@ -64,7 +64,7 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 
 	@Override
 	public void create(int idPlan, int idCourse, String workDone) throws Exception {
-		ArrayList<CoursePlan> coursePlans = (ArrayList<CoursePlan>) coursePlanRepo.findAll();
+		CoursePlan cp = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
         
         if(idPlan == 0 || idCourse == 0){
 			throw new Exception("The input parameters are incorrect");
@@ -80,13 +80,15 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
         	throw new Exception("Course not found");
         }
         
-        for (CoursePlan cp : coursePlans) {
-            if (cp.getPlan().getIdPlan() == idPlan && cp.getCourse().getIdCourse() == idCourse && cp.isDeleted( )== false) {
-                throw new Exception("Course-plan with paln id: " + cp.getPlan().getIdPlan() + " and course id: " 
-            + cp.getCourse().getIdCourse() + " already exists");
+        if(cp != null) {
+            if(!cp.isDeleted()){
+                throw new Exception("Course already attached to this plan");
             }
+            cp.setDeleted(false);
+            cp.setWorkDone(workDone);
+            coursePlanRepo.save(cp);
+            return;
         }
-
         CoursePlan coursePlan = new CoursePlan(plan, course, workDone);
         coursePlanRepo.save(coursePlan);
         System.out.println("idCoursePlan: " + coursePlan.getIdCoursePlan() + " idPlan: " + idPlan + " idCourse: " + idCourse + " WorkDone: " + workDone);
@@ -182,6 +184,24 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 
 	    return dto;
 		
+	}
+	
+	@Override
+	public void deleteByCourseIdAndPlanId(int idPlan, int idCourse) throws Exception {
+		CoursePlan coursePlan = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
+    	if (coursePlan == null) throw new Exception("Course-Plan with Plan id:"+ idPlan +" and Course id: "+idCourse+" does not exist");
+    	coursePlan.setDeleted(true); // SOFT DELETE
+    	coursePlanRepo.save(coursePlan);  // SAVE, NOT DELETE
+	}
+	
+	@Override
+	public void updateByCourseIdAndPlanId(int idPlan, int idCourse, String workDone) throws Exception {
+		CoursePlan coursePlan = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
+    	if (coursePlan == null) throw new Exception("Course-Plan with Plan id:"+ idPlan +" and Course id: "+idCourse+" does not exist");
+    	
+        coursePlan.setWorkDone(workDone);
+        coursePlanRepo.save(coursePlan);
+    	
 	}
 
 }

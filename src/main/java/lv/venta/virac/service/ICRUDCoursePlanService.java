@@ -19,10 +19,16 @@ public interface ICRUDCoursePlanService extends ICRUDBase<CoursePlan>{
 	public abstract ArrayList<CoursePlan> selectAllCoursePlanByPlan(int idPlan) throws Exception;
 	
 	//TODO: vai varbūt save var būt tas pats kas create?
-	//Save incoming idCorse and idPlan
+	//Save incoming idCourse and idPlan
 	//public abstract void saveCoursePlan(int idCourse, int idPlan, String workDone) throws Exception; 
 	
-	//Crete new course and attach to Plan
+	//Create new course and attach to Plan
 	public abstract CoursePlanDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone) throws Exception;
+	
+	//Delete for User current Plan table
+	public abstract void deleteByCourseIdAndPlanId(int idPlan, int idCourse) throws Exception;
+
+	//Update for User current Plan table
+	public abstract void updateByCourseIdAndPlanId(int idPlan, int idCourse, String workDone) throws Exception;
 	
 }

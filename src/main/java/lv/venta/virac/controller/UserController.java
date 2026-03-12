@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -275,5 +276,28 @@ public class UserController {
 		CoursePlanDTO result = coursePlanService.createCourseAndAttachToPlan(idPlan, courseDTO, workDone);
 	    return ResponseEntity.ok(result);
 	}
+	
+	//Delete endpoint for course-plan deleting
+	@DeleteMapping("/delete/course-plan/{idPlan}/{idCourse}")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<Void> deleteCoursePlan(@PathVariable("idPlan") int idPlan, 
+			@PathVariable("idCourse") int idCourse) throws Exception {
+	    coursePlanService.deleteByCourseIdAndPlanId(idPlan, idCourse);
+	    return ResponseEntity.ok().build();
+	}
+	
+	//Update endpoint for course-plan edit
+	@PutMapping("/update/course-plan/{idPlan}/{idCourse}/{workDone}")
+    public ResponseEntity<Void> update(@PathVariable("idPlan") int idPlan,@PathVariable("idCourse") int idCourse,
+    		@PathVariable("workDone") String workDone,@Valid @RequestBody CoursePlanDTO dto,
+            BindingResult result) throws Exception {
+
+        if (result.hasErrors()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        coursePlanService.updateByCourseIdAndPlanId(idPlan,idCourse,workDone);
+        return ResponseEntity.ok().build();
+    }
 
 }

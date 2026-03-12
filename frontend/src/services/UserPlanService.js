@@ -38,6 +38,15 @@ const saveCoursePlan = (idCourse, idPlan, workDone) =>
 const createCourseForPlan = (idPlan, workDone, courseDto) =>
   api.post(`${API}/add/course/${idPlan}/${encodeURIComponent(workDone)}`, courseDto);
 
+const deleteCoursePlan = (idPlan, idCourse) =>
+  api.delete(`${API}/delete/course-plan/${idPlan}/${idCourse}`);
+
+const updateCoursePlanWorkDone = (idPlan, idCourse, workDone, dto) =>
+  api.put(
+    `${API}/update/course-plan/${idPlan}/${idCourse}/${encodeURIComponent(workDone)}`,
+    dto
+  );
+
 const UserPlanService = {
   getAll,
   getByYear,   
@@ -49,7 +58,9 @@ const UserPlanService = {
   updatePlanForUserByOpenPlan,
   searchCoursesAutocomplete,
   saveCoursePlan,
-  createCourseForPlan
+  createCourseForPlan,
+  deleteCoursePlan,
+  updateCoursePlanWorkDone
 };
 
 export default UserPlanService;
