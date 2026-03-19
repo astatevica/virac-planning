@@ -95,15 +95,22 @@ export default function UserDashboard() {
       });
 
       const fullPlan = fullPlanRes.data || {};
+      console.log("FULL PLAN:", fullPlan);
       if (Array.isArray(fullPlan.coursePlans) && fullPlan.coursePlans.length > 0) {
         const normalized = fullPlan.coursePlans
           .filter((cp) => !cp?.deleted && !cp?.isDeleted && !cp?.course?.deleted && !cp?.course?.isDeleted)
-          .map((cp) => ({
-            ...(cp.course || {}),
-            ...(cp.courseDTO || {}),
-            idCoursePlan: cp.idCoursePlan ?? cp.idCoursePlanDTO ?? cp.coursePlanId ?? null,
-            workDone: cp.workDone ?? cp.work_done ?? ""
-          }));
+          .map((cp) => {
+            const courseData = {
+              ...(cp.course || {}),
+              ...(cp.courseDTO || {})
+            };
+
+            return {
+              ...courseData,
+              idCoursePlan: cp.idCoursePlan ?? cp.idCoursePlanDTO ?? cp.coursePlanId ?? null,
+              workDone: cp.workDone ?? cp.work_done ?? ""
+            };
+          });
         setOpenPlanCourses(normalized);
         setLocallyDeletedCourseIds([]);
       } else if (Array.isArray(fullPlan.coursePlanDTOs) && fullPlan.coursePlanDTOs.length > 0) {

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lv.venta.virac.dto.CourseDTO;
-import lv.venta.virac.dto.CoursePlanDTO;
+import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
@@ -273,9 +273,9 @@ public class UserController {
 	//Post endpoint to get all new course data and idPlan to save in repo
 	//TODO: padot user un pārbaudīt vai tas ir īstais lietotājs VISUR
 	@PostMapping("/add/course/{idPlan}/{workDone}")
-	public ResponseEntity<CoursePlanDTO> createCourseForPlan(@PathVariable("idPlan") int idPlan, 
+	public ResponseEntity<CoursePlanResponseDTO> createCourseForPlan(@PathVariable("idPlan") int idPlan, 
 			@PathVariable("workDone") String workDone, @RequestBody CourseDTO courseDTO) throws Exception{
-		CoursePlanDTO result = coursePlanService.createCourseAndAttachToPlan(idPlan, courseDTO, workDone);
+		CoursePlanResponseDTO result = coursePlanService.createCourseAndAttachToPlan(idPlan, courseDTO, workDone);
 	    return ResponseEntity.ok(result);
 	}
 	
@@ -294,7 +294,7 @@ public class UserController {
 	//TODO: padot user un pārbaudīt vai tas ir īstais lietotājs VISUR
 	@PutMapping("/update/course-plan/{idPlan}/{idCourse}/{workDone}")
     public ResponseEntity<Void> update(@PathVariable("idPlan") int idPlan,@PathVariable("idCourse") int idCourse,
-    		@PathVariable("workDone") String workDone,@Valid @RequestBody CoursePlanDTO dto,
+    		@PathVariable("workDone") String workDone,@Valid @RequestBody CoursePlanResponseDTO dto,
             BindingResult result) throws Exception {
 
         if (result.hasErrors()) {

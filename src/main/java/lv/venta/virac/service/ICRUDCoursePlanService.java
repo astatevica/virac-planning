@@ -3,7 +3,7 @@ package lv.venta.virac.service;
 import java.util.ArrayList;
 
 import lv.venta.virac.dto.CourseDTO;
-import lv.venta.virac.dto.CoursePlanDTO;
+import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.model.CoursePlan;
 
 public interface ICRUDCoursePlanService extends ICRUDBase<CoursePlan>{
@@ -16,14 +16,10 @@ public interface ICRUDCoursePlanService extends ICRUDBase<CoursePlan>{
 	public abstract void updateById(int id, int idPlan, int idCourse, String workDone) throws Exception;
 			
 	//Filter by Plan
-	public abstract ArrayList<CoursePlan> selectAllCoursePlanByPlan(int idPlan) throws Exception;
-	
-	//TODO: vai varbūt save var būt tas pats kas create?
-	//Save incoming idCourse and idPlan
-	//public abstract void saveCoursePlan(int idCourse, int idPlan, String workDone) throws Exception; 
+	public abstract ArrayList<CoursePlan> selectAllCoursePlanByPlan(int idPlan) throws Exception; 
 	
 	//Create new course and attach to Plan
-	public abstract CoursePlanDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone) throws Exception;
+	public abstract CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone) throws Exception;
 	
 	//Delete for User current Plan table
 	public abstract void deleteByCourseIdAndPlanId(int idPlan, int idCourse) throws Exception;

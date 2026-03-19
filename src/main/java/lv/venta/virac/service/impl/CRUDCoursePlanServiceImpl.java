@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lv.venta.virac.dto.CourseDTO;
-import lv.venta.virac.dto.CoursePlanDTO;
+import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.model.Course;
 import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Plan;
@@ -129,7 +129,7 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	}
 
 	@Override
-	public CoursePlanDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone) throws Exception {
+	public CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone) throws Exception {
 		//variables for easier use
 		String name = courseDTO.getName();
 		int ectsCredits = courseDTO.getEctsCredits();
@@ -177,9 +177,11 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	    System.out.println("New Course-Plan: " + cp);
 	    
 	    //Returns CoursePlan dto for frontend
-	    CoursePlanDTO dto = new CoursePlanDTO();
-	    dto.setIdPlan(idPlan);
-	    dto.setIdCourse(newCourse.getIdCourse());
+	    CoursePlanResponseDTO dto = new CoursePlanResponseDTO();
+	    dto.setEctsCredits(ectsCredits);
+	    dto.setFaculty(faculty);
+	    dto.setName(name);
+	    dto.setSemester(semester);
 	    dto.setWorkDone(workDone);
 
 	    return dto;
@@ -203,7 +205,7 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
     	
         coursePlan.setWorkDone(workDone);
         coursePlanRepo.save(coursePlan);
-    	
+
 	}
 
 }

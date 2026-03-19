@@ -11,5 +11,4 @@ public interface ICoursePlanRepo extends CrudRepository<CoursePlan, Integer>{
 	public abstract ArrayList<CoursePlan> findByPlan_IdPlan(int idPlan);
 	
 	public abstract CoursePlan findByPlan_IdPlanAndCourse_IdCourse(int idPlan, int idCourse);
-
 }
