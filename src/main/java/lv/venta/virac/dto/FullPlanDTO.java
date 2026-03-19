@@ -33,6 +33,8 @@ public class FullPlanDTO {
 	private ArrayList<ScientificArticlesDTO> articles;
 	private ArrayList<ProjectDTO> projects;
 	private ArrayList<StudentWorkDTO> studentWork;
+	
+	//TODO: satusu pievienot
 		
 	public FullPlanDTO() {
 		

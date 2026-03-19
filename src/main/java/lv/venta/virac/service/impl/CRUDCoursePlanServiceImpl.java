@@ -186,6 +186,8 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 		
 	}
 	
+	//TODO:Auditing
+	//TODO: pieliekt workDone un sasaistīt ar DTO
 	@Override
 	public void deleteByCourseIdAndPlanId(int idPlan, int idCourse) throws Exception {
 		CoursePlan coursePlan = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);

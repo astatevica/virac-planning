@@ -300,6 +300,7 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
         
         PlanStatus status = plan.getPlanStatus();
         
+        //TODO: paskatīties optimizāciju
         if(status == PlanStatus.plan_open) {
             plan.setNumOfProjects(numOfProjects);
             plan.setNumOfArticles(numOfArticles);
