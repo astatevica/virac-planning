@@ -18,13 +18,16 @@ public interface ICRUDCoursePlanService extends ICRUDBase<CoursePlan>{
 	//Filter by Plan
 	public abstract ArrayList<CoursePlan> selectAllCoursePlanByPlan(int idPlan) throws Exception; 
 	
+	//C - create 
+	public abstract void createAutocompleteCourse(int idPlan, int idCourse, String workDone, int employeeId) throws Exception;
+	
 	//Create new course and attach to Plan
-	public abstract CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone) throws Exception;
+	public abstract CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone, int employeeId) throws Exception;
 	
 	//Delete for User current Plan table
-	public abstract void deleteByCourseIdAndPlanId(int idPlan, int idCourse) throws Exception;
+	public abstract void deleteByCourseIdAndPlanId(int idPlan, int idCourse, int employeeId) throws Exception;
 
 	//Update for User current Plan table
-	public abstract void updateByCourseIdAndPlanId(int idPlan, int idCourse, String workDone) throws Exception;
+	public abstract void updateByCourseIdAndPlanId(int idPlan, int idCourse, String workDone, int employeeId) throws Exception;
 	
 }

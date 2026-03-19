@@ -127,9 +127,50 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 		
 		return result;
 	}
-
+	
+	
+	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
-	public CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone) throws Exception {
+	public void createAutocompleteCourse(int idPlan, int idCourse, String workDone, int employeeId) throws Exception {
+		CoursePlan cp = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
+		        
+        if(idPlan == 0 || idCourse == 0){
+			throw new Exception("The input parameters are incorrect");
+		}
+        
+        Plan plan = planRepo.findById(idPlan).get();
+        if(plan == null) {
+        	throw new Exception("Plan not found");
+        }
+        
+        if(employeeId != plan.getEmployee().getIdEmployee()) {
+        	throw new Exception("This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan");
+        }
+        
+        Course course = courseRepo.findById(idCourse).get();
+        if(course == null) {
+        	throw new Exception("Course not found");
+        }
+        
+        if(cp != null) {
+            if(!cp.isDeleted()){
+                throw new Exception("Course already attached to this plan");
+            }
+            cp.setDeleted(false);
+            cp.setWorkDone(workDone);
+            coursePlanRepo.save(cp);
+            return;
+        }
+        CoursePlan coursePlan = new CoursePlan(plan, course, workDone);
+        coursePlanRepo.save(coursePlan);
+        System.out.println("idCoursePlan: " + coursePlan.getIdCoursePlan() + " idPlan: " + idPlan + " idCourse: " + idCourse + " WorkDone: " + workDone);
+		
+		
+	}
+	
+	//TODO: pēc auditing pielikt citu pārbaudi employee
+	@Override
+	public CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone, int employeeId) throws Exception {
 		//variables for easier use
 		String name = courseDTO.getName();
 		int ectsCredits = courseDTO.getEctsCredits();
@@ -156,7 +197,12 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
         Plan plan = planRepo.findById(idPlan).get();
         if(plan == null) {
         	throw new Exception("Plan not found");
-        }        
+        }    
+        
+        //verifies that plan is connected to right user
+        if(employeeId != plan.getEmployee().getIdEmployee()) {
+        	throw new Exception("This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan");
+        }
 	    
         //Makes new Course after veryfing
 		Course c = new Course();
@@ -190,22 +236,33 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	
 	//TODO:Auditing
 	//TODO: pieliekt workDone un sasaistīt ar DTO
+	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
-	public void deleteByCourseIdAndPlanId(int idPlan, int idCourse) throws Exception {
+	public void deleteByCourseIdAndPlanId(int idPlan, int idCourse, int employeeId) throws Exception {
 		CoursePlan coursePlan = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
     	if (coursePlan == null) throw new Exception("Course-Plan with Plan id:"+ idPlan +" and Course id: "+idCourse+" does not exist");
+    	if(employeeId != coursePlan.getPlan().getEmployee().getIdEmployee()) {
+        	throw new Exception("This user: "+ coursePlan.getPlan().getEmployee().getName() + " " 
+    	+ coursePlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
+        }
     	coursePlan.setDeleted(true); // SOFT DELETE
     	coursePlanRepo.save(coursePlan);  // SAVE, NOT DELETE
 	}
 	
+	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
-	public void updateByCourseIdAndPlanId(int idPlan, int idCourse, String workDone) throws Exception {
+	public void updateByCourseIdAndPlanId(int idPlan, int idCourse, String workDone, int employeeId) throws Exception {
 		CoursePlan coursePlan = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
     	if (coursePlan == null) throw new Exception("Course-Plan with Plan id:"+ idPlan +" and Course id: "+idCourse+" does not exist");
-    	
+    	if(employeeId != coursePlan.getPlan().getEmployee().getIdEmployee()) {
+        	throw new Exception("This user: "+ coursePlan.getPlan().getEmployee().getName() + " " 
+    	+ coursePlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
+        }
         coursePlan.setWorkDone(workDone);
         coursePlanRepo.save(coursePlan);
 
 	}
+
+
 
 }

@@ -219,8 +219,8 @@ public class UserController {
     public ResponseEntity<Void> updatePlanForUserByOpenPlan(@Valid @RequestBody UpdatePlanDTO pl,
             BindingResult result, Authentication authentication) throws Exception {
 			
-		//User user = (User) authentication.getPrincipal();
-	    int employeeId = 5;//user.getEmployee().getIdEmployee();
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
@@ -258,50 +258,61 @@ public class UserController {
 	   		
 	}
 	
-	//TODO: vai tas nebūs tas pats kas create?
-	//TODO: padot user un pārbaudīt vai tas ir īstais lietotājs VISUR
 	//Gets from frontend autocomplete course and plan to save in repo
 	@GetMapping("/courses/autocomplete/{idCourse}/{idPlan}/{workDone}")
 	public ResponseEntity<Void> saveCoursePlan(@PathVariable("idCourse") int idCourse,@PathVariable("idPlan") int idPlan,
-	        @PathVariable("workDone") String workDone) throws Exception{
+	        @PathVariable("workDone") String workDone, Authentication authentication) throws Exception{
+		
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+	    
 		System.out.println(" idPlan: " + idPlan + " idCourse: " + idCourse + " WorkDone: " + workDone);
-		coursePlanService.create(idPlan, idCourse, workDone);
+		coursePlanService.createAutocompleteCourse(idPlan, idCourse, workDone, employeeId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 
 	//Post endpoint to get all new course data and idPlan to save in repo
-	//TODO: padot user un pārbaudīt vai tas ir īstais lietotājs VISUR
 	@PostMapping("/add/course/{idPlan}/{workDone}")
 	public ResponseEntity<CoursePlanResponseDTO> createCourseForPlan(@PathVariable("idPlan") int idPlan, 
-			@PathVariable("workDone") String workDone, @RequestBody CourseDTO courseDTO) throws Exception{
-		CoursePlanResponseDTO result = coursePlanService.createCourseAndAttachToPlan(idPlan, courseDTO, workDone);
+			@PathVariable("workDone") String workDone, @RequestBody CourseDTO courseDTO, 
+			Authentication authentication) throws Exception{
+		
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+	    
+	    CoursePlanResponseDTO result = coursePlanService.createCourseAndAttachToPlan(idPlan, courseDTO, workDone, employeeId);
+		
 	    return ResponseEntity.ok(result);
 	}
 	
 	//Delete endpoint for course-plan deleting
-	//TODO: padot user un pārbaudīt vai tas ir īstais lietotājs VISUR
 	@DeleteMapping("/delete/course-plan/{idPlan}/{idCourse}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<Void> deleteCoursePlan(@PathVariable("idPlan") int idPlan, 
-			@PathVariable("idCourse") int idCourse) throws Exception {
-		//TODO: padot lietotāju uz servisu un pārbaudīt VISUR
-	    coursePlanService.deleteByCourseIdAndPlanId(idPlan, idCourse);
+			@PathVariable("idCourse") int idCourse, Authentication authentication) throws Exception {
+		
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+	    
+	    coursePlanService.deleteByCourseIdAndPlanId(idPlan, idCourse, employeeId);
 	    return ResponseEntity.ok().build();
 	}
 	
 	//Update endpoint for course-plan edit
-	//TODO: padot user un pārbaudīt vai tas ir īstais lietotājs VISUR
 	@PutMapping("/update/course-plan/{idPlan}/{idCourse}/{workDone}")
     public ResponseEntity<Void> update(@PathVariable("idPlan") int idPlan,@PathVariable("idCourse") int idCourse,
     		@PathVariable("workDone") String workDone,@Valid @RequestBody CoursePlanResponseDTO dto,
-            BindingResult result) throws Exception {
+            BindingResult result, Authentication authentication) throws Exception {
+		
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
 
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().build();
         }
 
-        coursePlanService.updateByCourseIdAndPlanId(idPlan,idCourse,workDone);
+        coursePlanService.updateByCourseIdAndPlanId(idPlan,idCourse,workDone, employeeId);
         return ResponseEntity.ok().build();
     }
 
