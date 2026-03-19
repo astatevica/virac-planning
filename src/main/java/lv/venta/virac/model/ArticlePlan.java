@@ -1,12 +1,22 @@
 package lv.venta.virac.model;
 
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,6 +35,7 @@ import lombok.ToString;
 @Table(name = "articlePlanTable")
 @ToString
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @SQLDelete(sql = "UPDATE article_plan_table SET deleted = true WHERE id_article_plan=?")
 @FilterDef(name = "deletedArticlePlanFilter", parameters = @ParamDef(name = "isDeleted", type = Boolean.class))
 @Filter(name = "deletedArticlePlanFilter", condition = "deleted = :isDeleted")
@@ -48,6 +59,26 @@ public class ArticlePlan{
 	
 	@Column(name = "publicationLink")
 	private String publicationLink;
+	
+	@CreatedDate
+	@Column(nullable = false,updatable = false)
+	@JsonIgnore
+	private LocalDateTime createDate;
+	
+	@LastModifiedDate
+	@Column(insertable = false)
+	@JsonIgnore
+	private LocalDateTime lastModified;
+	
+	@CreatedBy
+	@Column(updatable = false)
+	@JsonIgnore
+	private Integer createdBy;
+	
+	@LastModifiedBy
+	@Column(insertable = false)
+	@JsonIgnore
+	private Integer lastModifiedBy;
 
 	@Column(name = "deleted")
 	private boolean deleted = Boolean.FALSE;
