@@ -55,7 +55,7 @@ public class Journal {
 	@ToString.Exclude
 	private Collection<ScientificArticles>  scientificArticles;
 	
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

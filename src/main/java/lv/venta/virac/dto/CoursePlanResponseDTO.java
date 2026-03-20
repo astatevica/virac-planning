@@ -11,6 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CoursePlanResponseDTO {
 	
+	private int idPlan;
+	private int idCourse;
 	private String name;
 	private int ectsCredits;
 	private String semester;

@@ -64,7 +64,7 @@ public class ProjectPlan {
 	//@Size(max = 200, min = 2)
 	private String workDone;
 	
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

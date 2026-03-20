@@ -75,7 +75,7 @@ public class StudentWork {
 	@ToString.Exclude
 	private Collection<WorkPlan> workPlan;
 	
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

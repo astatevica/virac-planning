@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lv.venta.virac.dto.CourseDTO;
+import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ScientificArticlesDTO;
@@ -250,11 +251,15 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	                    .collect(Collectors.toCollection(ArrayList::new));
 
 	    // COURSES
-	    ArrayList<CourseDTO> courses =
+	    ArrayList<CoursePlanResponseDTO> courses =
 	            coursePlanRepo.findByPlan_IdPlan(plan.getIdPlan())
 	                    .stream()
-	                    .map(cp -> modelMapper.map(cp.getCourse(), CourseDTO.class))
+	                    .map(cp -> modelMapper.map(cp.getCourse(), CoursePlanResponseDTO.class))
 	                    .collect(Collectors.toCollection(ArrayList::new));
+	    
+	   for(CoursePlanResponseDTO temp:courses) {
+		   temp.setWorkDone(coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(plan.getIdPlan(), temp.getIdCourse()).getWorkDone());
+	   }
 
 	    // STUDENT WORK
 	    ArrayList<StudentWorkDTO> studentWork =

@@ -153,7 +153,7 @@ public class Plan {
 	//@Size(max = 200, min = 2)
 	private String otherJobsEnd;
 	
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

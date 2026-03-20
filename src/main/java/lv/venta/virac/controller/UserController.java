@@ -300,11 +300,12 @@ public class UserController {
 	}
 	
 	//Update endpoint for course-plan edit
-	@PutMapping("/update/course-plan/{idPlan}/{idCourse}/{workDone}")
-    public ResponseEntity<Void> update(@PathVariable("idPlan") int idPlan,@PathVariable("idCourse") int idCourse,
-    		@PathVariable("workDone") String workDone,@Valid @RequestBody CoursePlanResponseDTO dto,
+	//TODO: slash nebūs id nepieciešams
+	//TODO: @RequestBody CoursePlanResponseDTO dto kādā formātā sūta šurp json
+	@PutMapping("/update/course-plan")
+    public ResponseEntity<Void> update(@Valid @RequestBody CoursePlanResponseDTO dto,
             BindingResult result, Authentication authentication) throws Exception {
-		
+		System.out.println(dto);
 		User user = (User) authentication.getPrincipal();
 	    int employeeId = user.getEmployee().getIdEmployee();
 
@@ -312,7 +313,7 @@ public class UserController {
             return ResponseEntity.badRequest().build();
         }
 
-        coursePlanService.updateByCourseIdAndPlanId(idPlan,idCourse,workDone, employeeId);
+        coursePlanService.updateByCourseIdAndPlanId(dto.getIdPlan(),dto.getIdCourse(),dto.getWorkDone(), employeeId);
         return ResponseEntity.ok().build();
     }
 

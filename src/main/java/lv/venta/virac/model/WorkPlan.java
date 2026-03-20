@@ -56,7 +56,7 @@ public class WorkPlan {
 	@Column(name = "workDone")
 	private String workDone;
 	
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

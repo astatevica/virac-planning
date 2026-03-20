@@ -56,7 +56,7 @@ public class Year {
 	@ToString.Exclude
 	private Collection<Plan> plan;
 	
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true ,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

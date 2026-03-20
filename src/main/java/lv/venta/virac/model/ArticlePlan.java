@@ -61,7 +61,7 @@ public class ArticlePlan{
 	private String publicationLink;
 	
 	@CreatedDate
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

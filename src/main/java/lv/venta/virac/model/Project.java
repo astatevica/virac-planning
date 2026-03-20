@@ -84,7 +84,7 @@ public class Project {
 	@ToString.Exclude
 	private Collection<ProjectPlan> projectPlan;
 	
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

@@ -68,7 +68,7 @@ public class Course {
 	@ToString.Exclude
 	private Collection<CoursePlan> coursePlan;
 	
-	@Column(nullable = false,updatable = false)
+	@Column(nullable = true,updatable = false)
 	@JsonIgnore
 	private LocalDateTime createDate;
 	

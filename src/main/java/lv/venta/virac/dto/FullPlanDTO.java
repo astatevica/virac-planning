@@ -38,7 +38,7 @@ public class FullPlanDTO {
 	private String otherJobsEnd;
 	
 	//No tabulām
-	private ArrayList<CourseDTO> courses;
+	private ArrayList<CoursePlanResponseDTO> courses;
 	private ArrayList<ScientificArticlesDTO> articles;
 	private ArrayList<ProjectDTO> projects;
 	private ArrayList<StudentWorkDTO> studentWork;

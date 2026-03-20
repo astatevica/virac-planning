@@ -43,7 +43,7 @@ const deleteCoursePlan = (idPlan, idCourse) =>
 
 const updateCoursePlanWorkDone = (idPlan, idCourse, workDone, dto) =>
   api.put(
-    `${API}/update/course-plan/${idPlan}/${idCourse}/${encodeURIComponent(workDone)}`,
+    `${API}/update/course-plan`,
     dto
   );
 
