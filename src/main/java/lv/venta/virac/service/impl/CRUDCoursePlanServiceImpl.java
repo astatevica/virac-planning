@@ -1,5 +1,6 @@
 package lv.venta.virac.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.hibernate.Filter;
@@ -210,8 +211,8 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	    c.setEctsCredits(ectsCredits);
 	    c.setSemester(semester);
 	    c.setFaculty(faculty);
+	    //c.setCreateDate(LocalDateTime.now()); //because Jpa for auditing thinks that this is update not save
 	    Course newCourse = courseRepo.save(c);
-	    System.out.println("New course: " + newCourse);
 	    
 	    //Creates new Plan-Course relation
 	    CoursePlan cp = new CoursePlan();
@@ -219,8 +220,8 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	    cp.setCourse(newCourse);
 	    cp.setDeleted(false);
 	    cp.setWorkDone(workDone);
+	    //cp.setCreateDate(LocalDateTime.now()); //because Jpa for auditing thinks that this is update not save
 	    coursePlanRepo.save(cp);
-	    System.out.println("New Course-Plan: " + cp);
 	    
 	    //Returns CoursePlan dto for frontend
 	    CoursePlanResponseDTO dto = new CoursePlanResponseDTO();
@@ -234,14 +235,12 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 		
 	}
 	
-	//TODO:Auditing
-	//TODO: pieliekt workDone un sasaistīt ar DTO
 	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
 	public void deleteByCourseIdAndPlanId(int idPlan, int idCourse, int employeeId) throws Exception {
 		CoursePlan coursePlan = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
     	if (coursePlan == null) throw new Exception("Course-Plan with Plan id:"+ idPlan +" and Course id: "+idCourse+" does not exist");
-    	if(employeeId != coursePlan.getPlan().getEmployee().getIdEmployee()) {
+    	if(employeeId != coursePlan.getCreatedBy()) {
         	throw new Exception("This user: "+ coursePlan.getPlan().getEmployee().getName() + " " 
     	+ coursePlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
         }
@@ -249,12 +248,11 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
     	coursePlanRepo.save(coursePlan);  // SAVE, NOT DELETE
 	}
 	
-	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
 	public void updateByCourseIdAndPlanId(int idPlan, int idCourse, String workDone, int employeeId) throws Exception {
 		CoursePlan coursePlan = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
     	if (coursePlan == null) throw new Exception("Course-Plan with Plan id:"+ idPlan +" and Course id: "+idCourse+" does not exist");
-    	if(employeeId != coursePlan.getPlan().getEmployee().getIdEmployee()) {
+    	if(employeeId != coursePlan.getCreatedBy()) {
         	throw new Exception("This user: "+ coursePlan.getPlan().getEmployee().getName() + " " 
     	+ coursePlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
         }
