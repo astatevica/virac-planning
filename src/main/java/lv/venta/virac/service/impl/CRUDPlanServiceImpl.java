@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lv.venta.virac.dto.CourseDTO;
 import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
@@ -328,7 +327,6 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
             plan.setOtherJobs(otherJobs);
             plan.setOtherJobsEnd(otherJobsEnd);
             planRepo.save(plan);
-            System.out.println(plan);
         }else if (status == PlanStatus.planned_frozen) {
             plan.setPartInConfEnd(partInConfEnd);
             plan.setComAbConfEnd(comAbConfEnd);
@@ -339,7 +337,6 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
             plan.setParticipationInSeminarsEnd(participationInSeminarsEnd);
             plan.setOtherJobsEnd(otherJobsEnd);
             planRepo.save(plan);
-            System.out.println(plan);
         }else {
         	throw new Exception("Current plan is closed");
         }

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserPlanService from "../services/UserPlanService";
 import api from "../api/api";
+import JournalService from "../services/JournalService";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ export default function UserDashboard() {
   const [openPlan, setOpenPlan] = useState(null);
   const [openPlanCourses, setOpenPlanCourses] = useState([]);
   const [locallyDeletedCourseIds, setLocallyDeletedCourseIds] = useState([]);
+  const [openPlanArticles, setOpenPlanArticles] = useState([]);
+  const [locallyDeletedArticleIds, setLocallyDeletedArticleIds] = useState([]);
   const [saveMessage, setSaveMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -35,6 +38,31 @@ export default function UserDashboard() {
   const [courseEditWorkDone, setCourseEditWorkDone] = useState("");
   const [courseEditTarget, setCourseEditTarget] = useState(null);
   const [isCourseEditing, setIsCourseEditing] = useState(false);
+
+  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
+  const [articleMode, setArticleMode] = useState("existing");
+  const [articleSearch, setArticleSearch] = useState("");
+  const [articleOptions, setArticleOptions] = useState([]);
+  const [selectedArticle, setSelectedArticle] = useState(null);
+  const [articleComments, setArticleComments] = useState("");
+  const [articleLink, setArticleLink] = useState("");
+  const [isArticleSaving, setIsArticleSaving] = useState(false);
+  const [articleModalMessage, setArticleModalMessage] = useState("");
+  const [newArticle, setNewArticle] = useState({
+    name: "",
+    coAuthors: "",
+    idJournal: ""
+  });
+  const [articleJournals, setArticleJournals] = useState([]);
+  const [isArticleDeleteModalOpen, setIsArticleDeleteModalOpen] = useState(false);
+  const [isArticleDeleting, setIsArticleDeleting] = useState(false);
+  const [articleDeleteMessage, setArticleDeleteMessage] = useState("");
+  const [isArticleEditModalOpen, setIsArticleEditModalOpen] = useState(false);
+  const [articleEditMessage, setArticleEditMessage] = useState("");
+  const [articleEditComments, setArticleEditComments] = useState("");
+  const [articleEditLink, setArticleEditLink] = useState("");
+  const [articleEditTarget, setArticleEditTarget] = useState(null);
+  const [isArticleEditing, setIsArticleEditing] = useState(false);
 
   const currentYear = new Date().getFullYear();
 
@@ -78,7 +106,9 @@ export default function UserDashboard() {
     }
   };
 
-  const attachPlanContextToOpenPlan = useCallback(async (idPlan) => {
+  const attachPlanContextToOpenPlan = useCallback(async (idPlan, overrides = {}) => {
+    const deletedCourseIds = overrides.deletedCourseIds ?? locallyDeletedCourseIds;
+    const deletedArticleIds = overrides.deletedArticleIds ?? locallyDeletedArticleIds;
     try {
       const [planRes, fullPlanRes] = await Promise.all([
         UserPlanService.getPlanView(idPlan),
@@ -128,9 +158,82 @@ export default function UserDashboard() {
       } else {
         const courses = Array.isArray(fullPlan.courses) ? fullPlan.courses : [];
         const filtered = courses.filter((c) => !c?.deleted && !c?.isDeleted);
-        const deletedSet = new Set(locallyDeletedCourseIds.map((id) => Number(id)));
+        const deletedSet = new Set(deletedCourseIds.map((id) => Number(id)));
         const visible = filtered.filter((c) => !deletedSet.has(Number(c?.idCourse)));
         setOpenPlanCourses((prev) => {
+          if (visible.length === 0 && prev && prev.length > 0) return prev;
+          return visible;
+        });
+      }
+
+      if (Array.isArray(fullPlan.articlePlans) && fullPlan.articlePlans.length > 0) {
+        const deletedSet = new Set(deletedArticleIds.map((id) => Number(id)));
+        const normalized = fullPlan.articlePlans
+          .filter((ap) => !ap?.deleted && !ap?.isDeleted && !ap?.article?.deleted && !ap?.article?.isDeleted)
+          .map((ap) => {
+            const articleData = {
+              ...(ap.article || {}),
+              ...(ap.articleDTO || {}),
+              ...(ap.scientificArticle || {}),
+              ...(ap.scientificArticleDTO || {})
+            };
+
+            return {
+              ...articleData,
+              idArticle:
+                articleData.idArticle ??
+                ap.idArticle ??
+                ap.idScientificArticles ??
+                ap.idScientificArticle ??
+                ap.articleId ??
+                null,
+              idArticlePlan: ap.idArticlePlan ?? ap.idArticlePlanDTO ?? ap.articlePlanId ?? null,
+              articleComments: ap.articleComments ?? ap.comments ?? ap.article_comments ?? "",
+              publicationLink: ap.publicationLink ?? ap.link ?? ap.publication_link ?? ""
+            };
+          })
+          .filter((ap) => !deletedSet.has(Number(getArticleId(ap))));
+        setOpenPlanArticles(normalized);
+        setLocallyDeletedArticleIds([]);
+      } else if (Array.isArray(fullPlan.articlePlanDTOs) && fullPlan.articlePlanDTOs.length > 0) {
+        const articles = Array.isArray(fullPlan.articles) ? fullPlan.articles : [];
+        const deletedSet = new Set(deletedArticleIds.map((id) => Number(id)));
+        const normalized = fullPlan.articlePlanDTOs.map((ap) => {
+          const idArticle =
+            ap.idArticle ??
+            ap.idScientificArticles ??
+            ap.idScientificArticle ??
+            ap.articleId ??
+            null;
+          const matched = articles.find(
+            (a) =>
+              Number(a.idArticle ?? a.idScientificArticles ?? a.idScientificArticle ?? a.articleId) ===
+              Number(idArticle)
+          ) || {};
+          return {
+            ...matched,
+            idArticle: matched.idArticle ?? idArticle,
+            idArticlePlan: ap.idArticlePlan ?? ap.idArticlePlanDTO ?? ap.articlePlanId ?? null,
+            articleComments: ap.articleComments ?? ap.comments ?? "",
+            publicationLink: ap.publicationLink ?? ap.link ?? ""
+          };
+        }).filter((ap) => !ap?.deleted && !ap?.isDeleted && !deletedSet.has(Number(getArticleId(ap))));
+        setOpenPlanArticles(normalized);
+        setLocallyDeletedArticleIds([]);
+      } else {
+        const articles = Array.isArray(fullPlan.articles) ? fullPlan.articles : [];
+        const filtered = articles.filter((a) => !a?.deleted && !a?.isDeleted);
+        const deletedSet = new Set(deletedArticleIds.map((id) => Number(id)));
+        const visible = filtered.map((a) => ({
+          ...a,
+          idArticle:
+            a?.idArticle ?? a?.idScientificArticles ?? a?.idScientificArticle ?? a?.articleId ?? null
+        })).filter((a) => {
+          const idArticle =
+            a?.idArticle ?? a?.idScientificArticles ?? a?.idScientificArticle ?? a?.articleId ?? null;
+          return !deletedSet.has(Number(idArticle));
+        });
+        setOpenPlanArticles((prev) => {
           if (visible.length === 0 && prev && prev.length > 0) return prev;
           return visible;
         });
@@ -138,8 +241,9 @@ export default function UserDashboard() {
     } catch (err) {
       console.error("Could not load plan context for dashboard", err);
       setOpenPlanCourses([]);
+      setOpenPlanArticles([]);
     }
-  }, [extractStatus, locallyDeletedCourseIds]);
+  }, [extractStatus, locallyDeletedCourseIds, locallyDeletedArticleIds]);
 
   useEffect(() => {
     const loadCurrentYearPlans = async () => {
@@ -164,6 +268,7 @@ export default function UserDashboard() {
         } else {
           setOpenPlan(null);
           setOpenPlanCourses([]);
+          setOpenPlanArticles([]);
         }
       } catch (err) {
         console.error(err);
@@ -195,6 +300,44 @@ export default function UserDashboard() {
     return () => clearTimeout(timeoutId);
   }, [courseSearch, courseMode, isCourseModalOpen]);
 
+  useEffect(() => {
+    if (!isArticleModalOpen || articleMode !== "existing") return;
+
+    if (articleSearch.trim().length < 2) {
+      setArticleOptions([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const res = await UserPlanService.searchArticlesAutocomplete(articleSearch.trim());
+        setArticleOptions(res.data || []);
+      } catch (err) {
+        console.error(err);
+        setArticleOptions([]);
+      }
+    }, 250);
+
+    return () => clearTimeout(timeoutId);
+  }, [articleSearch, articleMode, isArticleModalOpen]);
+
+  useEffect(() => {
+    if (!isArticleModalOpen || articleMode !== "new") return;
+    if (articleJournals.length > 0) return;
+
+    const loadJournals = async () => {
+      try {
+        const res = await JournalService.getAll();
+        setArticleJournals(res.data || []);
+      } catch (err) {
+        console.error(err);
+        setArticleJournals([]);
+      }
+    };
+
+    loadJournals();
+  }, [isArticleModalOpen, articleMode, articleJournals.length]);
+
   const handleOpenPlanTextChange = (e) => {
     const { name, value } = e.target;
     setOpenPlan((prev) => ({ ...prev, [name]: value }));
@@ -216,6 +359,7 @@ export default function UserDashboard() {
       attachPlanContextToOpenPlan(selected.idPlan);
     } else {
       setOpenPlanCourses([]);
+      setOpenPlanArticles([]);
     }
   };
 
@@ -262,6 +406,7 @@ export default function UserDashboard() {
       } else {
         setOpenPlan(null);
         setOpenPlanCourses([]);
+        setOpenPlanArticles([]);
       }
     } catch (err) {
       console.error(err);
@@ -294,6 +439,57 @@ export default function UserDashboard() {
   const closeCourseModal = () => {
     setIsCourseModalOpen(false);
     resetCourseModal();
+  };
+
+  const resetArticleModal = () => {
+    setArticleMode("existing");
+    setArticleSearch("");
+    setArticleOptions([]);
+    setSelectedArticle(null);
+    setArticleComments("");
+    setArticleLink("");
+    setArticleModalMessage("");
+    setNewArticle({
+      name: "",
+      coAuthors: "",
+      idJournal: ""
+    });
+  };
+
+  const openArticleModal = () => {
+    resetArticleModal();
+    setIsArticleModalOpen(true);
+  };
+
+  const closeArticleModal = () => {
+    setIsArticleModalOpen(false);
+    resetArticleModal();
+  };
+
+  const openArticleDeleteModal = () => {
+    setArticleDeleteMessage("");
+    setIsArticleDeleteModalOpen(true);
+  };
+
+  const closeArticleDeleteModal = () => {
+    setIsArticleDeleteModalOpen(false);
+    setArticleDeleteMessage("");
+  };
+
+  const openArticleEditModal = (article) => {
+    setArticleEditTarget(article);
+    setArticleEditComments(getArticleComments(article));
+    setArticleEditLink(getArticleLink(article));
+    setArticleEditMessage("");
+    setIsArticleEditModalOpen(true);
+  };
+
+  const closeArticleEditModal = () => {
+    setIsArticleEditModalOpen(false);
+    setArticleEditTarget(null);
+    setArticleEditComments("");
+    setArticleEditLink("");
+    setArticleEditMessage("");
   };
 
   const openCourseDeleteModal = () => {
@@ -403,7 +599,9 @@ export default function UserDashboard() {
         }
       }
 
-      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      await attachPlanContextToOpenPlan(openPlan.idPlan, {
+        deletedArticleIds: [idArticle, ...locallyDeletedArticleIds]
+      });
       setCourseModalMessage("");
       setSaveMessage("Course saved and attached to plan.");
       closeCourseModal();
@@ -412,6 +610,113 @@ export default function UserDashboard() {
       setCourseModalMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to save course."));
     } finally {
       setIsCourseSaving(false);
+    }
+  };
+
+  const handleSaveArticleFromModal = async () => {
+    if (!openPlan?.idPlan) return;
+
+    if (!articleComments.trim()) {
+      setArticleModalMessage("Please provide article comments.");
+      return;
+    }
+    if (!articleLink.trim()) {
+      setArticleModalMessage("Please provide publication link.");
+      return;
+    }
+
+    try {
+      setIsArticleSaving(true);
+
+      if (articleMode === "existing") {
+        const selectedId =
+          selectedArticle?.idArticle ??
+          selectedArticle?.idScientificArticles ??
+          selectedArticle?.idScientificArticle ??
+          selectedArticle?.articleId ??
+          null;
+        if (!selectedId) {
+          setArticleModalMessage("Please select article from autocomplete.");
+          return;
+        }
+        const alreadyAdded = openPlanArticles.some((a) => {
+          const existingId =
+            a?.idArticle ??
+            a?.idScientificArticles ??
+            a?.idScientificArticle ??
+            a?.articleId ??
+            null;
+          return Number(existingId) === Number(selectedId);
+        });
+        if (alreadyAdded) {
+          setArticleModalMessage("This article is already attached to the plan.");
+          return;
+        }
+
+        await UserPlanService.saveArticlePlan(
+          selectedId,
+          openPlan.idPlan,
+          articleComments.trim(),
+          articleLink.trim()
+        );
+        setLocallyDeletedArticleIds((prev) =>
+          prev.filter((id) => Number(id) !== Number(selectedId))
+        );
+      } else {
+        if (!newArticle.name.trim() || !newArticle.idJournal) {
+          setArticleModalMessage("Please fill article name and journal.");
+          return;
+        }
+        const normalizedNew = {
+          name: newArticle.name.trim().toLowerCase(),
+          coAuthors: newArticle.coAuthors.trim().toLowerCase(),
+          idJournal: Number(newArticle.idJournal)
+        };
+        const duplicateByFields = openPlanArticles.some((a) => {
+          const existing = {
+            name: (a?.name || a?.title || "").toString().trim().toLowerCase(),
+            coAuthors: (a?.coAuthors || a?.coAuthor || "").toString().trim().toLowerCase(),
+            idJournal: Number(a?.idJournal ?? a?.journalId ?? 0)
+          };
+          return (
+            existing.name &&
+            existing.name === normalizedNew.name &&
+            existing.coAuthors === normalizedNew.coAuthors &&
+            existing.idJournal === normalizedNew.idJournal
+          );
+        });
+        if (duplicateByFields) {
+          setArticleModalMessage("This article already exists in the plan.");
+          return;
+        }
+
+        const createRes = await UserPlanService.createArticleForPlan(
+          openPlan.idPlan,
+          articleComments.trim(),
+          articleLink.trim(),
+          {
+            name: newArticle.name.trim(),
+            coAuthors: newArticle.coAuthors.trim(),
+            idJournal: Number(newArticle.idJournal)
+          }
+        );
+        const createdId = createRes?.data?.idArticle ?? createRes?.data?.idScientificArticles ?? null;
+        if (createdId) {
+          setLocallyDeletedArticleIds((prev) =>
+            prev.filter((id) => Number(id) !== Number(createdId))
+          );
+        }
+      }
+
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      setArticleModalMessage("");
+      setSaveMessage("Article saved and attached to plan.");
+      closeArticleModal();
+    } catch (err) {
+      console.error(err);
+      setArticleModalMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to save article."));
+    } finally {
+      setIsArticleSaving(false);
     }
   };
 
@@ -448,6 +753,36 @@ export default function UserDashboard() {
     course?.coursePlan?.idCoursePlanDTO ??
     course?.planCourseId ??
     null;
+
+  const getArticleId = (article) =>
+    article?.idArticle ??
+    article?.idScientificArticles ??
+    article?.idScientificArticle ??
+    article?.articleId ??
+    null;
+
+  const getArticlePlanId = (article) =>
+    article?.idArticlePlan ??
+    article?.articlePlanId ??
+    article?.idArticlePlanDTO ??
+    article?.planArticleId ??
+    null;
+
+  const getArticleComments = (article) =>
+    article?.articleComments ??
+    article?.comments ??
+    article?.article_comments ??
+    article?.articlePlan?.articleComments ??
+    article?.articlePlan?.comments ??
+    "";
+
+  const getArticleLink = (article) =>
+    article?.publicationLink ??
+    article?.link ??
+    article?.publication_link ??
+    article?.articlePlan?.publicationLink ??
+    article?.articlePlan?.link ??
+    "";
 
   const handleDeleteCoursePlan = async (course) => {
     const idCourse =
@@ -495,6 +830,45 @@ export default function UserDashboard() {
       setCourseDeleteMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to delete course."));
     } finally {
       setIsCourseDeleting(false);
+    }
+  };
+
+  const handleDeleteArticlePlan = async (article) => {
+    const idArticle = getArticleId(article);
+    if (!idArticle) {
+      setArticleDeleteMessage("Article ID not found, cannot delete.");
+      return;
+    }
+    if (!openPlan?.idPlan) {
+      setArticleDeleteMessage("Plan is not selected.");
+      return;
+    }
+
+    if (!window.confirm("Delete this article from plan?")) return;
+
+    try {
+      setIsArticleDeleting(true);
+      await UserPlanService.deleteArticlePlan(openPlan.idPlan, idArticle);
+      setOpenPlanArticles((prev) =>
+        prev.filter((a) => {
+          const aid = getArticleId(a);
+          return Number(aid) !== Number(idArticle);
+        })
+      );
+      setLocallyDeletedArticleIds((prev) => {
+        const next = new Set(prev.map((id) => Number(id)));
+        next.add(Number(idArticle));
+        return Array.from(next);
+      });
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      setArticleDeleteMessage("");
+      setSaveMessage("Article deleted from plan.");
+      closeArticleDeleteModal();
+    } catch (err) {
+      console.error(err);
+      setArticleDeleteMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to delete article."));
+    } finally {
+      setIsArticleDeleting(false);
     }
   };
 
@@ -553,6 +927,81 @@ export default function UserDashboard() {
     } finally {
       setIsCourseEditing(false);
     }
+  };
+
+  const handleEditArticlePlan = async () => {
+    if (!articleEditTarget) return;
+    if (!openPlan?.idPlan) {
+      setArticleEditMessage("Plan is not selected.");
+      return;
+    }
+    const idArticle = getArticleId(articleEditTarget);
+    if (!idArticle) {
+      setArticleEditMessage("Article ID not found.");
+      return;
+    }
+    if (!articleEditComments.trim()) {
+      setArticleEditMessage("Please provide article comments.");
+      return;
+    }
+    if (!articleEditLink.trim()) {
+      setArticleEditMessage("Please provide publication link.");
+      return;
+    }
+
+    try {
+      setIsArticleEditing(true);
+      const dto = {
+        idPlan: openPlan.idPlan,
+        idArticle,
+        articleComments: articleEditComments.trim(),
+        publicationLink: articleEditLink.trim(),
+        name: articleEditTarget?.name,
+        coAuthors: articleEditTarget?.coAuthors,
+        idJournal: articleEditTarget?.idJournal ?? articleEditTarget?.journalId
+      };
+      await UserPlanService.updateArticlePlan(dto);
+      setOpenPlanArticles((prev) =>
+        prev.map((a) => {
+          const aid = getArticleId(a);
+          if (Number(aid) !== Number(idArticle)) return a;
+          return { ...a, articleComments: articleEditComments.trim(), publicationLink: articleEditLink.trim() };
+        })
+      );
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      setSaveMessage("Article updated.");
+      closeArticleEditModal();
+    } catch (err) {
+      console.error(err);
+      setArticleEditMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to update article."));
+    } finally {
+      setIsArticleEditing(false);
+    }
+  };
+
+  const formatArticleText = (article) => {
+    const labels = {
+      idArticle: "ID",
+      idScientificArticles: "ID",
+      name: "Name",
+      title: "Name",
+      coAuthors: "Co-authors",
+      journalName: "Journal",
+      journal: "Journal",
+      articleComments: "Comments",
+      publicationLink: "Link"
+    };
+
+    const normalized = {
+      ...article,
+      articleComments: getArticleComments(article),
+      publicationLink: getArticleLink(article)
+    };
+
+    return Object.entries(normalized || {})
+      .filter(([, value]) => value !== null && value !== undefined && value !== "" && typeof value !== "object")
+      .map(([key, value]) => `${labels[key] || key}: ${value}`)
+      .join(" | ");
   };
 
   const normalizedStatus = extractStatus(openPlan);
@@ -676,6 +1125,22 @@ export default function UserDashboard() {
                       ) : (
                         <span>No courses attached</span>
                       )
+                    ) : row.done === "ArticleDTO" ? (
+                      openPlanArticles.length > 0 ? (
+                        <ol style={{ margin: 0, paddingLeft: 20 }}>
+                          {openPlanArticles.map((article, idx) => (
+                            <li key={`${getArticlePlanId(article) || getArticleId(article) || idx}-${idx}`}>
+                              {formatArticleText(article)}
+                              {" "}
+                              <button type="button" onClick={() => openArticleEditModal(article)}>
+                                Edit
+                              </button>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <span>No articles attached</span>
+                      )
                     ) : (
                       <span>{row.done}</span>
                     )
@@ -698,7 +1163,9 @@ export default function UserDashboard() {
                         onClick={
                           row.key === "courses"
                             ? openCourseModal
-                            : () => setSaveMessage(`${row.actions[0]} is not connected yet.`)
+                            : row.key === "articles"
+                              ? openArticleModal
+                              : () => setSaveMessage(`${row.actions[0]} is not connected yet.`)
                         }
                       >
                         {row.actions[0]}
@@ -710,7 +1177,9 @@ export default function UserDashboard() {
                         onClick={
                           row.key === "courses"
                             ? openCourseDeleteModal
-                            : () => setSaveMessage(`${row.actions[1]} is not connected yet.`)
+                            : row.key === "articles"
+                              ? openArticleDeleteModal
+                              : () => setSaveMessage(`${row.actions[1]} is not connected yet.`)
                         }
                       >
                         {row.actions[1]}
@@ -950,6 +1419,256 @@ export default function UserDashboard() {
             </button>
             {courseEditMessage && (
               <p style={{ color: "red", marginTop: 8 }}>{courseEditMessage}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isArticleModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
+            <h3>Add Article To Plan #{openPlan?.idPlan}</h3>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>
+                <input
+                  type="radio"
+                  name="articleMode"
+                  checked={articleMode === "existing"}
+                  onChange={() => setArticleMode("existing")}
+                />
+                {" "}Use existing article
+              </label>
+              {"  "}
+              <label>
+                <input
+                  type="radio"
+                  name="articleMode"
+                  checked={articleMode === "new"}
+                  onChange={() => setArticleMode("new")}
+                />
+                {" "}Create new article
+              </label>
+            </div>
+
+            {articleMode === "existing" ? (
+              <div style={{ marginBottom: 10 }}>
+                <label>Article autocomplete</label>
+                <input
+                  type="text"
+                  value={articleSearch}
+                  onChange={(e) => {
+                    setArticleSearch(e.target.value);
+                    setSelectedArticle(null);
+                  }}
+                  placeholder="Type at least 2 characters..."
+                  style={{ width: "100%", marginTop: 4 }}
+                />
+                {articleOptions.length > 0 && (
+                  <div style={{ border: "1px solid #ccc", maxHeight: 160, overflowY: "auto", marginTop: 4 }}>
+                    {articleOptions.map((article) => {
+                      const journalName =
+                        article.journalName ??
+                        article.journal ??
+                        article.journalTitle ??
+                        article.idJournal ??
+                        "";
+                      const idArticle =
+                        article.idArticle ??
+                        article.idScientificArticles ??
+                        article.idScientificArticle ??
+                        article.articleId ??
+                        null;
+                      return (
+                        <div
+                          key={idArticle || article.name}
+                          onClick={() => {
+                            setSelectedArticle(article);
+                            setArticleSearch(
+                              `${article.name} (Co-authors: ${article.coAuthors || "-"}, Journal: ${journalName || "-"})`
+                            );
+                            setArticleOptions([]);
+                          }}
+                          style={{ padding: 8, cursor: "pointer", borderBottom: "1px solid #eee" }}
+                        >
+                          {article.name} | Co-authors: {article.coAuthors || "-"} | Journal: {journalName || "-"}
+                          {(() => {
+                            const existing = openPlanArticles.find(
+                              (a) => Number(getArticleId(a)) === Number(idArticle)
+                            );
+                            const comments = existing ? getArticleComments(existing) : "";
+                            return comments ? ` | Comments: ${comments}` : "";
+                          })()}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ marginBottom: 10 }}>
+                <label>Name</label>
+                <input
+                  type="text"
+                  value={newArticle.name}
+                  onChange={(e) => setNewArticle((prev) => ({ ...prev, name: e.target.value }))}
+                  style={{ width: "100%", marginBottom: 6 }}
+                />
+                <label>Co-authors</label>
+                <input
+                  type="text"
+                  value={newArticle.coAuthors}
+                  onChange={(e) => setNewArticle((prev) => ({ ...prev, coAuthors: e.target.value }))}
+                  style={{ width: "100%", marginBottom: 6 }}
+                />
+                <label>Journal</label>
+                <select
+                  value={newArticle.idJournal}
+                  onChange={(e) => setNewArticle((prev) => ({ ...prev, idJournal: e.target.value }))}
+                  style={{ width: "100%", marginBottom: 6 }}
+                >
+                  <option value="">Select journal</option>
+                  {articleJournals.map((j) => (
+                    <option key={j.idJournal} value={j.idJournal}>
+                      {j.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Article comments</label>
+              <textarea
+                rows={2}
+                value={articleComments}
+                onChange={(e) => setArticleComments(e.target.value)}
+                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
+              />
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Publication link</label>
+              <input
+                type="text"
+                value={articleLink}
+                onChange={(e) => setArticleLink(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+            </div>
+
+            <button type="button" onClick={handleSaveArticleFromModal} disabled={isArticleSaving}>
+              {isArticleSaving ? "Saving..." : "Save Article"}
+            </button>
+            {" "}
+            <button type="button" onClick={closeArticleModal} disabled={isArticleSaving}>
+              Cancel
+            </button>
+            {articleModalMessage && (
+              <p style={{ color: "red", marginTop: 8 }}>{articleModalMessage}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isArticleDeleteModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
+            <h3>Delete Article From Plan #{openPlan?.idPlan}</h3>
+
+            {openPlanArticles.length === 0 ? (
+              <p>No articles attached.</p>
+            ) : (
+              <ol style={{ paddingLeft: 20 }}>
+                {openPlanArticles.map((article, idx) => (
+                  <li key={`${getArticlePlanId(article) || getArticleId(article) || idx}-${idx}`} style={{ marginBottom: 8 }}>
+                    <div>{formatArticleText(article)}</div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteArticlePlan(article)}
+                      style={{ marginTop: 4 }}
+                    >
+                      {isArticleDeleting ? "Deleting..." : "Delete"}
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            <button type="button" onClick={closeArticleDeleteModal} disabled={isArticleDeleting}>
+              Close
+            </button>
+            {articleDeleteMessage && (
+              <p style={{ color: "red", marginTop: 8 }}>{articleDeleteMessage}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isArticleEditModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
+            <h3>Edit Article Plan</h3>
+            <div style={{ marginBottom: 10 }}>
+              <div>{articleEditTarget ? formatArticleText(articleEditTarget) : ""}</div>
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Article comments</label>
+              <textarea
+                rows={2}
+                value={articleEditComments}
+                onChange={(e) => setArticleEditComments(e.target.value)}
+                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
+              />
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Publication link</label>
+              <input
+                type="text"
+                value={articleEditLink}
+                onChange={(e) => setArticleEditLink(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+            </div>
+            <button type="button" onClick={handleEditArticlePlan} disabled={isArticleEditing}>
+              {isArticleEditing ? "Saving..." : "Save"}
+            </button>
+            {" "}
+            <button type="button" onClick={closeArticleEditModal} disabled={isArticleEditing}>
+              Cancel
+            </button>
+            {articleEditMessage && (
+              <p style={{ color: "red", marginTop: 8 }}>{articleEditMessage}</p>
             )}
           </div>
         </div>

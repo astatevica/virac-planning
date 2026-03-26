@@ -47,6 +47,29 @@ const updateCoursePlanWorkDone = (idPlan, idCourse, workDone, dto) =>
     dto
   );
 
+const searchArticlesAutocomplete = (keyword) =>
+  api.get(`${API}/article/autocomplete/${encodeURIComponent(keyword)}`);
+
+const saveArticlePlan = (idArticle, idPlan, comments, link) =>
+  api.get(
+    `${API}/articles/autocomplete/${idArticle}/${idPlan}/${encodeURIComponent(comments)}/${encodeURIComponent(link)}`
+  );
+
+const createArticleForPlan = (idPlan, comments, link, articleDto) =>
+  api.post(
+    `${API}/add/article/${idPlan}/${encodeURIComponent(comments)}/${encodeURIComponent(link)}`,
+    articleDto
+  );
+
+const deleteArticlePlan = (idPlan, idArticle) =>
+  api.delete(`${API}/delete/article-plan/${idPlan}/${idArticle}`);
+
+const updateArticlePlan = (dto) =>
+  api.put(
+    `${API}/update/article-plan`,
+    dto
+  );
+
 const UserPlanService = {
   getAll,
   getByYear,   
@@ -60,7 +83,12 @@ const UserPlanService = {
   saveCoursePlan,
   createCourseForPlan,
   deleteCoursePlan,
-  updateCoursePlanWorkDone
+  updateCoursePlanWorkDone,
+  searchArticlesAutocomplete,
+  saveArticlePlan,
+  createArticleForPlan,
+  deleteArticlePlan,
+  updateArticlePlan
 };
 
 export default UserPlanService;
