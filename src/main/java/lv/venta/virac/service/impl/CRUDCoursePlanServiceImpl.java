@@ -1,6 +1,5 @@
 package lv.venta.virac.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.hibernate.Filter;
@@ -130,7 +129,6 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	}
 	
 	
-	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
 	public void createAutocompleteCourse(int idPlan, int idCourse, String workDone, int employeeId) throws Exception {
 		CoursePlan cp = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);
@@ -164,9 +162,6 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
         }
         CoursePlan coursePlan = new CoursePlan(plan, course, workDone);
         coursePlanRepo.save(coursePlan);
-        System.out.println("idCoursePlan: " + coursePlan.getIdCoursePlan() + " idPlan: " + idPlan + " idCourse: " + idCourse + " WorkDone: " + workDone);
-		
-		
 	}
 	
 	//TODO: pēc auditing pielikt citu pārbaudi employee
@@ -235,7 +230,6 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 		
 	}
 	
-	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
 	public void deleteByCourseIdAndPlanId(int idPlan, int idCourse, int employeeId) throws Exception {
 		CoursePlan coursePlan = coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(idPlan,idCourse);

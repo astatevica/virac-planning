@@ -16,5 +16,8 @@ public interface ICRUDScientificArticlesService extends ICRUDBase<ScientificArti
 	//Filter by CoAuthor
 	public abstract ArrayList<ScientificArticles> selectAllScientificArticlesByCoauthor(String coAuthors) throws Exception;
 	
+	//Select all articles by autocomplete
+	public abstract ArrayList<ScientificArticles> selectNameAutocomplete(String keyword) throws Exception;
+	
 		
 }

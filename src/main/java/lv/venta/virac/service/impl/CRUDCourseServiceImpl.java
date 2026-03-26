@@ -86,9 +86,7 @@ public class CRUDCourseServiceImpl implements ICRUDCourseService{
 
 	@Override
 	public ArrayList<Course> selectNameAutocomplete(String keyword){
-		System.out.println("Keyword: " + keyword);
 		ArrayList<Course> result = courseRepo.searchCourses(keyword);
-		System.out.println("ServiceImpl: " + result);
 		return result;		
 			
 	}

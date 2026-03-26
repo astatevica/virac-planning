@@ -2,6 +2,8 @@ package lv.venta.virac.service;
 
 import java.util.ArrayList;
 
+import lv.venta.virac.dto.ArticlePlanReponseDTO;
+import lv.venta.virac.dto.ScientificArticlesDTO;
 import lv.venta.virac.model.ArticlePlan;
 
 public interface ICRUDArticlePlanService extends ICRUDBase<ArticlePlan>{
@@ -15,5 +17,21 @@ public interface ICRUDArticlePlanService extends ICRUDBase<ArticlePlan>{
 		
 	//Filter by Plan
 	public abstract ArrayList<ArticlePlan> selectAllArticlePlanByPlan(int idPlan) throws Exception;
+	
+	//C - create autocomplete article
+	public abstract void createAutocompleteArticle(int idPlan, int idArticle, String articleComments, String publicationLink, 
+			int employeeId) throws Exception;
+	
+	//Create new article and attach to Plan
+	public abstract ArticlePlanReponseDTO createArticleAndAttachToPlan(int idPlan, ScientificArticlesDTO articleDTO, 
+			String articleComments, String publicationLink, int employeeId) throws Exception;
+
+	//Delete for User current Plan table
+	public abstract void deleteByArticleIdAndPlanId(int idPlan, int idArticle, int employeeId) throws Exception;
+	
+	//Update for User current Plan table
+	public abstract void updateByArticleIdAndPlanId(int idPlan, int idArticle, String articleComments,
+			String publicationLink, int employeeId) throws Exception;
+		
 		
 }

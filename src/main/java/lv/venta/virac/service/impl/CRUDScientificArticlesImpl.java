@@ -109,4 +109,10 @@ public class CRUDScientificArticlesImpl implements ICRUDScientificArticlesServic
 		return result;
 	}
 
+	@Override
+	public ArrayList<ScientificArticles> selectNameAutocomplete(String keyword) throws Exception {
+		ArrayList<ScientificArticles> result = scArtRepo.searchArticles(keyword);
+		return result;
+	}
+
 }

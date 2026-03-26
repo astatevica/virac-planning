@@ -9,10 +9,13 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lv.venta.virac.dto.ArticlePlanReponseDTO;
+import lv.venta.virac.dto.ScientificArticlesDTO;
 import lv.venta.virac.model.ArticlePlan;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.repo.IArticlePlanRepo;
+import lv.venta.virac.repo.IJournalRepo;
 import lv.venta.virac.repo.IPlanRepo;
 import lv.venta.virac.repo.IScientificArticlesRepo;
 import lv.venta.virac.service.ICRUDArticlePlanService;
@@ -28,6 +31,9 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 	
 	@Autowired
 	private IScientificArticlesRepo artRepo;
+	
+	@Autowired
+	private IJournalRepo journalRepo;
 	
 	@PersistenceContext
     private EntityManager entityManager;
@@ -123,6 +129,132 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 		}
 		
 		return result;
+	}
+
+	@Override
+	public void createAutocompleteArticle(int idPlan, int idArticle,  String articleComments, String publicationLink, int employeeId) throws Exception {
+		ArticlePlan ap = artPlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(idPlan,idArticle);
+        
+        if(idPlan == 0 || idArticle == 0){
+			throw new Exception("The input parameters are incorrect");
+		}
+        
+        Plan plan = planRepo.findById(idPlan).get();
+        if(plan == null) {
+        	throw new Exception("Plan not found");
+        }
+        
+        if(employeeId != plan.getEmployee().getIdEmployee()) {
+        	throw new Exception("This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan");
+        }
+        
+        ScientificArticles article = artRepo.findById(idArticle).get();
+        if(article == null) {
+        	throw new Exception("Article not found");
+        }
+        
+        if(ap != null) {
+            if(!ap.isDeleted()){
+                throw new Exception("Article already attached to this plan");
+            }
+            ap.setDeleted(false);
+            ap.setArticleComments(articleComments);
+            ap.setPublicationLink(publicationLink);
+            artPlanRepo.save(ap);
+            return;
+        }
+        ArticlePlan articlePlan = new ArticlePlan(plan, article, articleComments, publicationLink);
+        artPlanRepo.save(articlePlan);
+	}
+
+	@Override
+	public ArticlePlanReponseDTO createArticleAndAttachToPlan(int idPlan, ScientificArticlesDTO articleDTO,
+			String articleComments, String publicationLink, int employeeId) throws Exception {
+		//variables for easier use
+		String name = articleDTO.getName();
+		String coAuthors = articleDTO.getCoAuthors();
+		int idJournal = articleDTO.getIdJournal();
+		
+		//reads already made articles
+		ArrayList<ScientificArticles> articles = (ArrayList<ScientificArticles>) artRepo.findAll();
+        
+		//verifies that article and idPlan input parameters are not empty
+        if(name == null || coAuthors == null || idJournal == 0 || idPlan == 0){
+			throw new Exception("The input parameters are incorrect");
+		}
+        
+        //verifies that article already is not made
+        for (ScientificArticles art : articles) {
+            if (art.getName().equals(name) & art.getCoAuthors()==coAuthors & art.getJournal().getIdJournal() == idJournal & art.isDeleted( )== false) {
+                throw new Exception("Article: " + art.getName() + " already exists");
+            }
+        }
+        
+        //verifies that plan is correct
+        Plan plan = planRepo.findById(idPlan).get();
+        if(plan == null) {
+        	throw new Exception("Plan not found");
+        }    
+        
+        //verifies that plan is connected to right user
+        if(employeeId != plan.getEmployee().getIdEmployee()) {
+        	throw new Exception("This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan");
+        }
+	    
+        //Makes new Article after veryfing
+		ScientificArticles a = new ScientificArticles();
+	    a.setName(name);
+	    a.setCoAuthors(coAuthors);
+	    a.setJournal(journalRepo.findById(idJournal).get());
+	    ScientificArticles newArticle = artRepo.save(a);
+	    
+	    //Creates new Plan-Article relation
+	    ArticlePlan ap = new ArticlePlan();
+	    ap.setPlan(planRepo.findById(idPlan).get());
+	    ap.setScientificArticles(newArticle);
+	    ap.setDeleted(false);
+	    ap.setArticleComments(articleComments);
+	    ap.setPublicationLink(publicationLink);
+	    artPlanRepo.save(ap);
+	    
+	    //Returns ArticlePlan dto for frontend
+	    ArticlePlanReponseDTO dto = new ArticlePlanReponseDTO();
+	    dto.setName(name);
+	    dto.setIdPlan(idPlan);
+	    dto.setIdJournal(idJournal);
+	    dto.setIdArticle(idJournal);
+	    dto.setCoAuthors(coAuthors);
+	    dto.setArticleComments(articleComments);
+	    dto.setPublicationLink(publicationLink);
+
+	    return dto;
+	}
+
+	@Override
+	public void deleteByArticleIdAndPlanId(int idPlan, int idArticle, int employeeId) throws Exception {
+		ArticlePlan articlePlan = artPlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(idPlan,idArticle);
+    	if (articlePlan == null) throw new Exception("Article-Plan with Plan id:"+ idPlan +" and Article id: "+idArticle+" does not exist");
+    	if(employeeId != articlePlan.getCreatedBy()) {
+        	throw new Exception("This user: "+ articlePlan.getPlan().getEmployee().getName() + " " 
+    	+ articlePlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
+        }
+    	articlePlan.setDeleted(true); // SOFT DELETE
+    	artPlanRepo.save(articlePlan);  // SAVE, NOT DELETE
+	}
+
+	@Override
+	public void updateByArticleIdAndPlanId(int idPlan, int idArticle, String articleComments, String publicationLink,
+			int employeeId) throws Exception {
+		ArticlePlan articlePlan = artPlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(idPlan,idArticle);
+    	if (articlePlan == null) throw new Exception("Article-Plan with Plan id:"+ idPlan +" and Article id: "+idArticle+" does not exist");
+    	if(employeeId != articlePlan.getCreatedBy()) {
+        	throw new Exception("This user: "+ articlePlan.getPlan().getEmployee().getName() + " " 
+    	+ articlePlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
+        }
+        articlePlan.setArticleComments(articleComments);
+        articlePlan.setPublicationLink(publicationLink);
+        artPlanRepo.save(articlePlan);
+		
 	}
 
 }
