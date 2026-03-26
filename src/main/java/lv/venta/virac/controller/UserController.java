@@ -1,6 +1,8 @@
 package lv.venta.virac.controller;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ProjectPlanDTO;
 import lv.venta.virac.dto.UpdatePlanDTO;
+import lv.venta.virac.errors.ErrorResponse;
+import lv.venta.virac.errors.FieldErrorDetail;
 import lv.venta.virac.model.Course;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Project;
@@ -54,7 +58,7 @@ public class UserController {
 		this.courseService = courseService;
 		this.coursePlanService = coursePlanService;
 	}
-	
+
 	@GetMapping("/filter/plans/all")
 	@PreAuthorize("hasRole('USER')")
     public ResponseEntity<ArrayList<PlanDTO>> selectAllPlansByEmployee(
@@ -190,7 +194,6 @@ public class UserController {
             @PathVariable("id") int id) throws Exception {
 
         Plan pl = planService.retrieveById(id);
-        System.out.println(pl);
         return ResponseEntity.ok(
         		new PlanDTO(
      	               pl.getIdPlan(), pl.getEmployee().getIdEmployee(), pl.getYear().getIdYear(),pl.getNumOfProjects(),
@@ -216,14 +219,26 @@ public class UserController {
 	
 	//Update planDTO 
 	@PutMapping("/update/current-year/plan")
-    public ResponseEntity<Void> updatePlanForUserByOpenPlan(@Valid @RequestBody UpdatePlanDTO pl,
+    public ResponseEntity<?> updatePlanForUserByOpenPlan(@Valid @RequestBody UpdatePlanDTO pl,
             BindingResult result, Authentication authentication) throws Exception {
 			
 		User user = (User) authentication.getPrincipal();
 	    int employeeId = user.getEmployee().getIdEmployee();
 
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+	    if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+ 
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+ 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 
         planService.updatePlanForUserByOpenPlan(employeeId,pl.getNumOfProjects(),
@@ -266,7 +281,6 @@ public class UserController {
 		User user = (User) authentication.getPrincipal();
 	    int employeeId = user.getEmployee().getIdEmployee();
 	    
-		System.out.println(" idPlan: " + idPlan + " idCourse: " + idCourse + " WorkDone: " + workDone);
 		coursePlanService.createAutocompleteCourse(idPlan, idCourse, workDone, employeeId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -274,16 +288,32 @@ public class UserController {
 
 	//Post endpoint to get all new course data and idPlan to save in repo
 	@PostMapping("/add/course/{idPlan}/{workDone}")
-	public ResponseEntity<CoursePlanResponseDTO> createCourseForPlan(@PathVariable("idPlan") int idPlan, 
-			@PathVariable("workDone") String workDone, @RequestBody CourseDTO courseDTO, 
+	public ResponseEntity<?> createCourseForPlan(@PathVariable("idPlan") int idPlan, 
+			@PathVariable("workDone") String workDone, @Valid @RequestBody CourseDTO courseDTO, BindingResult result, 
 			Authentication authentication) throws Exception{
 		
 		User user = (User) authentication.getPrincipal();
 	    int employeeId = user.getEmployee().getIdEmployee();
 	    
-	    CoursePlanResponseDTO result = coursePlanService.createCourseAndAttachToPlan(idPlan, courseDTO, workDone, employeeId);
+	    if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+ 
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+ 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+	    
+	    CoursePlanResponseDTO resultReponse = coursePlanService.createCourseAndAttachToPlan(idPlan, courseDTO, workDone, employeeId);
 		
-	    return ResponseEntity.ok(result);
+	    return ResponseEntity.ok(resultReponse);
 	}
 	
 	//Delete endpoint for course-plan deleting
@@ -300,21 +330,30 @@ public class UserController {
 	}
 	
 	//Update endpoint for course-plan edit
-	//TODO: slash nebūs id nepieciešams
-	//TODO: @RequestBody CoursePlanResponseDTO dto kādā formātā sūta šurp json
 	@PutMapping("/update/course-plan")
-    public ResponseEntity<Void> update(@Valid @RequestBody CoursePlanResponseDTO dto,
+    public ResponseEntity<?> update(@Valid @RequestBody CoursePlanResponseDTO dto,
             BindingResult result, Authentication authentication) throws Exception {
-		System.out.println(dto);
 		User user = (User) authentication.getPrincipal();
 	    int employeeId = user.getEmployee().getIdEmployee();
 
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().build();
+	    if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+ 
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+ 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
-
+	    
         coursePlanService.updateByCourseIdAndPlanId(dto.getIdPlan(),dto.getIdCourse(),dto.getWorkDone(), employeeId);
         return ResponseEntity.ok().build();
     }
-
+	
 }
