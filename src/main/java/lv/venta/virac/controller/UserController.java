@@ -313,7 +313,6 @@ public class UserController {
 	}
 
 	//CREATE Post endpoint to get all new course data and idPlan to save in repo
-	//TODO:paskatīties errors
 	@PostMapping("/add/course/{idPlan}")
 	public ResponseEntity<?> createCourseForPlan(@PathVariable("idPlan") int idPlan, 
 			@Valid @RequestBody CoursePlanWorkDTO courseDTO, BindingResult result, 
@@ -322,7 +321,6 @@ public class UserController {
 		User user = (User) authentication.getPrincipal();
 	    int employeeId = user.getEmployee().getIdEmployee();
 	    
-	    System.out.println(result.getAllErrors());
 	    if (result.hasErrors()) {
             // Convert FieldErrors to FieldErrorDetail objects
             List<FieldErrorDetail> errors = result.getFieldErrors().stream()
@@ -332,10 +330,8 @@ public class UserController {
                             error.getRejectedValue()
                     ))
                     .collect(Collectors.toList());
-            System.out.println(errors.toString());
             // Create ErrorResponse
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
-            System.out.println(errorResponse);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 	    
@@ -373,10 +369,8 @@ public class UserController {
                             error.getRejectedValue()
                     ))
                     .collect(Collectors.toList());
-            System.out.println(errors.toString());
             // Create ErrorResponse
             ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
-            System.out.println(errorResponse);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 	    
@@ -398,7 +392,7 @@ public class UserController {
 	                		dto.getIdArticle(),
 	                		dto.getName(),
 	                		dto.getCoAuthors(),
-	                		dto.getJournal().getName() //TODO: paskatīties vai šis ir ok
+	                		dto.getJournal().getName()
 	                ))
 	                .toList());
 		

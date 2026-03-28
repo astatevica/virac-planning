@@ -24,6 +24,7 @@ export default function UserDashboard() {
   const [courseWorkDone, setCourseWorkDone] = useState("");
   const [isCourseSaving, setIsCourseSaving] = useState(false);
   const [courseModalMessage, setCourseModalMessage] = useState("");
+  const [courseModalFieldErrors, setCourseModalFieldErrors] = useState({});
   const [newCourse, setNewCourse] = useState({
     name: "",
     ectsCredits: "",
@@ -36,6 +37,11 @@ export default function UserDashboard() {
   const [isCourseEditModalOpen, setIsCourseEditModalOpen] = useState(false);
   const [courseEditMessage, setCourseEditMessage] = useState("");
   const [courseEditWorkDone, setCourseEditWorkDone] = useState("");
+  const [courseEditName, setCourseEditName] = useState("");
+  const [courseEditEcts, setCourseEditEcts] = useState("");
+  const [courseEditSemester, setCourseEditSemester] = useState("");
+  const [courseEditFaculty, setCourseEditFaculty] = useState("");
+  const [courseEditFieldErrors, setCourseEditFieldErrors] = useState({});
   const [courseEditTarget, setCourseEditTarget] = useState(null);
   const [isCourseEditing, setIsCourseEditing] = useState(false);
 
@@ -99,11 +105,36 @@ export default function UserDashboard() {
     if (typeof msg === "string") return msg;
     if (typeof msg === "number" || typeof msg === "boolean") return String(msg);
     try {
+      if (typeof msg.message === "string" && Array.isArray(msg.errors)) {
+        const details = msg.errors
+          .map((e) => {
+            const field = e?.field ? `${e.field}: ` : "";
+            const message = e?.message || "";
+            const rejected =
+              e?.rejectedValue !== null && e?.rejectedValue !== undefined
+                ? ` (rejected: ${e.rejectedValue})`
+                : "";
+            return `${field}${message}${rejected}`.trim();
+          })
+          .filter(Boolean)
+          .join("; ");
+        return details ? `${msg.message}. ${details}` : msg.message;
+      }
       if (typeof msg.message === "string") return msg.message;
       return JSON.stringify(msg);
     } catch {
       return String(msg);
     }
+  };
+
+  const extractFieldErrors = (err) => {
+    const data = err?.response?.data;
+    if (!data || !Array.isArray(data.errors)) return {};
+    const map = {};
+    data.errors.forEach((e) => {
+      if (e?.field) map[e.field] = e.message || "Invalid value";
+    });
+    return map;
   };
 
   const attachPlanContextToOpenPlan = useCallback(async (idPlan, overrides = {}) => {
@@ -433,6 +464,7 @@ export default function UserDashboard() {
     setSelectedCourse(null);
     setCourseWorkDone("");
     setCourseModalMessage("");
+    setCourseModalFieldErrors({});
     setNewCourse({
       name: "",
       ectsCredits: "",
@@ -515,7 +547,12 @@ export default function UserDashboard() {
   const openCourseEditModal = (course) => {
     setCourseEditTarget(course);
     setCourseEditWorkDone(getWorkDoneText(course));
+    setCourseEditName(course?.name || "");
+    setCourseEditEcts(course?.ectsCredits ?? "");
+    setCourseEditSemester(course?.semester || "");
+    setCourseEditFaculty(course?.faculty || "");
     setCourseEditMessage("");
+    setCourseEditFieldErrors({});
     setIsCourseEditModalOpen(true);
   };
 
@@ -523,84 +560,37 @@ export default function UserDashboard() {
     setIsCourseEditModalOpen(false);
     setCourseEditTarget(null);
     setCourseEditWorkDone("");
+    setCourseEditName("");
+    setCourseEditEcts("");
+    setCourseEditSemester("");
+    setCourseEditFaculty("");
     setCourseEditMessage("");
+    setCourseEditFieldErrors({});
   };
 
   const handleSaveCourseFromModal = async () => {
     if (!openPlan?.idPlan) return;
 
-    if (!courseWorkDone.trim()) {
-      setCourseModalMessage("Please provide work done for course.");
-      return;
-    }
-
     try {
       setIsCourseSaving(true);
+      setCourseModalFieldErrors({});
 
       if (courseMode === "existing") {
-        if (!selectedCourse?.idCourse) {
-          setCourseModalMessage("Please select course from autocomplete.");
-          return;
-        }
-        const alreadyAdded = openPlanCourses.some((c) => {
-          const existingId = c?.idCourse ?? c?.courseId ?? c?.course?.idCourse;
-          return Number(existingId) === Number(selectedCourse.idCourse);
-        });
-        if (alreadyAdded) {
-          setCourseModalMessage("This course is already attached to the plan.");
-          return;
-        }
-
         await UserPlanService.saveCoursePlan({
           idPlan: openPlan.idPlan,
-          idCourse: selectedCourse.idCourse,
+          idCourse: selectedCourse?.idCourse ?? 0,
           workDone: courseWorkDone.trim()
         });
         setLocallyDeletedCourseIds((prev) =>
-          prev.filter((id) => Number(id) !== Number(selectedCourse.idCourse))
+          prev.filter((id) => Number(id) !== Number(selectedCourse?.idCourse))
         );
       } else {
-        if (
-          !newCourse.name.trim() ||
-          !newCourse.ectsCredits ||
-          !newCourse.semester.trim() ||
-          !newCourse.faculty.trim()
-        ) {
-          setCourseModalMessage("Please fill all new course fields.");
-          return;
-        }
-        const normalizedNew = {
-          name: newCourse.name.trim().toLowerCase(),
-          ectsCredits: Number(newCourse.ectsCredits),
-          semester: newCourse.semester.trim().toLowerCase(),
-          faculty: newCourse.faculty.trim().toLowerCase()
-        };
-        const duplicateByFields = openPlanCourses.some((c) => {
-          const existing = {
-            name: (c?.name || c?.courseName || "").toString().trim().toLowerCase(),
-            ectsCredits: Number(c?.ectsCredits ?? c?.ects ?? 0),
-            semester: (c?.semester || "").toString().trim().toLowerCase(),
-            faculty: (c?.faculty || "").toString().trim().toLowerCase()
-          };
-          return (
-            existing.name &&
-            existing.name === normalizedNew.name &&
-            existing.ectsCredits === normalizedNew.ectsCredits &&
-            existing.semester === normalizedNew.semester &&
-            existing.faculty === normalizedNew.faculty
-          );
-        });
-        if (duplicateByFields) {
-          setCourseModalMessage("This course already exists in the plan.");
-          return;
-        }
-
         const createRes = await UserPlanService.createCourseForPlan(
           openPlan.idPlan,
           {
             idCourse: 0,
             name: newCourse.name.trim(),
-            ectsCredits: Number(newCourse.ectsCredits),
+            ectsCredits: Number(newCourse.ectsCredits) || 0,
             semester: newCourse.semester.trim(),
             faculty: newCourse.faculty.trim(),
             workDone: courseWorkDone.trim()
@@ -616,10 +606,11 @@ export default function UserDashboard() {
 
       await attachPlanContextToOpenPlan(openPlan.idPlan);
       setCourseModalMessage("");
-      setSaveMessage("Course saved and attached to plan.");
+      // setSaveMessage("Course saved and attached to plan.");
       closeCourseModal();
     } catch (err) {
       console.error(err);
+      setCourseModalFieldErrors(extractFieldErrors(err));
       setCourseModalMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to save course."));
     } finally {
       setIsCourseSaving(false);
@@ -628,15 +619,6 @@ export default function UserDashboard() {
 
   const handleSaveArticleFromModal = async () => {
     if (!openPlan?.idPlan) return;
-
-    if (!articleComments.trim()) {
-      setArticleModalMessage("Please provide article comments.");
-      return;
-    }
-    if (!articleLink.trim()) {
-      setArticleModalMessage("Please provide publication link.");
-      return;
-    }
 
     try {
       setIsArticleSaving(true);
@@ -647,24 +629,7 @@ export default function UserDashboard() {
           selectedArticle?.idScientificArticles ??
           selectedArticle?.idScientificArticle ??
           selectedArticle?.articleId ??
-          null;
-        if (!selectedId) {
-          setArticleModalMessage("Please select article from autocomplete.");
-          return;
-        }
-        const alreadyAdded = openPlanArticles.some((a) => {
-          const existingId =
-            a?.idArticle ??
-            a?.idScientificArticles ??
-            a?.idScientificArticle ??
-            a?.articleId ??
-            null;
-          return Number(existingId) === Number(selectedId);
-        });
-        if (alreadyAdded) {
-          setArticleModalMessage("This article is already attached to the plan.");
-          return;
-        }
+          0;
 
         await UserPlanService.saveArticlePlan(
           selectedId,
@@ -676,33 +641,6 @@ export default function UserDashboard() {
           prev.filter((id) => Number(id) !== Number(selectedId))
         );
       } else {
-        if (!newArticle.name.trim() || !newArticle.idJournal) {
-          setArticleModalMessage("Please fill article name and journal.");
-          return;
-        }
-        const normalizedNew = {
-          name: newArticle.name.trim().toLowerCase(),
-          coAuthors: newArticle.coAuthors.trim().toLowerCase(),
-          idJournal: Number(newArticle.idJournal)
-        };
-        const duplicateByFields = openPlanArticles.some((a) => {
-          const existing = {
-            name: (a?.name || a?.title || "").toString().trim().toLowerCase(),
-            coAuthors: (a?.coAuthors || a?.coAuthor || "").toString().trim().toLowerCase(),
-            idJournal: Number(a?.idJournal ?? a?.journalId ?? 0)
-          };
-          return (
-            existing.name &&
-            existing.name === normalizedNew.name &&
-            existing.coAuthors === normalizedNew.coAuthors &&
-            existing.idJournal === normalizedNew.idJournal
-          );
-        });
-        if (duplicateByFields) {
-          setArticleModalMessage("This article already exists in the plan.");
-          return;
-        }
-
         const createRes = await UserPlanService.createArticleForPlan(
           openPlan.idPlan,
           articleComments.trim(),
@@ -710,7 +648,7 @@ export default function UserDashboard() {
           {
             name: newArticle.name.trim(),
             coAuthors: newArticle.coAuthors.trim(),
-            idJournal: Number(newArticle.idJournal)
+            idJournal: Number(newArticle.idJournal) || 0
           }
         );
         const createdId = createRes?.data?.idArticle ?? createRes?.data?.idScientificArticles ?? null;
@@ -742,9 +680,16 @@ export default function UserDashboard() {
       faculty: "Faculty",
       workDone: "Work done"
     };
+    const hiddenKeys = new Set(["idPlan"]);
 
     return Object.entries(course || {})
-      .filter(([, value]) => value !== null && value !== undefined && value !== "" && typeof value !== "object")
+      .filter(([key, value]) =>
+        !hiddenKeys.has(key) &&
+        value !== null &&
+        value !== undefined &&
+        value !== "" &&
+        typeof value !== "object"
+      )
       .map(([key, value]) => `${labels[key] || key}: ${value}`)
       .join(" | ");
   };
@@ -805,11 +750,11 @@ export default function UserDashboard() {
       course?.courseDTO?.idCourse ??
       null;
     if (!idCourse) {
-      setCourseDeleteMessage("Course ID not found, cannot delete.");
+      // setCourseDeleteMessage("Course ID not found, cannot delete.");
       return;
     }
     if (!openPlan?.idPlan) {
-      setCourseDeleteMessage("Plan is not selected.");
+      // setCourseDeleteMessage("Plan is not selected.");
       return;
     }
 
@@ -836,7 +781,7 @@ export default function UserDashboard() {
       });
       await attachPlanContextToOpenPlan(openPlan.idPlan);
       setCourseDeleteMessage("");
-      setSaveMessage("Course deleted from plan.");
+      // setSaveMessage("Course deleted from plan.");
       closeCourseDeleteModal();
     } catch (err) {
       console.error(err);
@@ -888,7 +833,7 @@ export default function UserDashboard() {
   const handleEditCoursePlan = async () => {
     if (!courseEditTarget) return;
     if (!openPlan?.idPlan) {
-      setCourseEditMessage("Plan is not selected.");
+      // setCourseEditMessage("Plan is not selected.");
       return;
     }
     const idCourse =
@@ -898,19 +843,24 @@ export default function UserDashboard() {
       courseEditTarget?.courseDTO?.idCourse ??
       null;
     if (!idCourse) {
-      setCourseEditMessage("Course ID not found.");
+      // setCourseEditMessage("Course ID not found.");
       return;
     }
     if (!courseEditWorkDone.trim()) {
-      setCourseEditMessage("Please provide work done.");
+      // setCourseEditMessage("Please provide work done.");
       return;
     }
 
     try {
       setIsCourseEditing(true);
+      setCourseEditFieldErrors({});
       const dto = {
         idPlan: openPlan.idPlan,
         idCourse,
+        name: courseEditName.trim(),
+        ectsCredits: Number(courseEditEcts) || 0,
+        semester: courseEditSemester.trim(),
+        faculty: courseEditFaculty.trim(),
         workDone: courseEditWorkDone.trim()
       };
       await UserPlanService.updateCoursePlanWorkDone(dto);
@@ -923,14 +873,22 @@ export default function UserDashboard() {
             c?.courseDTO?.idCourse ??
             null;
           if (Number(cid) !== Number(idCourse)) return c;
-          return { ...c, workDone: courseEditWorkDone.trim() };
+          return {
+            ...c,
+            name: courseEditName.trim(),
+            ectsCredits: Number(courseEditEcts) || 0,
+            semester: courseEditSemester.trim(),
+            faculty: courseEditFaculty.trim(),
+            workDone: courseEditWorkDone.trim()
+          };
         })
       );
       await attachPlanContextToOpenPlan(openPlan.idPlan);
-      setSaveMessage("Course updated.");
+      // setSaveMessage("Course updated.");
       closeCourseEditModal();
     } catch (err) {
       console.error(err);
+      setCourseEditFieldErrors(extractFieldErrors(err));
       setCourseEditMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to update course."));
     } finally {
       setIsCourseEditing(false);
@@ -1300,6 +1258,11 @@ export default function UserDashboard() {
                   onChange={(e) => setNewCourse((prev) => ({ ...prev, name: e.target.value }))}
                   style={{ width: "100%", marginBottom: 6 }}
                 />
+                {courseModalFieldErrors.name && (
+                  <div style={{ color: "red", marginBottom: 6 }}>
+                    {courseModalFieldErrors.name}
+                  </div>
+                )}
                 <label>ECTS</label>
                 <input
                   type="number"
@@ -1307,6 +1270,11 @@ export default function UserDashboard() {
                   onChange={(e) => setNewCourse((prev) => ({ ...prev, ectsCredits: e.target.value }))}
                   style={{ width: "100%", marginBottom: 6 }}
                 />
+                {courseModalFieldErrors.ectsCredits && (
+                  <div style={{ color: "red", marginBottom: 6 }}>
+                    {courseModalFieldErrors.ectsCredits}
+                  </div>
+                )}
                 <label>Semester</label>
                 <input
                   type="text"
@@ -1314,6 +1282,11 @@ export default function UserDashboard() {
                   onChange={(e) => setNewCourse((prev) => ({ ...prev, semester: e.target.value }))}
                   style={{ width: "100%", marginBottom: 6 }}
                 />
+                {courseModalFieldErrors.semester && (
+                  <div style={{ color: "red", marginBottom: 6 }}>
+                    {courseModalFieldErrors.semester}
+                  </div>
+                )}
                 <label>Faculty</label>
                 <input
                   type="text"
@@ -1321,6 +1294,11 @@ export default function UserDashboard() {
                   onChange={(e) => setNewCourse((prev) => ({ ...prev, faculty: e.target.value }))}
                   style={{ width: "100%" }}
                 />
+                {courseModalFieldErrors.faculty && (
+                  <div style={{ color: "red", marginTop: 6 }}>
+                    {courseModalFieldErrors.faculty}
+                  </div>
+                )}
               </div>
             )}
 
@@ -1332,6 +1310,9 @@ export default function UserDashboard() {
                 onChange={(e) => setCourseWorkDone(e.target.value)}
                 style={{ width: "100%", marginTop: 4, resize: "vertical" }}
               />
+              {courseModalFieldErrors.workDone && (
+                <div style={{ color: "red", marginTop: 4 }}>{courseModalFieldErrors.workDone}</div>
+              )}
             </div>
 
             <button type="button" onClick={handleSaveCourseFromModal} disabled={isCourseSaving}>
@@ -1410,6 +1391,54 @@ export default function UserDashboard() {
               <div>{courseEditTarget ? formatCourseText(courseEditTarget) : ""}</div>
             </div>
             <div style={{ marginBottom: 10 }}>
+              <label>Name</label>
+              <input
+                type="text"
+                value={courseEditName}
+                onChange={(e) => setCourseEditName(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {courseEditFieldErrors.name && (
+                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.name}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>ECTS</label>
+              <input
+                type="number"
+                value={courseEditEcts}
+                onChange={(e) => setCourseEditEcts(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {courseEditFieldErrors.ectsCredits && (
+                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.ectsCredits}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Semester</label>
+              <input
+                type="text"
+                value={courseEditSemester}
+                onChange={(e) => setCourseEditSemester(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {courseEditFieldErrors.semester && (
+                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.semester}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Faculty</label>
+              <input
+                type="text"
+                value={courseEditFaculty}
+                onChange={(e) => setCourseEditFaculty(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {courseEditFieldErrors.faculty && (
+                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.faculty}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
               <label>Work done</label>
               <textarea
                 rows={3}
@@ -1417,6 +1446,9 @@ export default function UserDashboard() {
                 onChange={(e) => setCourseEditWorkDone(e.target.value)}
                 style={{ width: "100%", marginTop: 4, resize: "vertical" }}
               />
+              {courseEditFieldErrors.workDone && (
+                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.workDone}</div>
+              )}
             </div>
             <button type="button" onClick={handleEditCoursePlan} disabled={isCourseEditing}>
               {isCourseEditing ? "Saving..." : "Save"}
