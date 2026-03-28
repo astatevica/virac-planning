@@ -20,20 +20,23 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lv.venta.virac.dto.ArticleDTO;
+import lv.venta.virac.dto.ArticlePlanCommentsDTO;
 import lv.venta.virac.dto.ArticlePlanReponseDTO;
 import lv.venta.virac.dto.CourseAutocompleteDTO;
 import lv.venta.virac.dto.CourseDTO;
 import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.CoursePlanWorkDTO;
 import lv.venta.virac.dto.FullPlanDTO;
+import lv.venta.virac.dto.JournalDTO;
 import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ProjectPlanDTO;
-import lv.venta.virac.dto.ScientificArticlesDTO;
+import lv.venta.virac.dto.ScientificArticlesCommentsDTO;
 import lv.venta.virac.dto.UpdatePlanDTO;
 import lv.venta.virac.errors.ErrorResponse;
 import lv.venta.virac.errors.FieldErrorDetail;
 import lv.venta.virac.model.Course;
+import lv.venta.virac.model.Journal;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectPlan;
@@ -41,6 +44,7 @@ import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.service.ICRUDArticlePlanService;
 import lv.venta.virac.service.ICRUDCoursePlanService;
 import lv.venta.virac.service.ICRUDCourseService;
+import lv.venta.virac.service.ICRUDJournalService;
 import lv.venta.virac.service.ICRUDPlanService;
 import lv.venta.virac.service.ICRUDProjectPlanService;
 import lv.venta.virac.service.ICRUDProjectService;
@@ -59,10 +63,11 @@ public class UserController {
 	private ICRUDCoursePlanService coursePlanService;
 	private ICRUDScientificArticlesService articlesService;
 	private ICRUDArticlePlanService artPlanService;
+	private ICRUDJournalService journalService;
 	
 	public UserController(ICRUDPlanService planService, ICRUDProjectPlanService projPlanService, 
 			ICRUDProjectService projService, ICRUDCourseService courseService,ICRUDCoursePlanService coursePlanService,
-			ICRUDScientificArticlesService articlesService, ICRUDArticlePlanService artPlanService) {
+			ICRUDScientificArticlesService articlesService, ICRUDArticlePlanService artPlanService, ICRUDJournalService journalService) {
 		this.planService = planService;
 		this.projPlanService = projPlanService;
 		this.projService = projService;
@@ -70,6 +75,7 @@ public class UserController {
 		this.coursePlanService = coursePlanService;
 		this.articlesService = articlesService;
 		this.artPlanService = artPlanService;
+		this.journalService = journalService;
 	}
 
 	@GetMapping("/filter/plans/all")
@@ -380,6 +386,71 @@ public class UserController {
 	
 	//---------------------------- ARTICLE SECTION -------------------------------------//
 	
+	//GET Journals for dropdown list
+	@GetMapping("/journals/all")
+    public ResponseEntity<?> getAllJournals(@Valid JournalDTO dto, BindingResult result) throws Exception {
+		
+		//Do not need to check user
+        ArrayList<Journal> journals = journalService.retrieveAll();
+        
+        if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        ArrayList<JournalDTO> response =
+        	    new ArrayList<>(
+        	    		journals.stream()
+        	            .map(jou -> new JournalDTO(
+        	            	jou.getIdJournal(),
+        	                jou.getName()
+        	            ))
+        	            .toList()
+        	    );
+        return ResponseEntity.ok(response);
+    }
+
+	//GET Journal by id
+    @GetMapping("/journals/{idJournal}")
+    public ResponseEntity<JournalDTO> getJournalById(@PathVariable("idJournal") int idJournal) throws Exception {
+    	
+    	//Do not need to check user
+        Journal jou = journalService.retrieveById(idJournal);
+        return ResponseEntity.ok(new JournalDTO(jou.getIdJournal(),jou.getName()));
+    }
+
+    //CREATE new journal
+    @PostMapping("/journals/add")
+    public ResponseEntity<?> createNewJournal(@Valid @RequestBody JournalDTO dto, BindingResult result) throws Exception {
+    	//Do not need to check user TODO:check this
+    	
+    	if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+
+        journalService.create(dto.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+	
 	//Gets from frontend autocomplete for article name
 	@GetMapping("/article/autocomplete/{keyword}")
 	public ResponseEntity<ArrayList<ArticleDTO>> selectArticleNameAutocomplete
@@ -400,24 +471,37 @@ public class UserController {
 	   		
 	}
 	
-	//Gets from frontend autocomplete article and plan to save in repo
-	@GetMapping("/articles/autocomplete/{idArticle}/{idPlan}/{comments}/{link}")
-	public ResponseEntity<Void> saveArticlePlan(@PathVariable("idArticle") int idArticle ,@PathVariable("idPlan") int idPlan,
-	        @PathVariable("comments") String comments, @PathVariable("link") String link, Authentication authentication) throws Exception{
+	//SAVE and gets from frontend autocomplete article and plan to save in repo
+	@GetMapping("/articles/autocomplete/{idArticle}/{idPlan}")
+	public ResponseEntity<?> saveArticlePlan(@PathVariable("idArticle") int idArticle ,@PathVariable("idPlan") int idPlan,
+			@Valid ArticlePlanCommentsDTO dto, BindingResult result, Authentication authentication) throws Exception{
 		
 		User user = (User) authentication.getPrincipal();
 	    int employeeId = user.getEmployee().getIdEmployee();
 	    
-		artPlanService.createAutocompleteArticle(idPlan, idArticle, comments, link, employeeId);
+	    if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+	    
+		artPlanService.createAutocompleteArticle(idPlan, idArticle, dto, employeeId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	//Post endpoint to get all new article data and idPlan to save in repo
-	@PostMapping("/add/article/{idPlan}/{comments}/{link}")
+	//CREATE endpoint to get all new article data and idPlan to save in repo
+	@PostMapping("/add/article/{idPlan}")
 	public ResponseEntity<?> createArticleForPlan(@PathVariable("idPlan") int idPlan, 
-			@PathVariable("comments") String comments,@PathVariable("link") String link, 
-			@Valid @RequestBody ScientificArticlesDTO articleDTO, BindingResult result, 
+			@Valid @RequestBody ScientificArticlesCommentsDTO articleDTO, BindingResult result, 
 			Authentication authentication) throws Exception{
 		
 		User user = (User) authentication.getPrincipal();
@@ -439,7 +523,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 	    
-	    ArticlePlanReponseDTO resultReponse = artPlanService.createArticleAndAttachToPlan(idPlan,  articleDTO, comments, link, employeeId);
+	    ArticlePlanReponseDTO resultReponse = artPlanService.createArticleAndAttachToPlan(idPlan, articleDTO, employeeId);
 		
 	    return ResponseEntity.ok(resultReponse);
 	}

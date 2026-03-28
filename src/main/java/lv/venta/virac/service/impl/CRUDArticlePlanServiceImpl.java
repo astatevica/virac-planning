@@ -9,8 +9,9 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import lv.venta.virac.dto.ArticlePlanCommentsDTO;
 import lv.venta.virac.dto.ArticlePlanReponseDTO;
-import lv.venta.virac.dto.ScientificArticlesDTO;
+import lv.venta.virac.dto.ScientificArticlesCommentsDTO;
 import lv.venta.virac.model.ArticlePlan;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.ScientificArticles;
@@ -132,7 +133,7 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 	}
 
 	@Override
-	public void createAutocompleteArticle(int idPlan, int idArticle,  String articleComments, String publicationLink, int employeeId) throws Exception {
+	public void createAutocompleteArticle(int idPlan, int idArticle,  ArticlePlanCommentsDTO dto, int employeeId) throws Exception {
 		ArticlePlan ap = artPlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(idPlan,idArticle);
         
         if(idPlan == 0 || idArticle == 0){
@@ -158,22 +159,24 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
                 throw new Exception("Article already attached to this plan");
             }
             ap.setDeleted(false);
-            ap.setArticleComments(articleComments);
-            ap.setPublicationLink(publicationLink);
+            ap.setArticleComments(dto.getComments());
+            ap.setPublicationLink(dto.getLink());
             artPlanRepo.save(ap);
             return;
         }
-        ArticlePlan articlePlan = new ArticlePlan(plan, article, articleComments, publicationLink);
+        ArticlePlan articlePlan = new ArticlePlan(plan, article, dto.getComments(), dto.getLink());
         artPlanRepo.save(articlePlan);
 	}
 
 	@Override
-	public ArticlePlanReponseDTO createArticleAndAttachToPlan(int idPlan, ScientificArticlesDTO articleDTO,
-			String articleComments, String publicationLink, int employeeId) throws Exception {
+	public ArticlePlanReponseDTO createArticleAndAttachToPlan(int idPlan, ScientificArticlesCommentsDTO articleDTO,
+			int employeeId) throws Exception {
 		//variables for easier use
 		String name = articleDTO.getName();
 		String coAuthors = articleDTO.getCoAuthors();
 		int idJournal = articleDTO.getIdJournal();
+		String comments = articleDTO.getComments();
+		String link = articleDTO.getLink();
 		
 		//reads already made articles
 		ArrayList<ScientificArticles> articles = (ArrayList<ScientificArticles>) artRepo.findAll();
@@ -213,8 +216,8 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 	    ap.setPlan(planRepo.findById(idPlan).get());
 	    ap.setScientificArticles(newArticle);
 	    ap.setDeleted(false);
-	    ap.setArticleComments(articleComments);
-	    ap.setPublicationLink(publicationLink);
+	    ap.setArticleComments(comments);
+	    ap.setPublicationLink(link);
 	    artPlanRepo.save(ap);
 	    
 	    //Returns ArticlePlan dto for frontend
@@ -224,8 +227,8 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 	    dto.setIdJournal(idJournal);
 	    dto.setIdArticle(idJournal);
 	    dto.setCoAuthors(coAuthors);
-	    dto.setArticleComments(articleComments);
-	    dto.setPublicationLink(publicationLink);
+	    dto.setArticleComments(comments);
+	    dto.setPublicationLink(link);
 
 	    return dto;
 	}

@@ -10,5 +10,6 @@ public interface ICRUDJournalService extends ICRUDBase<Journal>{
 			
 	//U - update
 	public abstract void updateById(int id, String name) throws Exception;
+	
 		
 }

@@ -9,15 +9,12 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@AllArgsConstructor
-public class ArticlePlanReponseDTO {
+public class ScientificArticlesCommentsDTO {
 
-	@Min(value = 1, message = "idPlan must be not null")
-	private int idPlan;
-	
-	@Min(value = 1, message = "idArticle must be not null")
+	//Can be empty if coming from new course entity
 	private int idArticle;
 	
 	@NotBlank(message = "Name is required")
@@ -31,8 +28,8 @@ public class ArticlePlanReponseDTO {
 	private int idJournal;
 	
 	@Size(min = 0, max = 150, message = "Comments must be between 0 and 150 characters")
-	private String articleComments;
+	private String comments;
 	
 	@Size(min = 3, max = 50, message = "Link must be between 3 and 50 characters")
-	private String publicationLink;
+	private String link;
 }
