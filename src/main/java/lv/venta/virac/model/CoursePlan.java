@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,6 +45,7 @@ public class CoursePlan extends Auditable{
 	private Course course;
 	
 	@Column(name = "workDone")
+	@Size(min = 3)
 	private String workDone;
 	
 	@Column(name = "deleted")

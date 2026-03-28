@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lv.venta.virac.dto.CourseDTO;
 import lv.venta.virac.dto.CoursePlanResponseDTO;
+import lv.venta.virac.dto.CoursePlanWorkDTO;
 import lv.venta.virac.model.Course;
 import lv.venta.virac.model.CoursePlan;
 import lv.venta.virac.model.Plan;
@@ -166,12 +166,13 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	
 	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
-	public CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CourseDTO courseDTO, String workDone, int employeeId) throws Exception {
+	public CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CoursePlanWorkDTO courseDTO, int employeeId) throws Exception {
 		//variables for easier use
 		String name = courseDTO.getName();
 		int ectsCredits = courseDTO.getEctsCredits();
 		String semester = courseDTO.getSemester();
 		String faculty = courseDTO.getFaculty();
+		String workDone = courseDTO.getWorkDone();
 		System.out.println("Name: " + name + " ECTS: " + ectsCredits + " Semester: " + semester + " Faculty: " + faculty);
 		
 		//reads already made courses
@@ -206,7 +207,6 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	    c.setEctsCredits(ectsCredits);
 	    c.setSemester(semester);
 	    c.setFaculty(faculty);
-	    //c.setCreateDate(LocalDateTime.now()); //because Jpa for auditing thinks that this is update not save
 	    Course newCourse = courseRepo.save(c);
 	    
 	    //Creates new Plan-Course relation
@@ -215,7 +215,6 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	    cp.setCourse(newCourse);
 	    cp.setDeleted(false);
 	    cp.setWorkDone(workDone);
-	    //cp.setCreateDate(LocalDateTime.now()); //because Jpa for auditing thinks that this is update not save
 	    coursePlanRepo.save(cp);
 	    
 	    //Returns CoursePlan dto for frontend

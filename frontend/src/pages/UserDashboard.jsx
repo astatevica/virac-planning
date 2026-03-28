@@ -327,11 +327,21 @@ export default function UserDashboard() {
 
     const loadJournals = async () => {
       try {
-        const res = await JournalService.getAll();
+        const res = await api.get("/user/journal");
         setArticleJournals(res.data || []);
       } catch (err) {
-        console.error(err);
-        setArticleJournals([]);
+        try {
+          const res = await api.get("/journal");
+          setArticleJournals(res.data || []);
+        } catch (fallbackErr) {
+          try {
+            const res = await JournalService.getAll();
+            setArticleJournals(res.data || []);
+          } catch (finalErr) {
+            console.error(finalErr);
+            setArticleJournals([]);
+          }
+        }
       }
     };
 
@@ -541,11 +551,11 @@ export default function UserDashboard() {
           return;
         }
 
-        await UserPlanService.saveCoursePlan(
-          selectedCourse.idCourse,
-          openPlan.idPlan,
-          courseWorkDone.trim()
-        );
+        await UserPlanService.saveCoursePlan({
+          idPlan: openPlan.idPlan,
+          idCourse: selectedCourse.idCourse,
+          workDone: courseWorkDone.trim()
+        });
         setLocallyDeletedCourseIds((prev) =>
           prev.filter((id) => Number(id) !== Number(selectedCourse.idCourse))
         );
@@ -585,12 +595,17 @@ export default function UserDashboard() {
           return;
         }
 
-        const createRes = await UserPlanService.createCourseForPlan(openPlan.idPlan, courseWorkDone.trim(), {
-          name: newCourse.name.trim(),
-          ectsCredits: Number(newCourse.ectsCredits),
-          semester: newCourse.semester.trim(),
-          faculty: newCourse.faculty.trim()
-        });
+        const createRes = await UserPlanService.createCourseForPlan(
+          openPlan.idPlan,
+          {
+            idCourse: 0,
+            name: newCourse.name.trim(),
+            ectsCredits: Number(newCourse.ectsCredits),
+            semester: newCourse.semester.trim(),
+            faculty: newCourse.faculty.trim(),
+            workDone: courseWorkDone.trim()
+          }
+        );
         const createdId = createRes?.data?.idCourse;
         if (createdId) {
           setLocallyDeletedCourseIds((prev) =>
@@ -599,9 +614,7 @@ export default function UserDashboard() {
         }
       }
 
-      await attachPlanContextToOpenPlan(openPlan.idPlan, {
-        deletedArticleIds: [idArticle, ...locallyDeletedArticleIds]
-      });
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
       setCourseModalMessage("");
       setSaveMessage("Course saved and attached to plan.");
       closeCourseModal();
@@ -900,12 +913,7 @@ export default function UserDashboard() {
         idCourse,
         workDone: courseEditWorkDone.trim()
       };
-      await UserPlanService.updateCoursePlanWorkDone(
-        openPlan.idPlan,
-        idCourse,
-        courseEditWorkDone.trim(),
-        dto
-      );
+      await UserPlanService.updateCoursePlanWorkDone(dto);
       setOpenPlanCourses((prev) =>
         prev.map((c) => {
           const cid =

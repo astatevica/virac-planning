@@ -30,22 +30,17 @@ const updatePlanForUserByOpenPlan = (planDto) =>
 const searchCoursesAutocomplete = (keyword) =>
   api.get(`${API}/courses/autocomplete/${encodeURIComponent(keyword)}`);
 
-const saveCoursePlan = (idCourse, idPlan, workDone) =>
-  api.get(
-    `${API}/courses/autocomplete/${idCourse}/${idPlan}/${encodeURIComponent(workDone)}`
-  );
+const saveCoursePlan = (dto) =>
+  api.get(`${API}/courses/autocomplete`, { params: dto });
 
-const createCourseForPlan = (idPlan, workDone, courseDto) =>
-  api.post(`${API}/add/course/${idPlan}/${encodeURIComponent(workDone)}`, courseDto);
+const createCourseForPlan = (idPlan, courseDto) =>
+  api.post(`${API}/add/course/${idPlan}`, courseDto);
 
 const deleteCoursePlan = (idPlan, idCourse) =>
   api.delete(`${API}/delete/course-plan/${idPlan}/${idCourse}`);
 
-const updateCoursePlanWorkDone = (idPlan, idCourse, workDone, dto) =>
-  api.put(
-    `${API}/update/course-plan`,
-    dto
-  );
+const updateCoursePlanWorkDone = (dto) =>
+  api.put(`${API}/update/course-plan`, dto);
 
 const searchArticlesAutocomplete = (keyword) =>
   api.get(`${API}/article/autocomplete/${encodeURIComponent(keyword)}`);
