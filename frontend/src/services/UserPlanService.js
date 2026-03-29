@@ -45,14 +45,15 @@ const updateCoursePlanWorkDone = (dto) =>
 const searchArticlesAutocomplete = (keyword) =>
   api.get(`${API}/article/autocomplete/${encodeURIComponent(keyword)}`);
 
-const saveArticlePlan = (idArticle, idPlan, comments, link) =>
+const saveArticlePlan = (idArticle, idPlan, dto) =>
   api.get(
-    `${API}/articles/autocomplete/${idArticle}/${idPlan}/${encodeURIComponent(comments)}/${encodeURIComponent(link)}`
+    `${API}/articles/autocomplete/${idArticle}/${idPlan}`,
+    { params: dto }
   );
 
-const createArticleForPlan = (idPlan, comments, link, articleDto) =>
+const createArticleForPlan = (idPlan, articleDto) =>
   api.post(
-    `${API}/add/article/${idPlan}/${encodeURIComponent(comments)}/${encodeURIComponent(link)}`,
+    `${API}/add/article/${idPlan}`,
     articleDto
   );
 
@@ -64,6 +65,15 @@ const updateArticlePlan = (dto) =>
     `${API}/update/article-plan`,
     dto
   );
+
+const getAllJournals = () =>
+  api.get(`${API}/journals/all`);
+
+const getJournalById = (idJournal) =>
+  api.get(`${API}/journals/${idJournal}`);
+
+const createJournal = (dto) =>
+  api.post(`${API}/journals/add`, dto);
 
 const UserPlanService = {
   getAll,
@@ -83,7 +93,10 @@ const UserPlanService = {
   saveArticlePlan,
   createArticleForPlan,
   deleteArticlePlan,
-  updateArticlePlan
+  updateArticlePlan,
+  getAllJournals,
+  getJournalById,
+  createJournal
 };
 
 export default UserPlanService;

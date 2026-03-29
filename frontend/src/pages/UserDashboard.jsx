@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserPlanService from "../services/UserPlanService";
 import api from "../api/api";
-import JournalService from "../services/JournalService";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -60,6 +59,9 @@ export default function UserDashboard() {
     idJournal: ""
   });
   const [articleJournals, setArticleJournals] = useState([]);
+  const [newJournalName, setNewJournalName] = useState("");
+  const [isJournalCreating, setIsJournalCreating] = useState(false);
+  const [journalMessage, setJournalMessage] = useState("");
   const [isArticleDeleteModalOpen, setIsArticleDeleteModalOpen] = useState(false);
   const [isArticleDeleting, setIsArticleDeleting] = useState(false);
   const [articleDeleteMessage, setArticleDeleteMessage] = useState("");
@@ -67,6 +69,11 @@ export default function UserDashboard() {
   const [articleEditMessage, setArticleEditMessage] = useState("");
   const [articleEditComments, setArticleEditComments] = useState("");
   const [articleEditLink, setArticleEditLink] = useState("");
+  const [articleEditName, setArticleEditName] = useState("");
+  const [articleEditCoAuthors, setArticleEditCoAuthors] = useState("");
+  const [articleEditJournalId, setArticleEditJournalId] = useState("");
+  const [articleEditJournalName, setArticleEditJournalName] = useState("");
+  const [articleEditFieldErrors, setArticleEditFieldErrors] = useState({});
   const [articleEditTarget, setArticleEditTarget] = useState(null);
   const [isArticleEditing, setIsArticleEditing] = useState(false);
 
@@ -352,32 +359,44 @@ export default function UserDashboard() {
     return () => clearTimeout(timeoutId);
   }, [articleSearch, articleMode, isArticleModalOpen]);
 
+  const loadJournals = async () => {
+    try {
+      const res = await UserPlanService.getAllJournals();
+      setArticleJournals(res.data || []);
+    } catch (err) {
+      console.error(err);
+      setArticleJournals([]);
+    }
+  };
+
   useEffect(() => {
     if (!isArticleModalOpen || articleMode !== "new") return;
     if (articleJournals.length > 0) return;
+    loadJournals();
+  }, [isArticleModalOpen, articleMode, articleJournals.length]);
 
-    const loadJournals = async () => {
+  useEffect(() => {
+    if (!isArticleEditModalOpen) return;
+    if (articleJournals.length > 0) return;
+    loadJournals();
+  }, [isArticleEditModalOpen, articleJournals.length]);
+
+  useEffect(() => {
+    if (!isArticleEditModalOpen) return;
+    if (!articleEditJournalId) return;
+
+    const loadJournalById = async () => {
       try {
-        const res = await api.get("/user/journal");
-        setArticleJournals(res.data || []);
+        const res = await UserPlanService.getJournalById(articleEditJournalId);
+        const name = res.data?.name ?? res.data?.journalName ?? "";
+        if (name) setArticleEditJournalName(name);
       } catch (err) {
-        try {
-          const res = await api.get("/journal");
-          setArticleJournals(res.data || []);
-        } catch (fallbackErr) {
-          try {
-            const res = await JournalService.getAll();
-            setArticleJournals(res.data || []);
-          } catch (finalErr) {
-            console.error(finalErr);
-            setArticleJournals([]);
-          }
-        }
+        console.error(err);
       }
     };
 
-    loadJournals();
-  }, [isArticleModalOpen, articleMode, articleJournals.length]);
+    loadJournalById();
+  }, [isArticleEditModalOpen, articleEditJournalId]);
 
   const handleOpenPlanTextChange = (e) => {
     const { name, value } = e.target;
@@ -491,6 +510,8 @@ export default function UserDashboard() {
     setArticleComments("");
     setArticleLink("");
     setArticleModalMessage("");
+    setNewJournalName("");
+    setJournalMessage("");
     setNewArticle({
       name: "",
       coAuthors: "",
@@ -508,6 +529,31 @@ export default function UserDashboard() {
     resetArticleModal();
   };
 
+  const handleCreateJournal = async () => {
+    if (!newJournalName.trim()) return;
+    try {
+      setIsJournalCreating(true);
+      setJournalMessage("");
+      await UserPlanService.createJournal({ name: newJournalName.trim() });
+      const res = await UserPlanService.getAllJournals();
+      const journals = res.data || [];
+      setArticleJournals(journals);
+      const created = journals.find(
+        (j) => j.name?.toLowerCase() === newJournalName.trim().toLowerCase()
+      );
+      if (created?.idJournal) {
+        setNewArticle((prev) => ({ ...prev, idJournal: created.idJournal.toString() }));
+      }
+      setNewJournalName("");
+      setJournalMessage("Journal created.");
+    } catch (err) {
+      console.error(err);
+      setJournalMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to create journal."));
+    } finally {
+      setIsJournalCreating(false);
+    }
+  };
+
   const openArticleDeleteModal = () => {
     setArticleDeleteMessage("");
     setIsArticleDeleteModalOpen(true);
@@ -522,7 +568,20 @@ export default function UserDashboard() {
     setArticleEditTarget(article);
     setArticleEditComments(getArticleComments(article));
     setArticleEditLink(getArticleLink(article));
+    setArticleEditName(article?.name || article?.title || "");
+    setArticleEditCoAuthors(article?.coAuthors || article?.coAuthor || "");
+    setArticleEditJournalId(
+      (article?.idJournal ?? article?.journalId ?? article?.idJournalDTO ?? "").toString()
+    );
+    setArticleEditJournalName(
+      article?.journalName ??
+      article?.journal ??
+      article?.journalTitle ??
+      article?.journalDTO?.name ??
+      ""
+    );
     setArticleEditMessage("");
+    setArticleEditFieldErrors({});
     setIsArticleEditModalOpen(true);
   };
 
@@ -531,7 +590,12 @@ export default function UserDashboard() {
     setArticleEditTarget(null);
     setArticleEditComments("");
     setArticleEditLink("");
+    setArticleEditName("");
+    setArticleEditCoAuthors("");
+    setArticleEditJournalId("");
+    setArticleEditJournalName("");
     setArticleEditMessage("");
+    setArticleEditFieldErrors({});
   };
 
   const openCourseDeleteModal = () => {
@@ -634,8 +698,10 @@ export default function UserDashboard() {
         await UserPlanService.saveArticlePlan(
           selectedId,
           openPlan.idPlan,
-          articleComments.trim(),
-          articleLink.trim()
+          {
+            articleComments: articleComments.trim(),
+            publicationLink: articleLink.trim()
+          }
         );
         setLocallyDeletedArticleIds((prev) =>
           prev.filter((id) => Number(id) !== Number(selectedId))
@@ -643,12 +709,12 @@ export default function UserDashboard() {
       } else {
         const createRes = await UserPlanService.createArticleForPlan(
           openPlan.idPlan,
-          articleComments.trim(),
-          articleLink.trim(),
           {
             name: newArticle.name.trim(),
             coAuthors: newArticle.coAuthors.trim(),
-            idJournal: Number(newArticle.idJournal) || 0
+            idJournal: Number(newArticle.idJournal) || 0,
+            articleComments: articleComments.trim(),
+            publicationLink: articleLink.trim()
           }
         );
         const createdId = createRes?.data?.idArticle ?? createRes?.data?.idScientificArticles ?? null;
@@ -917,21 +983,29 @@ export default function UserDashboard() {
 
     try {
       setIsArticleEditing(true);
+      setArticleEditFieldErrors({});
       const dto = {
         idPlan: openPlan.idPlan,
         idArticle,
+        name: articleEditName.trim(),
+        coAuthors: articleEditCoAuthors.trim(),
+        idJournal: Number(articleEditJournalId) || 0,
         articleComments: articleEditComments.trim(),
-        publicationLink: articleEditLink.trim(),
-        name: articleEditTarget?.name,
-        coAuthors: articleEditTarget?.coAuthors,
-        idJournal: articleEditTarget?.idJournal ?? articleEditTarget?.journalId
+        publicationLink: articleEditLink.trim()
       };
       await UserPlanService.updateArticlePlan(dto);
       setOpenPlanArticles((prev) =>
         prev.map((a) => {
           const aid = getArticleId(a);
           if (Number(aid) !== Number(idArticle)) return a;
-          return { ...a, articleComments: articleEditComments.trim(), publicationLink: articleEditLink.trim() };
+          return {
+            ...a,
+            name: articleEditName.trim(),
+            coAuthors: articleEditCoAuthors.trim(),
+            idJournal: Number(articleEditJournalId) || 0,
+            articleComments: articleEditComments.trim(),
+            publicationLink: articleEditLink.trim()
+          };
         })
       );
       await attachPlanContextToOpenPlan(openPlan.idPlan);
@@ -939,6 +1013,7 @@ export default function UserDashboard() {
       closeArticleEditModal();
     } catch (err) {
       console.error(err);
+      setArticleEditFieldErrors(extractFieldErrors(err));
       setArticleEditMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to update article."));
     } finally {
       setIsArticleEditing(false);
@@ -1584,6 +1659,26 @@ export default function UserDashboard() {
                     </option>
                   ))}
                 </select>
+                <div style={{ marginBottom: 6 }}>
+                  <label>Or create new journal</label>
+                  <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                    <input
+                      type="text"
+                      value={newJournalName}
+                      onChange={(e) => setNewJournalName(e.target.value)}
+                      placeholder="New journal name"
+                      style={{ flex: 1 }}
+                    />
+                    <button type="button" onClick={handleCreateJournal} disabled={isJournalCreating}>
+                      {isJournalCreating ? "Creating..." : "Add Journal"}
+                    </button>
+                  </div>
+                  {journalMessage && (
+                    <div style={{ color: journalMessage.includes("created") ? "green" : "red", marginTop: 4 }}>
+                      {journalMessage}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -1683,6 +1778,79 @@ export default function UserDashboard() {
               <div>{articleEditTarget ? formatArticleText(articleEditTarget) : ""}</div>
             </div>
             <div style={{ marginBottom: 10 }}>
+              <label>Name</label>
+              <input
+                type="text"
+                value={articleEditName}
+                onChange={(e) => setArticleEditName(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {articleEditFieldErrors.name && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {articleEditFieldErrors.name}
+                </div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Co-authors</label>
+              <input
+                type="text"
+                value={articleEditCoAuthors}
+                onChange={(e) => setArticleEditCoAuthors(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {articleEditFieldErrors.coAuthors && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {articleEditFieldErrors.coAuthors}
+                </div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Journal</label>
+              <select
+                value={articleEditJournalId}
+                onChange={(e) => {
+                  const nextId = e.target.value;
+                  setArticleEditJournalId(nextId);
+                  const match = articleJournals.find((j) => String(j.idJournal) === String(nextId));
+                  if (match?.name) setArticleEditJournalName(match.name);
+                }}
+                style={{ width: "100%", marginTop: 4 }}
+              >
+                <option value="">Select journal</option>
+                {articleJournals.map((j) => (
+                  <option key={j.idJournal} value={j.idJournal}>
+                    {j.name}
+                  </option>
+                ))}
+              </select>
+              <div style={{ marginTop: 6 }}>
+                <label>Or create new journal</label>
+                <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                  <input
+                    type="text"
+                    value={newJournalName}
+                    onChange={(e) => setNewJournalName(e.target.value)}
+                    placeholder="New journal name"
+                    style={{ flex: 1 }}
+                  />
+                  <button type="button" onClick={handleCreateJournal} disabled={isJournalCreating}>
+                    {isJournalCreating ? "Creating..." : "Add Journal"}
+                  </button>
+                </div>
+                {journalMessage && (
+                  <div style={{ color: journalMessage.includes("created") ? "green" : "red", marginTop: 4 }}>
+                    {journalMessage}
+                  </div>
+                )}
+              </div>
+              {articleEditFieldErrors.idJournal && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {articleEditFieldErrors.idJournal}
+                </div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
               <label>Article comments</label>
               <textarea
                 rows={2}
@@ -1690,6 +1858,11 @@ export default function UserDashboard() {
                 onChange={(e) => setArticleEditComments(e.target.value)}
                 style={{ width: "100%", marginTop: 4, resize: "vertical" }}
               />
+              {articleEditFieldErrors.articleComments && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {articleEditFieldErrors.articleComments}
+                </div>
+              )}
             </div>
             <div style={{ marginBottom: 10 }}>
               <label>Publication link</label>
@@ -1699,6 +1872,11 @@ export default function UserDashboard() {
                 onChange={(e) => setArticleEditLink(e.target.value)}
                 style={{ width: "100%", marginTop: 4 }}
               />
+              {articleEditFieldErrors.publicationLink && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {articleEditFieldErrors.publicationLink}
+                </div>
+              )}
             </div>
             <button type="button" onClick={handleEditArticlePlan} disabled={isArticleEditing}>
               {isArticleEditing ? "Saving..." : "Save"}

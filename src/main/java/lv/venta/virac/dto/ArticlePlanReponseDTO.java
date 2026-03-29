@@ -21,7 +21,7 @@ public class ArticlePlanReponseDTO {
 	private int idArticle;
 	
 	@NotBlank(message = "Name is required")
-	@Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
+	@Size(min = 3, max = 150, message = "Name must be between 3 and 150 characters")
 	private String name;
 	
 	@Size(min = 3, max = 50, message = "coAuthors field must be between 3 and 50 characters")

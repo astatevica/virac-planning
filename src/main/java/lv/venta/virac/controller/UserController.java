@@ -28,6 +28,7 @@ import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.CoursePlanWorkDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.JournalDTO;
+import lv.venta.virac.dto.JournalResponseDTO;
 import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ProjectPlanDTO;
@@ -430,8 +431,7 @@ public class UserController {
 
     //CREATE new journal
     @PostMapping("/journals/add")
-    public ResponseEntity<?> createNewJournal(@Valid @RequestBody JournalDTO dto, BindingResult result) throws Exception {
-    	//Do not need to check user TODO:check this
+    public ResponseEntity<?> createNewJournal(@Valid @RequestBody JournalResponseDTO dto, BindingResult result) throws Exception {
     	
     	if (result.hasErrors()) {
             // Convert FieldErrors to FieldErrorDetail objects
