@@ -53,6 +53,7 @@ export default function UserDashboard() {
   const [articleLink, setArticleLink] = useState("");
   const [isArticleSaving, setIsArticleSaving] = useState(false);
   const [articleModalMessage, setArticleModalMessage] = useState("");
+  const [articleModalFieldErrors, setArticleModalFieldErrors] = useState({});
   const [newArticle, setNewArticle] = useState({
     name: "",
     coAuthors: "",
@@ -72,7 +73,6 @@ export default function UserDashboard() {
   const [articleEditName, setArticleEditName] = useState("");
   const [articleEditCoAuthors, setArticleEditCoAuthors] = useState("");
   const [articleEditJournalId, setArticleEditJournalId] = useState("");
-  const [articleEditJournalName, setArticleEditJournalName] = useState("");
   const [articleEditFieldErrors, setArticleEditFieldErrors] = useState({});
   const [articleEditTarget, setArticleEditTarget] = useState(null);
   const [isArticleEditing, setIsArticleEditing] = useState(false);
@@ -226,8 +226,19 @@ export default function UserDashboard() {
                 ap.articleId ??
                 null,
               idArticlePlan: ap.idArticlePlan ?? ap.idArticlePlanDTO ?? ap.articlePlanId ?? null,
-              articleComments: ap.articleComments ?? ap.comments ?? ap.article_comments ?? "",
-              publicationLink: ap.publicationLink ?? ap.link ?? ap.publication_link ?? ""
+              articleComments:
+                ap.articleComments ??
+                ap.articleComment ??
+                ap.comments ??
+                ap.article_comments ??
+                "",
+              publicationLink:
+                ap.publicationLink ??
+                ap.publication_link ??
+                ap.link ??
+                ap.publicationUrl ??
+                ap.publication_url ??
+                ""
             };
           })
           .filter((ap) => !deletedSet.has(Number(getArticleId(ap))));
@@ -252,8 +263,14 @@ export default function UserDashboard() {
             ...matched,
             idArticle: matched.idArticle ?? idArticle,
             idArticlePlan: ap.idArticlePlan ?? ap.idArticlePlanDTO ?? ap.articlePlanId ?? null,
-            articleComments: ap.articleComments ?? ap.comments ?? "",
-            publicationLink: ap.publicationLink ?? ap.link ?? ""
+            articleComments: ap.articleComments ?? ap.articleComment ?? ap.comments ?? "",
+            publicationLink:
+              ap.publicationLink ??
+              ap.publication_link ??
+              ap.link ??
+              ap.publicationUrl ??
+              ap.publication_url ??
+              ""
           };
         }).filter((ap) => !ap?.deleted && !ap?.isDeleted && !deletedSet.has(Number(getArticleId(ap))));
         setOpenPlanArticles(normalized);
@@ -381,22 +398,6 @@ export default function UserDashboard() {
     loadJournals();
   }, [isArticleEditModalOpen, articleJournals.length]);
 
-  useEffect(() => {
-    if (!isArticleEditModalOpen) return;
-    if (!articleEditJournalId) return;
-
-    const loadJournalById = async () => {
-      try {
-        const res = await UserPlanService.getJournalById(articleEditJournalId);
-        const name = res.data?.name ?? res.data?.journalName ?? "";
-        if (name) setArticleEditJournalName(name);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    loadJournalById();
-  }, [isArticleEditModalOpen, articleEditJournalId]);
 
   const handleOpenPlanTextChange = (e) => {
     const { name, value } = e.target;
@@ -510,6 +511,7 @@ export default function UserDashboard() {
     setArticleComments("");
     setArticleLink("");
     setArticleModalMessage("");
+    setArticleModalFieldErrors({});
     setNewJournalName("");
     setJournalMessage("");
     setNewArticle({
@@ -573,13 +575,6 @@ export default function UserDashboard() {
     setArticleEditJournalId(
       (article?.idJournal ?? article?.journalId ?? article?.idJournalDTO ?? "").toString()
     );
-    setArticleEditJournalName(
-      article?.journalName ??
-      article?.journal ??
-      article?.journalTitle ??
-      article?.journalDTO?.name ??
-      ""
-    );
     setArticleEditMessage("");
     setArticleEditFieldErrors({});
     setIsArticleEditModalOpen(true);
@@ -593,7 +588,6 @@ export default function UserDashboard() {
     setArticleEditName("");
     setArticleEditCoAuthors("");
     setArticleEditJournalId("");
-    setArticleEditJournalName("");
     setArticleEditMessage("");
     setArticleEditFieldErrors({});
   };
@@ -686,6 +680,7 @@ export default function UserDashboard() {
 
     try {
       setIsArticleSaving(true);
+      setArticleModalFieldErrors({});
 
       if (articleMode === "existing") {
         const selectedId =
@@ -731,6 +726,7 @@ export default function UserDashboard() {
       closeArticleModal();
     } catch (err) {
       console.error(err);
+      setArticleModalFieldErrors(extractFieldErrors(err));
       setArticleModalMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to save article."));
     } finally {
       setIsArticleSaving(false);
@@ -794,18 +790,33 @@ export default function UserDashboard() {
 
   const getArticleComments = (article) =>
     article?.articleComments ??
+    article?.articleComment ??
     article?.comments ??
     article?.article_comments ??
     article?.articlePlan?.articleComments ??
+    article?.articlePlan?.articleComment ??
     article?.articlePlan?.comments ??
+    article?.articlePlanDTO?.articleComments ??
+    article?.articlePlanDTO?.articleComment ??
+    article?.articlePlanDTO?.comments ??
     "";
 
   const getArticleLink = (article) =>
     article?.publicationLink ??
-    article?.link ??
     article?.publication_link ??
+    article?.publicationUrl ??
+    article?.publication_url ??
+    article?.link ??
     article?.articlePlan?.publicationLink ??
+    article?.articlePlan?.publication_link ??
+    article?.articlePlan?.publicationUrl ??
+    article?.articlePlan?.publication_url ??
     article?.articlePlan?.link ??
+    article?.articlePlanDTO?.publicationLink ??
+    article?.articlePlanDTO?.publication_link ??
+    article?.articlePlanDTO?.publicationUrl ??
+    article?.articlePlanDTO?.publication_url ??
+    article?.articlePlanDTO?.link ??
     "";
 
   const handleDeleteCoursePlan = async (course) => {
@@ -1639,6 +1650,11 @@ export default function UserDashboard() {
                   onChange={(e) => setNewArticle((prev) => ({ ...prev, name: e.target.value }))}
                   style={{ width: "100%", marginBottom: 6 }}
                 />
+                {articleModalFieldErrors.name && (
+                  <div style={{ color: "red", marginBottom: 6 }}>
+                    {articleModalFieldErrors.name}
+                  </div>
+                )}
                 <label>Co-authors</label>
                 <input
                   type="text"
@@ -1646,6 +1662,11 @@ export default function UserDashboard() {
                   onChange={(e) => setNewArticle((prev) => ({ ...prev, coAuthors: e.target.value }))}
                   style={{ width: "100%", marginBottom: 6 }}
                 />
+                {articleModalFieldErrors.coAuthors && (
+                  <div style={{ color: "red", marginBottom: 6 }}>
+                    {articleModalFieldErrors.coAuthors}
+                  </div>
+                )}
                 <label>Journal</label>
                 <select
                   value={newArticle.idJournal}
@@ -1659,6 +1680,11 @@ export default function UserDashboard() {
                     </option>
                   ))}
                 </select>
+                {articleModalFieldErrors.idJournal && (
+                  <div style={{ color: "red", marginBottom: 6 }}>
+                    {articleModalFieldErrors.idJournal}
+                  </div>
+                )}
                 <div style={{ marginBottom: 6 }}>
                   <label>Or create new journal</label>
                   <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
@@ -1690,6 +1716,11 @@ export default function UserDashboard() {
                 onChange={(e) => setArticleComments(e.target.value)}
                 style={{ width: "100%", marginTop: 4, resize: "vertical" }}
               />
+              {articleModalFieldErrors.articleComments && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {articleModalFieldErrors.articleComments}
+                </div>
+              )}
             </div>
 
             <div style={{ marginBottom: 10 }}>
@@ -1700,6 +1731,11 @@ export default function UserDashboard() {
                 onChange={(e) => setArticleLink(e.target.value)}
                 style={{ width: "100%", marginTop: 4 }}
               />
+              {articleModalFieldErrors.publicationLink && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {articleModalFieldErrors.publicationLink}
+                </div>
+              )}
             </div>
 
             <button type="button" onClick={handleSaveArticleFromModal} disabled={isArticleSaving}>
@@ -1807,16 +1843,14 @@ export default function UserDashboard() {
             </div>
             <div style={{ marginBottom: 10 }}>
               <label>Journal</label>
-              <select
-                value={articleEditJournalId}
-                onChange={(e) => {
-                  const nextId = e.target.value;
-                  setArticleEditJournalId(nextId);
-                  const match = articleJournals.find((j) => String(j.idJournal) === String(nextId));
-                  if (match?.name) setArticleEditJournalName(match.name);
-                }}
-                style={{ width: "100%", marginTop: 4 }}
-              >
+                <select
+                  value={articleEditJournalId}
+                  onChange={(e) => {
+                    const nextId = e.target.value;
+                    setArticleEditJournalId(nextId);
+                  }}
+                  style={{ width: "100%", marginTop: 4 }}
+                >
                 <option value="">Select journal</option>
                 {articleJournals.map((j) => (
                   <option key={j.idJournal} value={j.idJournal}>

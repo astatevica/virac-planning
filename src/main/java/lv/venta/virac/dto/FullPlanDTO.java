@@ -39,7 +39,7 @@ public class FullPlanDTO {
 	
 	//No tabulām
 	private ArrayList<CoursePlanResponseDTO> courses;
-	private ArrayList<ScientificArticlesDTO> articles;
+	private ArrayList<ScientificArticlesResponseDTO> articles;
 	private ArrayList<ProjectDTO> projects;
 	private ArrayList<StudentWorkDTO> studentWork;
 	

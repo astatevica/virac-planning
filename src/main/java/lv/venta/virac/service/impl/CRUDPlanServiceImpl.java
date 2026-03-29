@@ -15,7 +15,7 @@ import jakarta.persistence.PersistenceContext;
 import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
-import lv.venta.virac.dto.ScientificArticlesDTO;
+import lv.venta.virac.dto.ScientificArticlesResponseDTO;
 import lv.venta.virac.dto.StudentWorkDTO;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Plan;
@@ -243,11 +243,18 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	                    .collect(Collectors.toCollection(ArrayList::new));
 
 	    // ARTICLES
-	    ArrayList<ScientificArticlesDTO> articles =
+	    ArrayList<ScientificArticlesResponseDTO> articles =
 	            articlePlanRepo.findByPlan_IdPlan(plan.getIdPlan())
 	                    .stream()
-	                    .map(ap -> modelMapper.map(ap.getScientificArticles(), ScientificArticlesDTO.class))
+	                    .map(ap -> modelMapper.map(ap.getScientificArticles(), ScientificArticlesResponseDTO.class))
 	                    .collect(Collectors.toCollection(ArrayList::new));
+	    
+	    for(ScientificArticlesResponseDTO temp:articles) {
+		   temp.setArticleComments(articlePlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(plan.getIdPlan(),
+				   temp.getIdArticle()).getArticleComments());
+		   temp.setPublicationLink(articlePlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(plan.getIdPlan(),
+				   temp.getIdArticle()).getPublicationLink());
+	   }
 
 	    // COURSES
 	    ArrayList<CoursePlanResponseDTO> courses =
@@ -255,7 +262,7 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	                    .stream()
 	                    .map(cp -> modelMapper.map(cp.getCourse(), CoursePlanResponseDTO.class))
 	                    .collect(Collectors.toCollection(ArrayList::new));
-	    
+	   
 	   for(CoursePlanResponseDTO temp:courses) {
 		   temp.setWorkDone(coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(plan.getIdPlan(), temp.getIdCourse()).getWorkDone());
 	   }

@@ -159,12 +159,12 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
                 throw new Exception("Article already attached to this plan");
             }
             ap.setDeleted(false);
-            ap.setArticleComments(dto.getComments());
-            ap.setPublicationLink(dto.getLink());
+            ap.setArticleComments(dto.getArticleComments());
+            ap.setPublicationLink(dto.getPublicationLink());
             artPlanRepo.save(ap);
             return;
         }
-        ArticlePlan articlePlan = new ArticlePlan(plan, article, dto.getComments(), dto.getLink());
+        ArticlePlan articlePlan = new ArticlePlan(plan, article, dto.getArticleComments(), dto.getPublicationLink());
         artPlanRepo.save(articlePlan);
 	}
 
@@ -175,8 +175,8 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 		String name = articleDTO.getName();
 		String coAuthors = articleDTO.getCoAuthors();
 		int idJournal = articleDTO.getIdJournal();
-		String comments = articleDTO.getComments();
-		String link = articleDTO.getLink();
+		String comments = articleDTO.getArticleComments();
+		String link = articleDTO.getPublicationLink();
 		
 		//reads already made articles
 		ArrayList<ScientificArticles> articles = (ArrayList<ScientificArticles>) artRepo.findAll();
