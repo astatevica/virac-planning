@@ -33,7 +33,9 @@ import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ProjectPlanDTO;
 import lv.venta.virac.dto.ScientificArticlesCommentsDTO;
+import lv.venta.virac.dto.StudentWorkPlanResponseDTO;
 import lv.venta.virac.dto.UpdatePlanDTO;
+import lv.venta.virac.dto.WorkPlanResponseDTO;
 import lv.venta.virac.errors.ErrorResponse;
 import lv.venta.virac.errors.FieldErrorDetail;
 import lv.venta.virac.model.Course;
@@ -50,6 +52,7 @@ import lv.venta.virac.service.ICRUDPlanService;
 import lv.venta.virac.service.ICRUDProjectPlanService;
 import lv.venta.virac.service.ICRUDProjectService;
 import lv.venta.virac.service.ICRUDScientificArticlesService;
+import lv.venta.virac.service.ICRUDWorkPlanService;
 import lv.venta.virac.user.User;
 
 
@@ -65,10 +68,12 @@ public class UserController {
 	private ICRUDScientificArticlesService articlesService;
 	private ICRUDArticlePlanService artPlanService;
 	private ICRUDJournalService journalService;
+	private ICRUDWorkPlanService studentWorkService;
 	
 	public UserController(ICRUDPlanService planService, ICRUDProjectPlanService projPlanService, 
 			ICRUDProjectService projService, ICRUDCourseService courseService,ICRUDCoursePlanService coursePlanService,
-			ICRUDScientificArticlesService articlesService, ICRUDArticlePlanService artPlanService, ICRUDJournalService journalService) {
+			ICRUDScientificArticlesService articlesService, ICRUDArticlePlanService artPlanService, ICRUDJournalService journalService,
+			ICRUDWorkPlanService studentWorkService) {
 		this.planService = planService;
 		this.projPlanService = projPlanService;
 		this.projService = projService;
@@ -77,6 +82,7 @@ public class UserController {
 		this.articlesService = articlesService;
 		this.artPlanService = artPlanService;
 		this.journalService = journalService;
+		this.studentWorkService = studentWorkService;
 	}
 
 	@GetMapping("/filter/plans/all")
@@ -565,6 +571,74 @@ public class UserController {
         }
 	    
         artPlanService.updateByArticleIdAndPlanId(dto.getIdPlan(),dto.getIdArticle(),dto.getArticleComments(), dto.getPublicationLink(), employeeId);
+        return ResponseEntity.ok().build();
+    }
+	
+	//---------------------------- COURSES SECTION -------------------------------------//
+	
+	//CREATE Post endpoint to get all new student work data and idPlan to save in repo
+	@PostMapping("/add/work-plan/{idPlan}")
+	public ResponseEntity<?> createStudentWorkForPlan(@PathVariable("idPlan") int idPlan, 
+			@Valid @RequestBody WorkPlanResponseDTO dto, BindingResult result, 
+			Authentication authentication) throws Exception{
+		
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+	    
+	    if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+	    
+	    StudentWorkPlanResponseDTO resultReponse = studentWorkService.createWorkAndAttachToPlan(idPlan, dto, employeeId);
+		
+	    return ResponseEntity.ok(resultReponse);
+	}
+	
+	//DELETE endpoint for work-plan deleting
+	@DeleteMapping("/delete/work-plan/{idPlan}/{idStudWork}")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<Void> deleteWorkPlan(@PathVariable("idPlan") int idPlan, 
+			@PathVariable("idStudWork") int idStudWork, Authentication authentication) throws Exception {
+		
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+	    
+	    studentWorkService.deleteByWorkIdAndPlanId(idPlan, idStudWork, employeeId);
+	    return ResponseEntity.ok().build();
+	}
+	
+	//UPDATE endpoint for work-plan edit
+	@PutMapping("/update/work-plan")
+    public ResponseEntity<?> updateWorkPlan(@Valid @RequestBody StudentWorkPlanResponseDTO dto,
+            BindingResult result, Authentication authentication) throws Exception {
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+
+	    if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+	    
+	    studentWorkService.updateByWorkIdAndPlanId(dto.getIdPlan(), dto.getIdStudWork(), dto.getWorkDone(), employeeId);
         return ResponseEntity.ok().build();
     }
 	

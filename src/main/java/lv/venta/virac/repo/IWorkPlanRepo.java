@@ -11,4 +11,6 @@ public interface IWorkPlanRepo extends CrudRepository<WorkPlan, Integer>{
 	public abstract ArrayList<WorkPlan> findByStudentWork_IdStudWork(int idStudWork);
 	
 	public abstract ArrayList<WorkPlan> findByPlan_IdPlan(int idPlan);
+	
+	public abstract WorkPlan findByPlan_IdPlanAndStudentWork_IdStudWork(int idPlan, int idStudWork);
 }

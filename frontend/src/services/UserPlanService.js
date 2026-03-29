@@ -66,6 +66,15 @@ const updateArticlePlan = (dto) =>
     dto
   );
 
+const createStudentWorkForPlan = (idPlan, dto) =>
+  api.post(`${API}/add/work-plan/${idPlan}`, dto);
+
+const deleteStudentWorkPlan = (idPlan, idStudWork) =>
+  api.delete(`${API}/delete/work-plan/${idPlan}/${idStudWork}`);
+
+const updateStudentWorkPlan = (dto) =>
+  api.put(`${API}/update/work-plan`, dto);
+
 const getAllJournals = () =>
   api.get(`${API}/journals/all`);
 
@@ -94,6 +103,9 @@ const UserPlanService = {
   createArticleForPlan,
   deleteArticlePlan,
   updateArticlePlan,
+  createStudentWorkForPlan,
+  deleteStudentWorkPlan,
+  updateStudentWorkPlan,
   getAllJournals,
   getJournalById,
   createJournal

@@ -164,7 +164,6 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
         coursePlanRepo.save(coursePlan);
 	}
 	
-	//TODO: pēc auditing pielikt citu pārbaudi employee
 	@Override
 	public CoursePlanResponseDTO createCourseAndAttachToPlan(int idPlan, CoursePlanWorkDTO courseDTO, int employeeId) throws Exception {
 		//variables for easier use

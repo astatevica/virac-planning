@@ -12,6 +12,8 @@ export default function UserDashboard() {
   const [locallyDeletedCourseIds, setLocallyDeletedCourseIds] = useState([]);
   const [openPlanArticles, setOpenPlanArticles] = useState([]);
   const [locallyDeletedArticleIds, setLocallyDeletedArticleIds] = useState([]);
+  const [openPlanStudentWorks, setOpenPlanStudentWorks] = useState([]);
+  const [locallyDeletedStudentWorkIds, setLocallyDeletedStudentWorkIds] = useState([]);
   const [saveMessage, setSaveMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
@@ -76,6 +78,33 @@ export default function UserDashboard() {
   const [articleEditFieldErrors, setArticleEditFieldErrors] = useState({});
   const [articleEditTarget, setArticleEditTarget] = useState(null);
   const [isArticleEditing, setIsArticleEditing] = useState(false);
+
+  const [isStudentWorkModalOpen, setIsStudentWorkModalOpen] = useState(false);
+  const [isStudentWorkSaving, setIsStudentWorkSaving] = useState(false);
+  const [studentWorkModalMessage, setStudentWorkModalMessage] = useState("");
+  const [studentWorkFieldErrors, setStudentWorkFieldErrors] = useState({});
+  const [newStudentWork, setNewStudentWork] = useState({
+    name: "",
+    studentName: "",
+    studentSurname: "",
+    degree: "",
+    workDone: ""
+  });
+  const [isStudentWorkDeleteModalOpen, setIsStudentWorkDeleteModalOpen] = useState(false);
+  const [isStudentWorkDeleting, setIsStudentWorkDeleting] = useState(false);
+  const [studentWorkDeleteMessage, setStudentWorkDeleteMessage] = useState("");
+  const [isStudentWorkEditModalOpen, setIsStudentWorkEditModalOpen] = useState(false);
+  const [studentWorkEditMessage, setStudentWorkEditMessage] = useState("");
+  const [studentWorkEditFieldErrors, setStudentWorkEditFieldErrors] = useState({});
+  const [isStudentWorkEditing, setIsStudentWorkEditing] = useState(false);
+  const [studentWorkEditForm, setStudentWorkEditForm] = useState({
+    idStudWork: "",
+    name: "",
+    studentName: "",
+    studentSurname: "",
+    degree: "",
+    workDone: ""
+  });
 
   const currentYear = new Date().getFullYear();
 
@@ -147,6 +176,7 @@ export default function UserDashboard() {
   const attachPlanContextToOpenPlan = useCallback(async (idPlan, overrides = {}) => {
     const deletedCourseIds = overrides.deletedCourseIds ?? locallyDeletedCourseIds;
     const deletedArticleIds = overrides.deletedArticleIds ?? locallyDeletedArticleIds;
+    const deletedStudentWorkIds = overrides.deletedStudentWorkIds ?? locallyDeletedStudentWorkIds;
     try {
       const [planRes, fullPlanRes] = await Promise.all([
         UserPlanService.getPlanView(idPlan),
@@ -293,12 +323,45 @@ export default function UserDashboard() {
           return visible;
         });
       }
+
+      const deletedWorkSet = new Set(deletedStudentWorkIds.map((id) => Number(id)));
+      if (Array.isArray(fullPlan.workPlans) && fullPlan.workPlans.length > 0) {
+        const normalized = fullPlan.workPlans
+          .filter((wp) => !wp?.deleted && !wp?.isDeleted)
+          .map((wp) => ({
+            ...(wp.studentWork || {}),
+            ...(wp.studentWorkDTO || {}),
+            idStudWork: wp.idStudWork ?? wp.idStudentWork ?? wp.studentWorkId ?? wp.studentWorkDTO?.idStudWork ?? null,
+            workDone: wp.workDone ?? wp.work_done ?? ""
+          }))
+          .filter((w) => !deletedWorkSet.has(Number(w.idStudWork)));
+        setOpenPlanStudentWorks(normalized);
+        setLocallyDeletedStudentWorkIds([]);
+      } else {
+        const works = Array.isArray(fullPlan.studentWork)
+          ? fullPlan.studentWork
+          : Array.isArray(fullPlan.studentWorks)
+            ? fullPlan.studentWorks
+            : [];
+        const visible = works
+          .filter((w) => !w?.deleted && !w?.isDeleted)
+          .map((w) => ({
+            ...w,
+            idStudWork: w.idStudWork ?? w.idStudentWork ?? w.studentWorkId ?? null
+          }))
+          .filter((w) => !deletedWorkSet.has(Number(w.idStudWork)));
+        setOpenPlanStudentWorks((prev) => {
+          if (visible.length === 0 && prev && prev.length > 0) return prev;
+          return visible;
+        });
+      }
     } catch (err) {
       console.error("Could not load plan context for dashboard", err);
       setOpenPlanCourses([]);
       setOpenPlanArticles([]);
+      setOpenPlanStudentWorks([]);
     }
-  }, [extractStatus, locallyDeletedCourseIds, locallyDeletedArticleIds]);
+  }, [extractStatus, locallyDeletedCourseIds, locallyDeletedArticleIds, locallyDeletedStudentWorkIds]);
 
   useEffect(() => {
     const loadCurrentYearPlans = async () => {
@@ -324,6 +387,7 @@ export default function UserDashboard() {
           setOpenPlan(null);
           setOpenPlanCourses([]);
           setOpenPlanArticles([]);
+          setOpenPlanStudentWorks([]);
         }
       } catch (err) {
         console.error(err);
@@ -421,6 +485,7 @@ export default function UserDashboard() {
     } else {
       setOpenPlanCourses([]);
       setOpenPlanArticles([]);
+      setOpenPlanStudentWorks([]);
     }
   };
 
@@ -592,6 +657,53 @@ export default function UserDashboard() {
     setArticleEditFieldErrors({});
   };
 
+  const openStudentWorkModal = () => {
+    setStudentWorkModalMessage("");
+    setStudentWorkFieldErrors({});
+    setNewStudentWork({
+      name: "",
+      studentName: "",
+      studentSurname: "",
+      degree: "",
+      workDone: ""
+    });
+    setIsStudentWorkModalOpen(true);
+  };
+
+  const closeStudentWorkModal = () => {
+    setIsStudentWorkModalOpen(false);
+  };
+
+  const openStudentWorkDeleteModal = () => {
+    setStudentWorkDeleteMessage("");
+    setIsStudentWorkDeleteModalOpen(true);
+  };
+
+  const closeStudentWorkDeleteModal = () => {
+    setIsStudentWorkDeleteModalOpen(false);
+    setStudentWorkDeleteMessage("");
+  };
+
+  const openStudentWorkEditModal = (work) => {
+    setStudentWorkEditForm({
+      idStudWork: getStudentWorkId(work) ?? "",
+      name: work?.name ?? "",
+      studentName: work?.studentName ?? "",
+      studentSurname: work?.studentSurname ?? "",
+      degree: work?.degree ?? "",
+      workDone: work?.workDone ?? ""
+    });
+    setStudentWorkEditFieldErrors({});
+    setStudentWorkEditMessage("");
+    setIsStudentWorkEditModalOpen(true);
+  };
+
+  const closeStudentWorkEditModal = () => {
+    setIsStudentWorkEditModalOpen(false);
+    setStudentWorkEditFieldErrors({});
+    setStudentWorkEditMessage("");
+  };
+
   const openCourseDeleteModal = () => {
     setCourseDeleteMessage("");
     setIsCourseDeleteModalOpen(true);
@@ -733,6 +845,102 @@ export default function UserDashboard() {
     }
   };
 
+  const handleSaveStudentWorkFromModal = async () => {
+    if (!openPlan?.idPlan) return;
+    try {
+      setIsStudentWorkSaving(true);
+      setStudentWorkFieldErrors({});
+      const dto = {
+        idStudWork: Number(newStudentWork.idStudWork) || 0,
+        name: newStudentWork.name,
+        studentName: newStudentWork.studentName,
+        studentSurname: newStudentWork.studentSurname,
+        degree: newStudentWork.degree,
+        workDone: newStudentWork.workDone
+      };
+      const res = await UserPlanService.createStudentWorkForPlan(openPlan.idPlan, dto);
+      const createdId = res?.data?.idStudWork ?? res?.data?.idStudentWork ?? null;
+      if (createdId) {
+        setLocallyDeletedStudentWorkIds((prev) =>
+          prev.filter((id) => Number(id) !== Number(createdId))
+        );
+      }
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      setStudentWorkModalMessage("");
+      setSaveMessage("Student work saved.");
+      closeStudentWorkModal();
+    } catch (err) {
+      console.error(err);
+      setStudentWorkFieldErrors(extractFieldErrors(err));
+      setStudentWorkModalMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to save student work."));
+    } finally {
+      setIsStudentWorkSaving(false);
+    }
+  };
+
+  const handleDeleteStudentWorkPlan = async (work) => {
+    const idStudWork = getStudentWorkId(work);
+    if (!idStudWork) return;
+    if (!openPlan?.idPlan) return;
+    try {
+      setIsStudentWorkDeleting(true);
+      await UserPlanService.deleteStudentWorkPlan(openPlan.idPlan, idStudWork);
+      setOpenPlanStudentWorks((prev) =>
+        prev.filter((w) => Number(getStudentWorkId(w)) !== Number(idStudWork))
+      );
+      setLocallyDeletedStudentWorkIds((prev) => {
+        const next = new Set(prev.map((id) => Number(id)));
+        next.add(Number(idStudWork));
+        return Array.from(next);
+      });
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      setStudentWorkDeleteMessage("");
+      setSaveMessage("Student work deleted.");
+      closeStudentWorkDeleteModal();
+    } catch (err) {
+      console.error(err);
+      setStudentWorkDeleteMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to delete student work."));
+    } finally {
+      setIsStudentWorkDeleting(false);
+    }
+  };
+
+  const handleEditStudentWorkPlan = async () => {
+    if (!openPlan?.idPlan) return;
+    const idStudWork = Number(studentWorkEditForm.idStudWork) || 0;
+    if (!idStudWork) return;
+    try {
+      setIsStudentWorkEditing(true);
+      setStudentWorkEditFieldErrors({});
+      const dto = {
+        idPlan: openPlan.idPlan,
+        idStudWork,
+        name: studentWorkEditForm.name,
+        studentName: studentWorkEditForm.studentName,
+        studentSurname: studentWorkEditForm.studentSurname,
+        degree: studentWorkEditForm.degree,
+        workDone: studentWorkEditForm.workDone
+      };
+      await UserPlanService.updateStudentWorkPlan(dto);
+      setOpenPlanStudentWorks((prev) =>
+        prev.map((w) => {
+          if (Number(getStudentWorkId(w)) !== Number(idStudWork)) return w;
+          return { ...w, ...dto };
+        })
+      );
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      setStudentWorkEditMessage("");
+      setSaveMessage("Student work updated.");
+      closeStudentWorkEditModal();
+    } catch (err) {
+      console.error(err);
+      setStudentWorkEditFieldErrors(extractFieldErrors(err));
+      setStudentWorkEditMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to update student work."));
+    } finally {
+      setIsStudentWorkEditing(false);
+    }
+  };
+
   const formatCourseText = (course) => {
     const labels = {
       idCourse: "ID",
@@ -764,6 +972,9 @@ export default function UserDashboard() {
     course?.coursePlanDTO?.workDone ??
     course?.coursePlanDTO?.work_done ??
     "";
+
+  const getStudentWorkId = (work) =>
+    work?.idStudWork ?? work?.idStudentWork ?? work?.studentWorkId ?? null;
 
   const getCoursePlanId = (course) =>
     course?.idCoursePlan ??
@@ -1177,6 +1388,22 @@ export default function UserDashboard() {
                       ) : (
                         <span>No courses attached</span>
                       )
+                    ) : row.done === "StudentWorkDTO" ? (
+                      openPlanStudentWorks.length > 0 ? (
+                        <ol style={{ margin: 0, paddingLeft: 20 }}>
+                          {openPlanStudentWorks.map((work, idx) => (
+                            <li key={`${getStudentWorkId(work) || idx}-${idx}`}>
+                              {`Name: ${work.name || ""} | Student: ${work.studentName || ""} ${work.studentSurname || ""} | Degree: ${work.degree || ""} | Work done: ${work.workDone || ""}`}
+                              {" "}
+                              <button type="button" onClick={() => openStudentWorkEditModal(work)}>
+                                Edit
+                              </button>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <span>No student work attached</span>
+                      )
                     ) : row.done === "ArticleDTO" ? (
                       openPlanArticles.length > 0 ? (
                         <ol style={{ margin: 0, paddingLeft: 20 }}>
@@ -1215,6 +1442,8 @@ export default function UserDashboard() {
                         onClick={
                           row.key === "courses"
                             ? openCourseModal
+                            : row.key === "studentWork"
+                              ? openStudentWorkModal
                             : row.key === "articles"
                               ? openArticleModal
                               : () => setSaveMessage(`${row.actions[0]} is not connected yet.`)
@@ -1229,6 +1458,8 @@ export default function UserDashboard() {
                         onClick={
                           row.key === "courses"
                             ? openCourseDeleteModal
+                            : row.key === "studentWork"
+                              ? openStudentWorkDeleteModal
                             : row.key === "articles"
                               ? openArticleDeleteModal
                               : () => setSaveMessage(`${row.actions[1]} is not connected yet.`)
@@ -1921,6 +2152,224 @@ export default function UserDashboard() {
             </button>
             {articleEditMessage && (
               <p style={{ color: "red", marginTop: 8 }}>{articleEditMessage}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isStudentWorkModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
+            <h3>Add Student Work To Plan #{openPlan?.idPlan}</h3>
+            <div style={{ marginBottom: 10 }}>
+              <label>Work name</label>
+              <input
+                type="text"
+                value={newStudentWork.name}
+                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, name: e.target.value }))}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {studentWorkFieldErrors.name && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.name}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Student name</label>
+              <input
+                type="text"
+                value={newStudentWork.studentName}
+                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, studentName: e.target.value }))}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {studentWorkFieldErrors.studentName && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.studentName}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Student surname</label>
+              <input
+                type="text"
+                value={newStudentWork.studentSurname}
+                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, studentSurname: e.target.value }))}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {studentWorkFieldErrors.studentSurname && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.studentSurname}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Degree</label>
+              <input
+                type="text"
+                value={newStudentWork.degree}
+                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, degree: e.target.value }))}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {studentWorkFieldErrors.degree && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.degree}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Work done</label>
+              <textarea
+                rows={2}
+                value={newStudentWork.workDone}
+                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, workDone: e.target.value }))}
+                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
+              />
+              {studentWorkFieldErrors.workDone && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.workDone}</div>
+              )}
+            </div>
+            <button type="button" onClick={handleSaveStudentWorkFromModal} disabled={isStudentWorkSaving}>
+              {isStudentWorkSaving ? "Saving..." : "Save Student Work"}
+            </button>
+            {" "}
+            <button type="button" onClick={closeStudentWorkModal} disabled={isStudentWorkSaving}>
+              Cancel
+            </button>
+            {studentWorkModalMessage && (
+              <p style={{ color: "red", marginTop: 8 }}>{studentWorkModalMessage}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isStudentWorkDeleteModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
+            <h3>Delete Student Work From Plan #{openPlan?.idPlan}</h3>
+            {openPlanStudentWorks.length === 0 ? (
+              <p>No student work attached.</p>
+            ) : (
+              <ol style={{ paddingLeft: 20 }}>
+                {openPlanStudentWorks.map((work, idx) => (
+                  <li key={`${getStudentWorkId(work) || idx}-${idx}`} style={{ marginBottom: 8 }}>
+                    {`Name: ${work.name || ""} | Student: ${work.studentName || ""} ${work.studentSurname || ""} | Degree: ${work.degree || ""}`}
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteStudentWorkPlan(work)}
+                      style={{ marginTop: 4 }}
+                    >
+                      {isStudentWorkDeleting ? "Deleting..." : "Delete"}
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            )}
+            <button type="button" onClick={closeStudentWorkDeleteModal} disabled={isStudentWorkDeleting}>
+              Close
+            </button>
+            {studentWorkDeleteMessage && (
+              <p style={{ color: "red", marginTop: 8 }}>{studentWorkDeleteMessage}</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isStudentWorkEditModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
+            <h3>Edit Student Work</h3>
+            <div style={{ marginBottom: 10 }}>
+              <label>Work name</label>
+              <input
+                type="text"
+                value={studentWorkEditForm.name}
+                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, name: e.target.value }))}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {studentWorkEditFieldErrors.name && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.name}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Student name</label>
+              <input
+                type="text"
+                value={studentWorkEditForm.studentName}
+                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, studentName: e.target.value }))}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {studentWorkEditFieldErrors.studentName && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.studentName}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Student surname</label>
+              <input
+                type="text"
+                value={studentWorkEditForm.studentSurname}
+                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, studentSurname: e.target.value }))}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {studentWorkEditFieldErrors.studentSurname && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.studentSurname}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Degree</label>
+              <input
+                type="text"
+                value={studentWorkEditForm.degree}
+                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, degree: e.target.value }))}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {studentWorkEditFieldErrors.degree && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.degree}</div>
+              )}
+            </div>
+            <div style={{ marginBottom: 10 }}>
+              <label>Work done</label>
+              <textarea
+                rows={2}
+                value={studentWorkEditForm.workDone}
+                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, workDone: e.target.value }))}
+                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
+              />
+              {studentWorkEditFieldErrors.workDone && (
+                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.workDone}</div>
+              )}
+            </div>
+            <button type="button" onClick={handleEditStudentWorkPlan} disabled={isStudentWorkEditing}>
+              {isStudentWorkEditing ? "Saving..." : "Save"}
+            </button>
+            {" "}
+            <button type="button" onClick={closeStudentWorkEditModal} disabled={isStudentWorkEditing}>
+              Cancel
+            </button>
+            {studentWorkEditMessage && (
+              <p style={{ color: "red", marginTop: 8 }}>{studentWorkEditMessage}</p>
             )}
           </div>
         </div>
