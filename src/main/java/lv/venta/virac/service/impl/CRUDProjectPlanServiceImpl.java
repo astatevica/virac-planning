@@ -135,4 +135,68 @@ public class CRUDProjectPlanServiceImpl implements ICRUDProjectPlanService{
 		return result;
 	}
 
+	@Override
+	public void createAutocompleteProject(int idPlan, int idProject, String tasks, String workDone, int employeeId) throws Exception {
+		ProjectPlan pp = projPlanRepo.findByPlan_IdPlanAndProject_IdProject(idPlan,idProject);
+        
+        if(idPlan == 0 || idProject == 0){
+			throw new Exception("The input parameters are incorrect");
+		}
+        
+        Plan plan = planRepo.findById(idPlan).get();
+        if(plan == null) {
+        	throw new Exception("Plan not found");
+        }
+        
+        if(employeeId != plan.getEmployee().getIdEmployee()) {
+        	throw new Exception("This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan");
+        }
+        
+        Project project = projRepo.findById(idProject).get();
+        if(project == null) {
+        	throw new Exception("Project not found");
+        }
+        
+        if(pp != null) {
+            if(!pp.isDeleted()){
+                throw new Exception("Project already attached to this plan");
+            }
+            pp.setDeleted(false);
+            pp.setWorkDone(workDone);
+            projPlanRepo.save(pp);
+            return;
+        }
+        ProjectPlan projectPlan = new ProjectPlan(plan, project, tasks, workDone);
+        projPlanRepo.save(projectPlan);
+		
+	}
+
+	@Override
+	public void deleteByProjectIdAndPlanId(int idPlan, int idProject, int employeeId) throws Exception {
+		ProjectPlan projectPlan = projPlanRepo.findByPlan_IdPlanAndProject_IdProject(idPlan,idProject);
+    	if (projectPlan == null) throw new Exception("Project-Plan with Plan id:"+ idPlan +" and Project id: "+idProject+" does not exist");
+    	if(employeeId != projectPlan.getCreatedBy()) {
+        	throw new Exception("This user: "+ projectPlan.getPlan().getEmployee().getName() + " " 
+    	+ projectPlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
+        }
+    	projectPlan.setDeleted(true); // SOFT DELETE
+    	projPlanRepo.save(projectPlan);  // SAVE, NOT DELETE
+		
+	}
+
+	@Override
+	public void updateByProjectIdAndPlanId(int idPlan, int idProject, String tasks, String workDone, int employeeId)
+			throws Exception {
+		ProjectPlan projectPlan = projPlanRepo.findByPlan_IdPlanAndProject_IdProject(idPlan,idProject);
+		if (projectPlan == null) throw new Exception("Project-Plan with Plan id:"+ idPlan +" and Project id: "+idProject+" does not exist");
+    	if(employeeId != projectPlan.getCreatedBy()) {
+        	throw new Exception("This user: "+ projectPlan.getPlan().getEmployee().getName() + " " 
+    	+ projectPlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
+        }
+    	projectPlan.setTasks(tasks);
+    	projectPlan.setWorkDone(workDone);
+        projPlanRepo.save(projectPlan);
+		
+	}
+
 }

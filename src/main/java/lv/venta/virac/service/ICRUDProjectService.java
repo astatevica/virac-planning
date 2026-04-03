@@ -22,5 +22,8 @@ public interface ICRUDProjectService extends ICRUDBase<Project>{
 
 	//Filter by End Date
 	public abstract ArrayList<Project> selectAllProjectsByEndDate(LocalDate endDate) throws Exception;
+	
+	//Select all projects by autocomplete
+	public abstract ArrayList<Project> selectNameAutocomplete(String keyword) throws Exception;
 
 }

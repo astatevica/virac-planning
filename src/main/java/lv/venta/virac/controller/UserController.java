@@ -30,8 +30,10 @@ import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.JournalDTO;
 import lv.venta.virac.dto.JournalResponseDTO;
 import lv.venta.virac.dto.PlanDTO;
+import lv.venta.virac.dto.ProjectAutocompleteDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ProjectPlanDTO;
+import lv.venta.virac.dto.ProjectPlanResponseDTO;
 import lv.venta.virac.dto.ScientificArticlesCommentsDTO;
 import lv.venta.virac.dto.StudentWorkPlanResponseDTO;
 import lv.venta.virac.dto.UpdatePlanDTO;
@@ -744,4 +746,109 @@ public class UserController {
 	    }
     }
 	
+	//---------------------------- PROJECT SECTION -------------------------------------//
+	
+	//SELECT Gets from frontend autocomplete for project name
+	@GetMapping("/project/autocomplete/{keyword}")
+	public ResponseEntity<ArrayList<ProjectDTO>> selectProjectNameAutocomplete(@PathVariable("keyword") String keyword){
+		
+		try {
+			ArrayList<Project> list = projService.selectNameAutocomplete(keyword);
+			
+			ArrayList<ProjectDTO> response =
+		            new ArrayList<>(list.stream()
+		                .map(dto -> new ProjectDTO(
+		                		dto.getIdProject(),
+		                		dto.getName(),
+		                		dto.getNumber(),
+		                		dto.getProjectManagement().getIdProjectManag(),
+		                		dto.getStartDate(),
+		                		dto.getEndDate(),
+		                		dto.getAcronym()
+		                ))
+		                .toList());
+			
+		    return ResponseEntity.ok(response);
+		}catch(Exception e){
+	        e.printStackTrace();
+	        return ResponseEntity.status(500).body(new ArrayList<>());
+		}
+	   		
+	}
+	
+	//SAVE Gets from frontend autocomplete project and plan to save in repo
+	@GetMapping("/project/autocomplete")
+	public ResponseEntity<?> saveProjectPlan(@Valid ProjectAutocompleteDTO dto, BindingResult result,
+			Authentication authentication){
+		
+		if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+		
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+	    try {
+			projPlanService.createAutocompleteProject(dto.getIdPlan(), dto.getIdProject(),dto.getTasks(),dto.getWorkDone(), employeeId);
+			return ResponseEntity.status(HttpStatus.CREATED).build();
+	    }catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).body(new ArrayList<>());
+	    }
+	}
+	
+	//DELETE endpoint for project-plan deleting
+	@DeleteMapping("/delete/project-plan/{idPlan}/{idProject}")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<Void> deleteProjectPlan(@PathVariable("idPlan") int idPlan, 
+			@PathVariable("idProject") int idProject, Authentication authentication){
+		
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+	    try {
+		    projPlanService.deleteByProjectIdAndPlanId(idPlan, idProject, employeeId);
+		    return ResponseEntity.ok().build();
+		}catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).build();
+	    }
+	}
+	
+	//UPDATE endpoint for course-plan edit
+	@PutMapping("/update/project-plan")
+    public ResponseEntity<?> updateProejctPlan(@Valid @RequestBody ProjectPlanResponseDTO dto,
+            BindingResult result, Authentication authentication){
+		User user = (User) authentication.getPrincipal();
+	    int employeeId = user.getEmployee().getIdEmployee();
+
+	    if (result.hasErrors()) {
+            // Convert FieldErrors to FieldErrorDetail objects
+            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+                    .map(error -> new FieldErrorDetail(
+                            error.getField(),
+                            error.getDefaultMessage(),
+                            error.getRejectedValue()
+                    ))
+                    .collect(Collectors.toList());
+            // Create ErrorResponse
+            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+	    try {
+	        projPlanService.updateByProjectIdAndPlanId(dto.getIdPlan(),dto.getIdProject(),dto.getTasks(), dto.getWorkDone(), employeeId);
+	        return ResponseEntity.ok().build();
+		}catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).body(new ArrayList<>());
+	    }
+    }
 }

@@ -135,6 +135,12 @@ public class CRUDProjectServiceImpl implements ICRUDProjectService{
 		return result;
 	}
 
+	@Override
+	public ArrayList<Project> selectNameAutocomplete(String keyword) throws Exception {
+		ArrayList<Project> result = projRepo.searchProjects(keyword);
+		return result;
+	}
+
 	
 	
 

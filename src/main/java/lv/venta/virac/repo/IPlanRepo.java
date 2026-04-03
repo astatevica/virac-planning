@@ -47,7 +47,6 @@ public interface IPlanRepo extends CrudRepository<Plan, Integer>{
 	
 	//Filter by Employee and Year
 	public abstract Plan findFirstByEmployee_IdEmployeeAndYear_IdYear(int idEmployee, int idYear);
-		
 	
 	
 }

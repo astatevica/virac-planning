@@ -18,5 +18,13 @@ public interface ICRUDProjectPlanService extends ICRUDBase<ProjectPlan>{
 	
 	//Filter by Project
 	public abstract ArrayList<ProjectPlan> selectAllProjectPlanByProject(int idProject) throws Exception;
+	
+	//C - create 
+	public abstract void createAutocompleteProject(int idPlan, int idProject, String tasks, String workDone, int employeeId) throws Exception;
 
+	//Delete for User current Project entity
+	public abstract void deleteByProjectIdAndPlanId(int idPlan, int idProject, int employeeId) throws Exception;
+
+	//Update for User current Project entity
+	public abstract void updateByProjectIdAndPlanId(int idPlan, int idProject, String tasks, String workDone, int employeeId) throws Exception;
 }
