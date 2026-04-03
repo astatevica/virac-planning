@@ -902,6 +902,7 @@ export default function UserDashboard() {
     const idStudWork = getStudentWorkId(work);
     if (!idStudWork) return;
     if (!openPlan?.idPlan) return;
+    if (!window.confirm("Delete this student work from plan?")) return;
     try {
       setIsStudentWorkDeleting(true);
       await UserPlanService.deleteStudentWorkPlan(openPlan.idPlan, idStudWork);
@@ -963,14 +964,20 @@ export default function UserDashboard() {
 
   const formatCourseText = (course) => {
     const labels = {
-      idCourse: "ID",
       name: "Name",
       ectsCredits: "ECTS",
       semester: "Semester",
       faculty: "Faculty",
       workDone: "Work done"
     };
-    const hiddenKeys = new Set(["idPlan"]);
+    const hiddenKeys = new Set([
+      "idPlan",
+      "idCourse",
+      "courseId",
+      "idCoursePlan",
+      "coursePlanId",
+      "idCoursePlanDTO"
+    ]);
 
     return Object.entries(course || {})
       .filter(([key, value]) =>
@@ -1270,8 +1277,6 @@ export default function UserDashboard() {
 
   const formatArticleText = (article) => {
     const labels = {
-      idArticle: "ID",
-      idScientificArticles: "ID",
       name: "Name",
       title: "Name",
       coAuthors: "Co-authors",
@@ -1280,6 +1285,16 @@ export default function UserDashboard() {
       articleComments: "Comments",
       publicationLink: "Link"
     };
+    const hiddenKeys = new Set([
+      "idPlan",
+      "idArticle",
+      "idScientificArticles",
+      "articleId",
+      "idJournal",
+      "idArticlePlan",
+      "articlePlanId",
+      "idArticlePlanDTO"
+    ]);
 
     const normalized = {
       ...article,
@@ -1288,7 +1303,13 @@ export default function UserDashboard() {
     };
 
     return Object.entries(normalized || {})
-      .filter(([, value]) => value !== null && value !== undefined && value !== "" && typeof value !== "object")
+      .filter(([key, value]) =>
+        !hiddenKeys.has(key) &&
+        value !== null &&
+        value !== undefined &&
+        value !== "" &&
+        typeof value !== "object"
+      )
       .map(([key, value]) => `${labels[key] || key}: ${value}`)
       .join(" | ");
   };
@@ -1529,6 +1550,9 @@ export default function UserDashboard() {
         >
           <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
             <h3>Add Course To Plan #{openPlan?.idPlan}</h3>
+            <div style={{ color: "green", marginTop: 4, marginBottom: 10 }}>
+              After adding Course you will be able to edit only "Work done" field.
+            </div>
 
             <div style={{ marginBottom: 10 }}>
               <label>
@@ -1821,6 +1845,9 @@ export default function UserDashboard() {
         >
           <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
             <h3>Add Article To Plan #{openPlan?.idPlan}</h3>
+            <div style={{ color: "green", marginTop: 4, marginBottom: 10 }}>
+              After adding Article you will be able to edit only "Comment" and "Link" fields.
+            </div>
 
             <div style={{ marginBottom: 10 }}>
               <label>
@@ -2197,6 +2224,9 @@ export default function UserDashboard() {
         >
           <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
             <h3>Add Student Work To Plan #{openPlan?.idPlan}</h3>
+            <div style={{ color: "green", marginTop: 4, marginBottom: 10 }}>
+              After adding Student Work you will be able to edit only "Work done" field.
+            </div>
             <div style={{ marginBottom: 10 }}>
               <label>Work name</label>
               <input
