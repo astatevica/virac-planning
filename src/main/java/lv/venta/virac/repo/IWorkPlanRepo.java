@@ -13,4 +13,7 @@ public interface IWorkPlanRepo extends CrudRepository<WorkPlan, Integer>{
 	public abstract ArrayList<WorkPlan> findByPlan_IdPlan(int idPlan);
 	
 	public abstract WorkPlan findByPlan_IdPlanAndStudentWork_IdStudWork(int idPlan, int idStudWork);
+	
+	//to not map deleted work-plans
+	public abstract ArrayList<WorkPlan> findByPlan_IdPlanAndDeletedFalse(int idPlan);
 }

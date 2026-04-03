@@ -12,5 +12,7 @@ public interface IProjectPlanRepo extends CrudRepository<ProjectPlan, Integer>{
 	
 	public abstract ArrayList<ProjectPlan> findByProject_IdProject(int idProject);
 	
+	//to not map deleted work-plans
+	public abstract ArrayList<ProjectPlan> findByPlan_IdPlanAndDeletedFalse(int idPlan);
 	
 }

@@ -11,5 +11,8 @@ public interface IArticlePlanRepo extends CrudRepository<ArticlePlan, Integer>{
 	public abstract ArrayList<ArticlePlan> findByPlan_IdPlan(int idPlan);
 	
 	public abstract ArticlePlan findByPlan_IdPlanAndScientificArticles_IdArticle(int idPlan, int idArticle);
+	
+	//to not map deleted article-plans
+	public abstract ArrayList<ArticlePlan> findByPlan_IdPlanAndDeletedFalse(int idPlan);
 
 }

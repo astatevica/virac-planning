@@ -105,6 +105,7 @@ export default function UserDashboard() {
     degree: "",
     workDone: ""
   });
+  const [degreeOptions, setDegreeOptions] = useState([]);
 
   const currentYear = new Date().getFullYear();
 
@@ -327,7 +328,7 @@ export default function UserDashboard() {
       const deletedWorkSet = new Set(deletedStudentWorkIds.map((id) => Number(id)));
       if (Array.isArray(fullPlan.workPlans) && fullPlan.workPlans.length > 0) {
         const normalized = fullPlan.workPlans
-          .filter((wp) => !wp?.deleted && !wp?.isDeleted)
+          .filter((wp) => !wp?.deleted && !wp?.isDeleted && !wp?.studentWork?.deleted && !wp?.studentWork?.isDeleted)
           .map((wp) => ({
             ...(wp.studentWork || {}),
             ...(wp.studentWorkDTO || {}),
@@ -362,6 +363,25 @@ export default function UserDashboard() {
       setOpenPlanStudentWorks([]);
     }
   }, [extractStatus, locallyDeletedCourseIds, locallyDeletedArticleIds, locallyDeletedStudentWorkIds]);
+
+  useEffect(() => {
+    if (degreeOptions.length > 0) return;
+    const fallback = ["magistrs", "bakalaurs", "cits", "pirma_cikla", "doktors"];
+    const loadDegrees = async () => {
+      try {
+        const res = await UserPlanService.getDegreeValues();
+        const data = res.data || [];
+        const normalized = Array.isArray(data)
+          ? data.map((d) => (typeof d === "string" ? d : d?.name ?? d?.value ?? ""))
+              .filter(Boolean)
+          : [];
+        setDegreeOptions(normalized.length > 0 ? normalized : fallback);
+      } catch (err) {
+        setDegreeOptions(fallback);
+      }
+    };
+    loadDegrees();
+  }, [degreeOptions.length]);
 
   useEffect(() => {
     const loadCurrentYearPlans = async () => {
@@ -690,7 +710,7 @@ export default function UserDashboard() {
       name: work?.name ?? "",
       studentName: work?.studentName ?? "",
       studentSurname: work?.studentSurname ?? "",
-      degree: work?.degree ?? "",
+      degree: work?.degree?.name ?? work?.degree ?? "",
       workDone: work?.workDone ?? ""
     });
     setStudentWorkEditFieldErrors({});
@@ -1062,12 +1082,13 @@ export default function UserDashboard() {
           return Number(cid) !== Number(idCourse);
         })
       );
-      setLocallyDeletedCourseIds((prev) => {
-        const next = new Set(prev.map((id) => Number(id)));
+      const nextDeleted = (() => {
+        const next = new Set(locallyDeletedCourseIds.map((id) => Number(id)));
         next.add(Number(idCourse));
         return Array.from(next);
-      });
-      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      })();
+      setLocallyDeletedCourseIds(nextDeleted);
+      await attachPlanContextToOpenPlan(openPlan.idPlan, { deletedCourseIds: nextDeleted });
       setCourseDeleteMessage("");
       // setSaveMessage("Course deleted from plan.");
       closeCourseDeleteModal();
@@ -1106,7 +1127,12 @@ export default function UserDashboard() {
         next.add(Number(idArticle));
         return Array.from(next);
       });
-      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      const nextDeleted = (() => {
+        const next = new Set(locallyDeletedArticleIds.map((id) => Number(id)));
+        next.add(Number(idArticle));
+        return Array.from(next);
+      })();
+      await attachPlanContextToOpenPlan(openPlan.idPlan, { deletedArticleIds: nextDeleted });
       setArticleDeleteMessage("");
       setSaveMessage("Article deleted from plan.");
       closeArticleDeleteModal();
@@ -2209,12 +2235,18 @@ export default function UserDashboard() {
             </div>
             <div style={{ marginBottom: 10 }}>
               <label>Degree</label>
-              <input
-                type="text"
+              <select
                 value={newStudentWork.degree}
                 onChange={(e) => setNewStudentWork((prev) => ({ ...prev, degree: e.target.value }))}
                 style={{ width: "100%", marginTop: 4 }}
-              />
+              >
+                <option value="">Select degree</option>
+                {degreeOptions.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
               {studentWorkFieldErrors.degree && (
                 <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.degree}</div>
               )}
@@ -2339,12 +2371,18 @@ export default function UserDashboard() {
             </div>
             <div style={{ marginBottom: 10 }}>
               <label>Degree</label>
-              <input
-                type="text"
+              <select
                 value={studentWorkEditForm.degree}
                 onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, degree: e.target.value }))}
                 style={{ width: "100%", marginTop: 4 }}
-              />
+              >
+                <option value="">Select degree</option>
+                {degreeOptions.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
               {studentWorkEditFieldErrors.degree && (
                 <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.degree}</div>
               )}

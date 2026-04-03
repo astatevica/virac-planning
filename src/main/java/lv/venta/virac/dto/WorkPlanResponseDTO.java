@@ -30,7 +30,7 @@ public class WorkPlanResponseDTO {
 	@Size(min = 3, max = 15, message = "Student surname must be between 3 and 15 characters")
 	private String studentSurname;
 	
-	@NotNull(message = "Status is required")
+	@NotNull(message = "Degree is required")
 	private Degree degree;
 	
 	@NotBlank(message = "Work Done required")

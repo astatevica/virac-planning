@@ -41,7 +41,7 @@ public class FullPlanDTO {
 	private ArrayList<CoursePlanResponseDTO> courses;
 	private ArrayList<ScientificArticlesResponseDTO> articles;
 	private ArrayList<ProjectDTO> projects;
-	private ArrayList<StudentWorkDTO> studentWork;
+	private ArrayList<WorkPlanResponseDTO> studentWork;
 	
 	//TODO: satusu pievienot
 

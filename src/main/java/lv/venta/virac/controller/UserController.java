@@ -599,6 +599,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
         }
 	    
+	    //TODO: try/catch bez throws Exception
 	    StudentWorkPlanResponseDTO resultReponse = studentWorkService.createWorkAndAttachToPlan(idPlan, dto, employeeId);
 		
 	    return ResponseEntity.ok(resultReponse);

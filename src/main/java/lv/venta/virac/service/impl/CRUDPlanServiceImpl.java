@@ -16,7 +16,7 @@ import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.ProjectDTO;
 import lv.venta.virac.dto.ScientificArticlesResponseDTO;
-import lv.venta.virac.dto.StudentWorkDTO;
+import lv.venta.virac.dto.WorkPlanResponseDTO;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Year;
@@ -237,15 +237,16 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	    
 	    // PROJECTS
 	    ArrayList<ProjectDTO> projects =
-	            projectPlanRepo.findByPlan_IdPlan(plan.getIdPlan())
+	            projectPlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
 	                    .stream()
 	                    .map(pp -> modelMapper.map(pp.getProject(), ProjectDTO.class))
 	                    .collect(Collectors.toCollection(ArrayList::new));
 
 	    // ARTICLES
 	    ArrayList<ScientificArticlesResponseDTO> articles =
-	            articlePlanRepo.findByPlan_IdPlan(plan.getIdPlan())
+	            articlePlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
 	                    .stream()
+	                    .filter(pp -> !pp.getScientificArticles().isDeleted())
 	                    .map(ap -> modelMapper.map(ap.getScientificArticles(), ScientificArticlesResponseDTO.class))
 	                    .collect(Collectors.toCollection(ArrayList::new));
 	    
@@ -258,8 +259,9 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 
 	    // COURSES
 	    ArrayList<CoursePlanResponseDTO> courses =
-	            coursePlanRepo.findByPlan_IdPlan(plan.getIdPlan())
+	            coursePlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
 	                    .stream()
+	                    .filter(pp -> !pp.getCourse().isDeleted())
 	                    .map(cp -> modelMapper.map(cp.getCourse(), CoursePlanResponseDTO.class))
 	                    .collect(Collectors.toCollection(ArrayList::new));
 	   
@@ -268,11 +270,16 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	   }
 
 	    // STUDENT WORK
-	    ArrayList<StudentWorkDTO> studentWork =
-	            studentWorkPlanRepo.findByPlan_IdPlan(plan.getIdPlan())
+	    ArrayList<WorkPlanResponseDTO> studentWork =
+	            studentWorkPlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
 	                    .stream()
-	                    .map(sw -> modelMapper.map(sw.getStudentWork(), StudentWorkDTO.class))
+	                    .filter(pp -> !pp.getStudentWork().isDeleted())
+	                    .map(sw -> modelMapper.map(sw.getStudentWork(), WorkPlanResponseDTO.class))
 	                    .collect(Collectors.toCollection(ArrayList::new));
+	    
+	    for(WorkPlanResponseDTO temp:studentWork) {
+		   temp.setWorkDone(studentWorkPlanRepo.findByPlan_IdPlanAndStudentWork_IdStudWork(plan.getIdPlan(), temp.getIdStudWork()).getWorkDone());
+	   }
 
 	    dto.setProjects(projects);
 	    dto.setArticles(articles);
