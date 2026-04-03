@@ -14,7 +14,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.FullPlanDTO;
-import lv.venta.virac.dto.ProjectDTO;
+import lv.venta.virac.dto.ProjectPlanResponseDTO;
 import lv.venta.virac.dto.ScientificArticlesResponseDTO;
 import lv.venta.virac.dto.WorkPlanResponseDTO;
 import lv.venta.virac.model.Employee;
@@ -236,11 +236,16 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	    FullPlanDTO dto = modelMapper.map(plan, FullPlanDTO.class);
 	    
 	    // PROJECTS
-	    ArrayList<ProjectDTO> projects =
+	    ArrayList<ProjectPlanResponseDTO> projects =
 	            projectPlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
 	                    .stream()
-	                    .map(pp -> modelMapper.map(pp.getProject(), ProjectDTO.class))
+	                    .map(pp -> modelMapper.map(pp.getProject(), ProjectPlanResponseDTO.class))
 	                    .collect(Collectors.toCollection(ArrayList::new));
+	    
+	    for(ProjectPlanResponseDTO temp:projects) {
+	    	temp.setTasks(projectPlanRepo.findByPlan_IdPlanAndProject_IdProject(plan.getIdPlan(), temp.getIdProject()).getTasks());
+			temp.setWorkDone(projectPlanRepo.findByPlan_IdPlanAndProject_IdProject(plan.getIdPlan(), temp.getIdProject()).getWorkDone());
+		}
 
 	    // ARTICLES
 	    ArrayList<ScientificArticlesResponseDTO> articles =

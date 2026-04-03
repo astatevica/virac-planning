@@ -8,6 +8,8 @@ export default function UserDashboard() {
   const [plans, setPlans] = useState([]);
   const [currentYearId, setCurrentYearId] = useState(null);
   const [openPlan, setOpenPlan] = useState(null);
+  const [openPlanProjects, setOpenPlanProjects] = useState([]);
+  const [locallyDeletedProjectIds, setLocallyDeletedProjectIds] = useState([]);
   const [openPlanCourses, setOpenPlanCourses] = useState([]);
   const [locallyDeletedCourseIds, setLocallyDeletedCourseIds] = useState([]);
   const [openPlanArticles, setOpenPlanArticles] = useState([]);
@@ -45,6 +47,32 @@ export default function UserDashboard() {
   const [courseEditFieldErrors, setCourseEditFieldErrors] = useState({});
   const [courseEditTarget, setCourseEditTarget] = useState(null);
   const [isCourseEditing, setIsCourseEditing] = useState(false);
+
+  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+  const [projectSearch, setProjectSearch] = useState("");
+  const [projectOptions, setProjectOptions] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [projectTasks, setProjectTasks] = useState("");
+  const [projectWorkDone, setProjectWorkDone] = useState("");
+  const [isProjectSaving, setIsProjectSaving] = useState(false);
+  const [projectModalMessage, setProjectModalMessage] = useState("");
+  const [projectModalFieldErrors, setProjectModalFieldErrors] = useState({});
+  const [isProjectDeleteModalOpen, setIsProjectDeleteModalOpen] = useState(false);
+  const [isProjectDeleting, setIsProjectDeleting] = useState(false);
+  const [projectDeleteMessage, setProjectDeleteMessage] = useState("");
+  const [isProjectEditModalOpen, setIsProjectEditModalOpen] = useState(false);
+  const [projectEditMessage, setProjectEditMessage] = useState("");
+  const [projectEditFieldErrors, setProjectEditFieldErrors] = useState({});
+  const [projectEditTarget, setProjectEditTarget] = useState(null);
+  const [projectEditName, setProjectEditName] = useState("");
+  const [projectEditNumber, setProjectEditNumber] = useState("");
+  const [projectEditManagementId, setProjectEditManagementId] = useState("");
+  const [projectEditStartDate, setProjectEditStartDate] = useState("");
+  const [projectEditEndDate, setProjectEditEndDate] = useState("");
+  const [projectEditAcronym, setProjectEditAcronym] = useState("");
+  const [projectEditTasks, setProjectEditTasks] = useState("");
+  const [projectEditWorkDone, setProjectEditWorkDone] = useState("");
+  const [isProjectEditing, setIsProjectEditing] = useState(false);
 
   const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
   const [articleMode, setArticleMode] = useState("existing");
@@ -174,7 +202,87 @@ export default function UserDashboard() {
     return map;
   };
 
+  const buttonStyles = {
+    add: {
+      backgroundColor: "#2e7d32",
+      color: "#fff",
+      border: "none",
+      padding: "6px 10px",
+      borderRadius: 4
+    },
+    update: {
+      backgroundColor: "#2e7d32",
+      color: "#fff",
+      border: "none",
+      padding: "6px 10px",
+      borderRadius: 4
+    },
+    edit: {
+      backgroundColor: "#ef6c00",
+      color: "#fff",
+      border: "none",
+      padding: "6px 10px",
+      borderRadius: 4
+    },
+    cancel: {
+      backgroundColor: "#ef6c00",
+      color: "#fff",
+      border: "none",
+      padding: "6px 10px",
+      borderRadius: 4
+    },
+    delete: {
+      backgroundColor: "#c62828",
+      color: "#fff",
+      border: "none",
+      padding: "6px 10px",
+      borderRadius: 4
+    },
+    view: {
+      backgroundColor: "#1565c0",
+      color: "#fff",
+      border: "none",
+      padding: "6px 10px",
+      borderRadius: 4
+    }
+  };
+
+  const getButtonStyle = (variant, disabled = false) => ({
+    ...buttonStyles[variant],
+    opacity: disabled ? 0.6 : 1,
+    cursor: disabled ? "not-allowed" : "pointer"
+  });
+
+  const toDateInputValue = (value) => {
+    if (!value) return "";
+    if (typeof value === "string") return value.slice(0, 10);
+    if (typeof value === "object" && value.year && value.month && value.day) {
+      const mm = String(value.month).padStart(2, "0");
+      const dd = String(value.day).padStart(2, "0");
+      return `${value.year}-${mm}-${dd}`;
+    }
+    return "";
+  };
+
+  const getProjectId = (project) =>
+    project?.idProject ??
+    project?.projectId ??
+    project?.idProjectDTO ??
+    project?.project?.idProject ??
+    project?.projectDTO?.idProject ??
+    null;
+
+  const getProjectPlanId = (project) =>
+    project?.idProjectPlan ??
+    project?.projectPlanId ??
+    project?.idProjectPlanDTO ??
+    project?.projectPlan?.idProjectPlan ??
+    project?.projectPlan?.idProjectPlanDTO ??
+    project?.planProjectId ??
+    null;
+
   const attachPlanContextToOpenPlan = useCallback(async (idPlan, overrides = {}) => {
+    const deletedProjectIds = overrides.deletedProjectIds ?? locallyDeletedProjectIds;
     const deletedCourseIds = overrides.deletedCourseIds ?? locallyDeletedCourseIds;
     const deletedArticleIds = overrides.deletedArticleIds ?? locallyDeletedArticleIds;
     const deletedStudentWorkIds = overrides.deletedStudentWorkIds ?? locallyDeletedStudentWorkIds;
@@ -195,6 +303,57 @@ export default function UserDashboard() {
 
       const fullPlan = fullPlanRes.data || {};
       console.log("FULL PLAN:", fullPlan);
+      if (Array.isArray(fullPlan.projectPlans) && fullPlan.projectPlans.length > 0) {
+        const deletedSet = new Set(deletedProjectIds.map((id) => Number(id)));
+        const normalized = fullPlan.projectPlans
+          .filter((pp) => !pp?.deleted && !pp?.isDeleted && !pp?.project?.deleted && !pp?.project?.isDeleted)
+          .map((pp) => {
+            const projectData = {
+              ...(pp.project || {}),
+              ...(pp.projectDTO || {})
+            };
+
+            return {
+              ...projectData,
+              idProjectPlan: pp.idProjectPlan ?? pp.idProjectPlanDTO ?? pp.projectPlanId ?? null,
+              tasks: pp.tasks ?? pp.projectTasks ?? pp.project_tasks ?? "",
+              workDone: pp.workDone ?? pp.work_done ?? ""
+            };
+          })
+          .filter((pp) => !deletedSet.has(Number(getProjectId(pp))));
+        setOpenPlanProjects(normalized);
+        setLocallyDeletedProjectIds([]);
+      } else if (Array.isArray(fullPlan.projectPlanDTOs) && fullPlan.projectPlanDTOs.length > 0) {
+        const projects = Array.isArray(fullPlan.projects) ? fullPlan.projects : [];
+        const deletedSet = new Set(deletedProjectIds.map((id) => Number(id)));
+        const normalized = fullPlan.projectPlanDTOs.map((pp) => {
+          const idProject =
+            pp.idProject ??
+            pp.projectId ??
+            pp.idProjectDTO ??
+            null;
+          const matched = projects.find((p) => Number(p.idProject ?? p.projectId) === Number(idProject)) || {};
+          return {
+            ...matched,
+            idProject: matched.idProject ?? idProject,
+            idProjectPlan: pp.idProjectPlan ?? pp.idProjectPlanDTO ?? pp.projectPlanId ?? null,
+            tasks: pp.tasks ?? pp.projectTasks ?? pp.project_tasks ?? "",
+            workDone: pp.workDone ?? pp.work_done ?? ""
+          };
+        }).filter((pp) => !pp?.deleted && !pp?.isDeleted && !deletedSet.has(Number(getProjectId(pp))));
+        setOpenPlanProjects(normalized);
+        setLocallyDeletedProjectIds([]);
+      } else {
+        const projects = Array.isArray(fullPlan.projects) ? fullPlan.projects : [];
+        const filtered = projects.filter((p) => !p?.deleted && !p?.isDeleted);
+        const deletedSet = new Set(deletedProjectIds.map((id) => Number(id)));
+        const visible = filtered.filter((p) => !deletedSet.has(Number(getProjectId(p))));
+        setOpenPlanProjects((prev) => {
+          if (visible.length === 0 && prev && prev.length > 0) return prev;
+          return visible;
+        });
+      }
+
       if (Array.isArray(fullPlan.coursePlans) && fullPlan.coursePlans.length > 0) {
         const normalized = fullPlan.coursePlans
           .filter((cp) => !cp?.deleted && !cp?.isDeleted && !cp?.course?.deleted && !cp?.course?.isDeleted)
@@ -358,11 +517,12 @@ export default function UserDashboard() {
       }
     } catch (err) {
       console.error("Could not load plan context for dashboard", err);
+      setOpenPlanProjects([]);
       setOpenPlanCourses([]);
       setOpenPlanArticles([]);
       setOpenPlanStudentWorks([]);
     }
-  }, [extractStatus, locallyDeletedCourseIds, locallyDeletedArticleIds, locallyDeletedStudentWorkIds]);
+  }, [extractStatus, locallyDeletedProjectIds, locallyDeletedCourseIds, locallyDeletedArticleIds, locallyDeletedStudentWorkIds]);
 
   useEffect(() => {
     if (degreeOptions.length > 0) return;
@@ -405,6 +565,7 @@ export default function UserDashboard() {
           await attachPlanContextToOpenPlan(firstPlan.idPlan);
         } else {
           setOpenPlan(null);
+          setOpenPlanProjects([]);
           setOpenPlanCourses([]);
           setOpenPlanArticles([]);
           setOpenPlanStudentWorks([]);
@@ -438,6 +599,27 @@ export default function UserDashboard() {
 
     return () => clearTimeout(timeoutId);
   }, [courseSearch, courseMode, isCourseModalOpen]);
+
+  useEffect(() => {
+    if (!isProjectModalOpen) return;
+
+    if (projectSearch.trim().length < 2) {
+      setProjectOptions([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const res = await UserPlanService.searchProjectsAutocomplete(projectSearch.trim());
+        setProjectOptions(res.data || []);
+      } catch (err) {
+        console.error(err);
+        setProjectOptions([]);
+      }
+    }, 250);
+
+    return () => clearTimeout(timeoutId);
+  }, [projectSearch, isProjectModalOpen]);
 
   useEffect(() => {
     if (!isArticleModalOpen || articleMode !== "existing") return;
@@ -494,21 +676,6 @@ export default function UserDashboard() {
     setOpenPlan((prev) => ({ ...prev, [name]: Number.isNaN(parsed) ? "" : parsed }));
   };
 
-  const handleOpenPlanSelect = (e) => {
-    const selectedId = Number(e.target.value);
-    const selected = plans.find((p) => p.idPlan === selectedId);
-    setOpenPlan(selected ? { ...selected } : null);
-    setSaveMessage("");
-
-    if (selected?.idPlan) {
-      attachPlanContextToOpenPlan(selected.idPlan);
-    } else {
-      setOpenPlanCourses([]);
-      setOpenPlanArticles([]);
-      setOpenPlanStudentWorks([]);
-    }
-  };
-
   const handleSaveOpenPlan = async () => {
     if (!openPlan) return;
 
@@ -551,6 +718,7 @@ export default function UserDashboard() {
         await attachPlanContextToOpenPlan(refreshedPlan.idPlan);
       } else {
         setOpenPlan(null);
+        setOpenPlanProjects([]);
         setOpenPlanCourses([]);
         setOpenPlanArticles([]);
       }
@@ -578,6 +746,26 @@ export default function UserDashboard() {
     });
   };
 
+  const resetProjectModal = () => {
+    setProjectSearch("");
+    setProjectOptions([]);
+    setSelectedProject(null);
+    setProjectTasks("");
+    setProjectWorkDone("");
+    setProjectModalMessage("");
+    setProjectModalFieldErrors({});
+  };
+
+  const openProjectModal = () => {
+    resetProjectModal();
+    setIsProjectModalOpen(true);
+  };
+
+  const closeProjectModal = () => {
+    setIsProjectModalOpen(false);
+    resetProjectModal();
+  };
+
   const openCourseModal = () => {
     resetCourseModal();
     setIsCourseModalOpen(true);
@@ -586,6 +774,26 @@ export default function UserDashboard() {
   const closeCourseModal = () => {
     setIsCourseModalOpen(false);
     resetCourseModal();
+  };
+
+  const openProjectDeleteModal = () => {
+    setProjectDeleteMessage("");
+    setIsProjectDeleteModalOpen(true);
+  };
+
+  const openCourseDeleteModal = () => {
+    setCourseDeleteMessage("");
+    setIsCourseDeleteModalOpen(true);
+  };
+
+  const closeProjectDeleteModal = () => {
+    setIsProjectDeleteModalOpen(false);
+    setProjectDeleteMessage("");
+  };
+
+  const closeCourseDeleteModal = () => {
+    setIsCourseDeleteModalOpen(false);
+    setCourseDeleteMessage("");
   };
 
   const resetArticleModal = () => {
@@ -614,6 +822,42 @@ export default function UserDashboard() {
   const closeArticleModal = () => {
     setIsArticleModalOpen(false);
     resetArticleModal();
+  };
+
+  const openProjectEditModal = (project) => {
+    setProjectEditTarget(project);
+    setProjectEditName(project?.name || "");
+    setProjectEditNumber(project?.number ?? "");
+    setProjectEditManagementId(
+      project?.managementId ??
+      project?.projectManagementId ??
+      project?.idProjectManag ??
+      project?.projectManagement?.idProjectManag ??
+      ""
+    );
+    setProjectEditStartDate(toDateInputValue(project?.startDate ?? project?.start_date));
+    setProjectEditEndDate(toDateInputValue(project?.endDate ?? project?.end_date));
+    setProjectEditAcronym(project?.acronym || "");
+    setProjectEditTasks(project?.tasks ?? project?.projectTasks ?? project?.project_tasks ?? "");
+    setProjectEditWorkDone(project?.workDone ?? project?.work_done ?? "");
+    setProjectEditMessage("");
+    setProjectEditFieldErrors({});
+    setIsProjectEditModalOpen(true);
+  };
+
+  const closeProjectEditModal = () => {
+    setIsProjectEditModalOpen(false);
+    setProjectEditTarget(null);
+    setProjectEditName("");
+    setProjectEditNumber("");
+    setProjectEditManagementId("");
+    setProjectEditStartDate("");
+    setProjectEditEndDate("");
+    setProjectEditAcronym("");
+    setProjectEditTasks("");
+    setProjectEditWorkDone("");
+    setProjectEditMessage("");
+    setProjectEditFieldErrors({});
   };
 
   const handleCreateJournal = async () => {
@@ -724,16 +968,6 @@ export default function UserDashboard() {
     setStudentWorkEditMessage("");
   };
 
-  const openCourseDeleteModal = () => {
-    setCourseDeleteMessage("");
-    setIsCourseDeleteModalOpen(true);
-  };
-
-  const closeCourseDeleteModal = () => {
-    setIsCourseDeleteModalOpen(false);
-    setCourseDeleteMessage("");
-  };
-
   const openCourseEditModal = (course) => {
     setCourseEditTarget(course);
     setCourseEditWorkDone(getWorkDoneText(course));
@@ -804,6 +1038,36 @@ export default function UserDashboard() {
       setCourseModalMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to save course."));
     } finally {
       setIsCourseSaving(false);
+    }
+  };
+
+  const handleSaveProjectFromModal = async () => {
+    if (!openPlan?.idPlan) return;
+
+    try {
+      setIsProjectSaving(true);
+      setProjectModalFieldErrors({});
+
+      const selectedId = getProjectId(selectedProject);
+      await UserPlanService.saveProjectPlan({
+        idPlan: openPlan.idPlan,
+        idProject: selectedId ?? 0,
+        tasks: projectTasks.trim(),
+        workDone: projectWorkDone.trim()
+      });
+      setLocallyDeletedProjectIds((prev) =>
+        prev.filter((id) => Number(id) !== Number(selectedId))
+      );
+
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      setProjectModalMessage("");
+      closeProjectModal();
+    } catch (err) {
+      console.error(err);
+      setProjectModalFieldErrors(extractFieldErrors(err));
+      setProjectModalMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to save project."));
+    } finally {
+      setIsProjectSaving(false);
     }
   };
 
@@ -960,6 +1224,124 @@ export default function UserDashboard() {
     } finally {
       setIsStudentWorkEditing(false);
     }
+  };
+
+  const handleDeleteProjectPlan = async (project) => {
+    const idProject = getProjectId(project);
+    if (!idProject) return;
+    if (!openPlan?.idPlan) return;
+    if (!window.confirm("Delete this project from plan?")) return;
+
+    try {
+      setIsProjectDeleting(true);
+      await UserPlanService.deleteProjectPlan(openPlan.idPlan, idProject);
+      setOpenPlanProjects((prev) =>
+        prev.filter((p) => Number(getProjectId(p)) !== Number(idProject))
+      );
+      const nextDeleted = (() => {
+        const next = new Set(locallyDeletedProjectIds.map((id) => Number(id)));
+        next.add(Number(idProject));
+        return Array.from(next);
+      })();
+      setLocallyDeletedProjectIds(nextDeleted);
+      await attachPlanContextToOpenPlan(openPlan.idPlan, { deletedProjectIds: nextDeleted });
+      setProjectDeleteMessage("");
+      closeProjectDeleteModal();
+    } catch (err) {
+      console.error(err);
+      setProjectDeleteMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to delete project."));
+    } finally {
+      setIsProjectDeleting(false);
+    }
+  };
+
+  const handleEditProjectPlan = async () => {
+    if (!openPlan?.idPlan) return;
+
+    const idProject = getProjectId(projectEditTarget);
+    if (!idProject) return;
+
+    try {
+      setIsProjectEditing(true);
+      setProjectEditFieldErrors({});
+      const dto = {
+        idPlan: openPlan.idPlan,
+        idProject,
+        name: projectEditName.trim(),
+        number: Number(projectEditNumber) || 0,
+        managementId: Number(projectEditManagementId) || 0,
+        startDate: projectEditStartDate || "",
+        endDate: projectEditEndDate || "",
+        acronym: projectEditAcronym.trim(),
+        tasks: projectEditTasks.trim(),
+        workDone: projectEditWorkDone.trim()
+      };
+      await UserPlanService.updateProjectPlan(dto);
+      setOpenPlanProjects((prev) =>
+        prev.map((p) => {
+          if (Number(getProjectId(p)) !== Number(idProject)) return p;
+          return { ...p, ...dto };
+        })
+      );
+      await attachPlanContextToOpenPlan(openPlan.idPlan);
+      setProjectEditMessage("");
+      setSaveMessage("Project updated.");
+      closeProjectEditModal();
+    } catch (err) {
+      console.error(err);
+      setProjectEditFieldErrors(extractFieldErrors(err));
+      setProjectEditMessage(normalizeMessage(err.response?.data?.message || err.response?.data || "Failed to update project."));
+    } finally {
+      setIsProjectEditing(false);
+    }
+  };
+
+  const formatProjectText = (project) => {
+    const labels = {
+      name: "Name",
+      number: "Number",
+      managementId: "Management ID",
+      startDate: "Start date",
+      endDate: "End date",
+      acronym: "Acronym",
+      tasks: "Tasks",
+      workDone: "Work done"
+    };
+    const hiddenKeys = new Set([
+      "idPlan",
+      "idProject",
+      "projectId",
+      "idProjectPlan",
+      "projectPlanId",
+      "idProjectPlanDTO"
+    ]);
+
+    const normalized = {
+      ...project,
+      managementId:
+        project?.managementId ??
+        project?.projectManagementId ??
+        project?.idProjectManag ??
+        project?.projectManagement?.idProjectManag ??
+        project?.project_management_id ??
+        project?.management_id ??
+        "",
+      startDate: toDateInputValue(project?.startDate ?? project?.start_date),
+      endDate: toDateInputValue(project?.endDate ?? project?.end_date),
+      tasks: project?.tasks ?? project?.projectTasks ?? project?.project_tasks ?? "",
+      workDone: project?.workDone ?? project?.work_done ?? ""
+    };
+
+    return Object.entries(normalized || {})
+      .filter(([key, value]) =>
+        !hiddenKeys.has(key) &&
+        value !== null &&
+        value !== undefined &&
+        value !== "" &&
+        typeof value !== "object"
+      )
+      .map(([key, value]) => `${labels[key] || key}: ${value}`)
+      .join(" | ");
   };
 
   const formatCourseText = (course) => {
@@ -1325,32 +1707,39 @@ export default function UserDashboard() {
         {currentYearId && ` (ID: ${currentYearId})`}
       </h3>
 
-      <table border="1" cellPadding="5">
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          border: "1px solid #aeb6bf",
+          background: "#fff"
+        }}
+      >
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Projects</th>
-            <th>Articles</th>
-            <th>Courses</th>
-            <th>Student Work</th>
-            <th>Actions</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>ID</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Projects</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Articles</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Courses</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Student Work</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {plans.length === 0 ? (
             <tr>
-              <td colSpan="6">No plans for current year</td>
+              <td colSpan="6" style={{ padding: "12px" }}>No plans for current year</td>
             </tr>
           ) : (
             plans.map((pl) => (
               <tr key={pl.idPlan}>
-                <td>{pl.idPlan}</td>
-                <td>{pl.numOfProjects}</td>
-                <td>{pl.numOfArticles}</td>
-                <td>{pl.numOfCourses}</td>
-                <td>{pl.numOfStudWork}</td>
-                <td>
-                  <button onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)}>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.idPlan}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfProjects}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfArticles}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfCourses}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfStudWork}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>
+                  <button onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)} style={getButtonStyle("view")}>
                     Open
                   </button>
                 </td>
@@ -1361,42 +1750,36 @@ export default function UserDashboard() {
       </table>
 
       <br />
-      <button onClick={() => navigate("/user/plans")}>View All Plans</button>
+      <button onClick={() => navigate("/user/plans")} style={getButtonStyle("view")}>View All Plans</button>
 
       <h2 style={{ marginTop: 20 }}>Open Plan Activities</h2>
 
-      {plans.length > 0 && (
-        <div style={{ marginBottom: 10 }}>
-          <label>Plan:</label>{" "}
-          <select value={openPlan?.idPlan || ""} onChange={handleOpenPlanSelect}>
-            {plans.map((pl) => (
-              <option key={pl.idPlan} value={pl.idPlan}>
-                Plan #{pl.idPlan}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      <table border="1" cellPadding="6" width="100%">
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          border: "1px solid #aeb6bf",
+          background: "#fff"
+        }}
+      >
         <thead>
           <tr>
-            <th>Activity</th>
-            <th>Planned</th>
-            <th>Done</th>
-            <th>Buttons</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa", width: "18%" }}>Activity</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa", width: "32%" }}>Planned</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa", width: "32%" }}>Done</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa", width: "18%" }}>Buttons</th>
           </tr>
         </thead>
         <tbody>
           {!openPlan ? (
             <tr>
-              <td colSpan="4">No open plan available.</td>
+              <td colSpan="4" style={{ padding: "12px" }}>No open plan available.</td>
             </tr>
           ) : (
             tableRows.map((row) => (
               <tr key={row.key}>
-                <td>{row.label}</td>
-                <td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8", verticalAlign: "top" }}>{row.label}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8", verticalAlign: "top" }}>
                   {row.type === "number" ? (
                     <input
                       type="number"
@@ -1404,7 +1787,7 @@ export default function UserDashboard() {
                       value={openPlan[row.planned] ?? ""}
                       onChange={handleOpenPlanNumberChange}
                       disabled={isPlannedFrozen}
-                      style={{ width: "95%" }}
+                      style={{ width: "100%" }}
                     />
                   ) : (
                     <textarea
@@ -1413,20 +1796,36 @@ export default function UserDashboard() {
                       onChange={handleOpenPlanTextChange}
                       disabled={isPlannedFrozen}
                       rows={2}
-                      style={{ width: "95%", resize: "vertical" }}
+                      style={{ width: "100%", resize: "vertical" }}
                     />
                   )}
                 </td>
-                <td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8", verticalAlign: "top" }}>
                   {row.done.endsWith("DTO") ? (
-                    row.done === "CourseDTO" ? (
+                    row.done === "ProjectDTO" ? (
+                      openPlanProjects.length > 0 ? (
+                        <ol style={{ margin: 0, paddingLeft: 20 }}>
+                          {openPlanProjects.map((project, idx) => (
+                            <li key={`${getProjectPlanId(project) || getProjectId(project) || idx}-${idx}`}>
+                              {formatProjectText(project)}
+                              {" "}
+                              <button type="button" onClick={() => openProjectEditModal(project)} style={getButtonStyle("edit")}>
+                                Edit
+                              </button>
+                            </li>
+                          ))}
+                        </ol>
+                      ) : (
+                        <span>No projects attached</span>
+                      )
+                    ) : row.done === "CourseDTO" ? (
                       openPlanCourses.length > 0 ? (
                         <ol style={{ margin: 0, paddingLeft: 20 }}>
                           {openPlanCourses.map((course, idx) => (
                             <li key={`${course.idCourse || idx}-${idx}`}>
                               {formatCourseText(course)}
                               {" "}
-                              <button type="button" onClick={() => openCourseEditModal(course)}>
+                              <button type="button" onClick={() => openCourseEditModal(course)} style={getButtonStyle("edit")}>
                                 Edit
                               </button>
                             </li>
@@ -1442,7 +1841,7 @@ export default function UserDashboard() {
                             <li key={`${getStudentWorkId(work) || idx}-${idx}`}>
                               {`Name: ${work.name || ""} | Student: ${work.studentName || ""} ${work.studentSurname || ""} | Degree: ${work.degree || ""} | Work done: ${work.workDone || ""}`}
                               {" "}
-                              <button type="button" onClick={() => openStudentWorkEditModal(work)}>
+                              <button type="button" onClick={() => openStudentWorkEditModal(work)} style={getButtonStyle("edit")}>
                                 Edit
                               </button>
                             </li>
@@ -1458,7 +1857,7 @@ export default function UserDashboard() {
                             <li key={`${getArticlePlanId(article) || getArticleId(article) || idx}-${idx}`}>
                               {formatArticleText(article)}
                               {" "}
-                              <button type="button" onClick={() => openArticleEditModal(article)}>
+                              <button type="button" onClick={() => openArticleEditModal(article)} style={getButtonStyle("edit")}>
                                 Edit
                               </button>
                             </li>
@@ -1480,14 +1879,17 @@ export default function UserDashboard() {
                     />
                   )}
                 </td>
-                <td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8", verticalAlign: "top" }}>
                   {row.actions?.length ? (
                     <>
                       <button
                         type="button"
                         disabled={isPlannedFrozen}
+                        style={getButtonStyle("add", isPlannedFrozen)}
                         onClick={
-                          row.key === "courses"
+                          row.key === "projects"
+                            ? openProjectModal
+                            : row.key === "courses"
                             ? openCourseModal
                             : row.key === "studentWork"
                               ? openStudentWorkModal
@@ -1502,8 +1904,11 @@ export default function UserDashboard() {
                       <button
                         type="button"
                         disabled={isPlannedFrozen}
+                        style={getButtonStyle("delete", isPlannedFrozen)}
                         onClick={
-                          row.key === "courses"
+                          row.key === "projects"
+                            ? openProjectDeleteModal
+                            : row.key === "courses"
                             ? openCourseDeleteModal
                             : row.key === "studentWork"
                               ? openStudentWorkDeleteModal
@@ -1526,7 +1931,7 @@ export default function UserDashboard() {
             <tr>
               <td colSpan="2"></td>
               <td>
-                <button type="button" onClick={handleSaveOpenPlan} disabled={isSaving}>
+                <button type="button" onClick={handleSaveOpenPlan} disabled={isSaving} style={getButtonStyle("update", isSaving)}>
                   {isSaving ? "Saving..." : "Save changes"}
                 </button>
               </td>
@@ -1535,6 +1940,121 @@ export default function UserDashboard() {
           )}
         </tbody>
       </table>
+
+      {isProjectModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
+            <h3>Add Project To Plan #{openPlan?.idPlan}</h3>
+            <div style={{ color: "green", marginTop: 4, marginBottom: 10 }}>
+              After adding Project you will be able to edit only "Tasks" and "Work done" fields.
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Project autocomplete</label>
+              <input
+                type="text"
+                value={projectSearch}
+                onChange={(e) => {
+                  setProjectSearch(e.target.value);
+                  setSelectedProject(null);
+                }}
+                placeholder="Type at least 2 characters..."
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectOptions.length > 0 && (
+                <div style={{ border: "1px solid #ccc", maxHeight: 160, overflowY: "auto", marginTop: 4 }}>
+                  {projectOptions.map((project) => (
+                    <div
+                      key={getProjectId(project) || project.name}
+                      onClick={() => {
+                        setSelectedProject(project);
+                        setProjectSearch(
+                          `${project.name} (Number: ${project.number}, Start: ${toDateInputValue(project.startDate)}, End: ${toDateInputValue(project.endDate)})`
+                        );
+                        setProjectOptions([]);
+                        const existing = openPlanProjects.find(
+                          (p) => Number(getProjectId(p)) === Number(getProjectId(project))
+                        );
+                        if (existing) {
+                          setProjectModalMessage("Project already attached to this plan.");
+                        } else {
+                          setProjectModalMessage("");
+                        }
+                      }}
+                      style={{ padding: "6px 8px", cursor: "pointer" }}
+                    >
+                      {project.name} | {project.acronym} | #{project.number}
+                    </div>
+                  ))}
+                </div>
+              )}
+              {projectModalFieldErrors.idProject && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {projectModalFieldErrors.idProject}
+                </div>
+              )}
+            </div>
+
+            {selectedProject && (
+              <div style={{ marginBottom: 10 }}>
+                <div>Selected: {formatProjectText(selectedProject)}</div>
+              </div>
+            )}
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Tasks</label>
+              <textarea
+                rows={3}
+                value={projectTasks}
+                onChange={(e) => setProjectTasks(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectModalFieldErrors.tasks && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {projectModalFieldErrors.tasks}
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Work done</label>
+              <textarea
+                rows={3}
+                value={projectWorkDone}
+                onChange={(e) => setProjectWorkDone(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectModalFieldErrors.workDone && (
+                <div style={{ color: "red", marginTop: 4 }}>
+                  {projectModalFieldErrors.workDone}
+                </div>
+              )}
+            </div>
+
+            {projectModalMessage && (
+              <div style={{ color: "red", marginBottom: 10 }}>{projectModalMessage}</div>
+            )}
+
+            <button type="button" onClick={handleSaveProjectFromModal} disabled={isProjectSaving} style={getButtonStyle("add", isProjectSaving)}>
+              {isProjectSaving ? "Saving..." : "Save Project"}
+            </button>
+            {" "}
+            <button type="button" onClick={closeProjectModal} disabled={isProjectSaving} style={getButtonStyle("cancel", isProjectSaving)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {isCourseModalOpen && (
         <div
@@ -1682,11 +2202,11 @@ export default function UserDashboard() {
               )}
             </div>
 
-            <button type="button" onClick={handleSaveCourseFromModal} disabled={isCourseSaving}>
+            <button type="button" onClick={handleSaveCourseFromModal} disabled={isCourseSaving} style={getButtonStyle("add", isCourseSaving)}>
               {isCourseSaving ? "Saving..." : "Save Course"}
             </button>
             {" "}
-            <button type="button" onClick={closeCourseModal} disabled={isCourseSaving}>
+            <button type="button" onClick={closeCourseModal} disabled={isCourseSaving} style={getButtonStyle("cancel", isCourseSaving)}>
               Cancel
             </button>
             {courseModalMessage && (
@@ -1721,7 +2241,7 @@ export default function UserDashboard() {
                     <button
                       type="button"
                       onClick={() => handleDeleteCoursePlan(course)}
-                      style={{ marginTop: 4 }}
+                      style={{ ...getButtonStyle("delete", isCourseDeleting), marginTop: 4 }}
                     >
                       {isCourseDeleting ? "Deleting..." : "Delete"}
                     </button>
@@ -1763,6 +2283,7 @@ export default function UserDashboard() {
                 type="text"
                 value={courseEditName}
                 onChange={(e) => setCourseEditName(e.target.value)}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {courseEditFieldErrors.name && (
@@ -1775,6 +2296,7 @@ export default function UserDashboard() {
                 type="number"
                 value={courseEditEcts}
                 onChange={(e) => setCourseEditEcts(e.target.value)}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {courseEditFieldErrors.ectsCredits && (
@@ -1787,6 +2309,7 @@ export default function UserDashboard() {
                 type="text"
                 value={courseEditSemester}
                 onChange={(e) => setCourseEditSemester(e.target.value)}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {courseEditFieldErrors.semester && (
@@ -1799,6 +2322,7 @@ export default function UserDashboard() {
                 type="text"
                 value={courseEditFaculty}
                 onChange={(e) => setCourseEditFaculty(e.target.value)}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {courseEditFieldErrors.faculty && (
@@ -1817,16 +2341,205 @@ export default function UserDashboard() {
                 <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.workDone}</div>
               )}
             </div>
-            <button type="button" onClick={handleEditCoursePlan} disabled={isCourseEditing}>
+            <button type="button" onClick={handleEditCoursePlan} disabled={isCourseEditing} style={getButtonStyle("update", isCourseEditing)}>
               {isCourseEditing ? "Saving..." : "Save"}
             </button>
             {" "}
-            <button type="button" onClick={closeCourseEditModal} disabled={isCourseEditing}>
+            <button type="button" onClick={closeCourseEditModal} disabled={isCourseEditing} style={getButtonStyle("cancel", isCourseEditing)}>
               Cancel
             </button>
             {courseEditMessage && (
               <p style={{ color: "red", marginTop: 8 }}>{courseEditMessage}</p>
             )}
+          </div>
+        </div>
+      )}
+
+      {isProjectDeleteModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 600, maxWidth: "95%", padding: 16 }}>
+            <h3>Delete Project From Plan #{openPlan?.idPlan}</h3>
+
+            {openPlanProjects.length === 0 ? (
+              <p>No projects attached to this plan.</p>
+            ) : (
+              <div style={{ maxHeight: 260, overflowY: "auto", border: "1px solid #ddd", padding: 8 }}>
+                {openPlanProjects.map((project, idx) => (
+                  <div key={`${getProjectPlanId(project) || getProjectId(project) || idx}-${idx}`} style={{ marginBottom: 8 }}>
+                    <div>{formatProjectText(project)}</div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteProjectPlan(project)}
+                      disabled={isProjectDeleting}
+                      style={getButtonStyle("delete", isProjectDeleting)}
+                    >
+                      {isProjectDeleting ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {projectDeleteMessage && (
+              <div style={{ color: "red", marginTop: 8 }}>{projectDeleteMessage}</div>
+            )}
+
+            <button type="button" onClick={closeProjectDeleteModal} disabled={isProjectDeleting}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isProjectEditModalOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0, 0, 0, 0.45)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000
+          }}
+        >
+          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
+            <h3>Edit Project</h3>
+            <div style={{ marginBottom: 10 }}>
+              <div>{projectEditTarget ? formatProjectText(projectEditTarget) : ""}</div>
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Name</label>
+              <input
+                type="text"
+                value={projectEditName}
+                onChange={(e) => setProjectEditName(e.target.value)}
+                disabled
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectEditFieldErrors.name && (
+                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.name}</div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Number</label>
+              <input
+                type="number"
+                value={projectEditNumber}
+                onChange={(e) => setProjectEditNumber(e.target.value)}
+                disabled
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectEditFieldErrors.number && (
+                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.number}</div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Management ID</label>
+              <input
+                type="number"
+                value={projectEditManagementId}
+                onChange={(e) => setProjectEditManagementId(e.target.value)}
+                disabled
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectEditFieldErrors.managementId && (
+                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.managementId}</div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Start Date</label>
+              <input
+                type="date"
+                value={projectEditStartDate}
+                onChange={(e) => setProjectEditStartDate(e.target.value)}
+                disabled
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectEditFieldErrors.startDate && (
+                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.startDate}</div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>End Date</label>
+              <input
+                type="date"
+                value={projectEditEndDate}
+                onChange={(e) => setProjectEditEndDate(e.target.value)}
+                disabled
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectEditFieldErrors.endDate && (
+                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.endDate}</div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Acronym</label>
+              <input
+                type="text"
+                value={projectEditAcronym}
+                onChange={(e) => setProjectEditAcronym(e.target.value)}
+                disabled
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectEditFieldErrors.acronym && (
+                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.acronym}</div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Tasks</label>
+              <textarea
+                rows={3}
+                value={projectEditTasks}
+                onChange={(e) => setProjectEditTasks(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectEditFieldErrors.tasks && (
+                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.tasks}</div>
+              )}
+            </div>
+
+            <div style={{ marginBottom: 10 }}>
+              <label>Work done</label>
+              <textarea
+                rows={3}
+                value={projectEditWorkDone}
+                onChange={(e) => setProjectEditWorkDone(e.target.value)}
+                style={{ width: "100%", marginTop: 4 }}
+              />
+              {projectEditFieldErrors.workDone && (
+                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.workDone}</div>
+              )}
+            </div>
+
+            {projectEditMessage && (
+              <div style={{ color: "red", marginBottom: 10 }}>{projectEditMessage}</div>
+            )}
+
+            <button type="button" onClick={handleEditProjectPlan} disabled={isProjectEditing} style={getButtonStyle("update", isProjectEditing)}>
+              {isProjectEditing ? "Saving..." : "Save"}
+            </button>
+            {" "}
+            <button type="button" onClick={closeProjectEditModal} disabled={isProjectEditing} style={getButtonStyle("cancel", isProjectEditing)}>
+              Cancel
+            </button>
           </div>
         </div>
       )}
@@ -1979,7 +2692,7 @@ export default function UserDashboard() {
                       placeholder="New journal name"
                       style={{ flex: 1 }}
                     />
-                    <button type="button" onClick={handleCreateJournal} disabled={isJournalCreating}>
+                    <button type="button" onClick={handleCreateJournal} disabled={isJournalCreating} style={getButtonStyle("add", isJournalCreating)}>
                       {isJournalCreating ? "Creating..." : "Add Journal"}
                     </button>
                   </div>
@@ -2022,11 +2735,11 @@ export default function UserDashboard() {
               )}
             </div>
 
-            <button type="button" onClick={handleSaveArticleFromModal} disabled={isArticleSaving}>
+            <button type="button" onClick={handleSaveArticleFromModal} disabled={isArticleSaving} style={getButtonStyle("add", isArticleSaving)}>
               {isArticleSaving ? "Saving..." : "Save Article"}
             </button>
             {" "}
-            <button type="button" onClick={closeArticleModal} disabled={isArticleSaving}>
+            <button type="button" onClick={closeArticleModal} disabled={isArticleSaving} style={getButtonStyle("cancel", isArticleSaving)}>
               Cancel
             </button>
             {articleModalMessage && (
@@ -2061,7 +2774,7 @@ export default function UserDashboard() {
                     <button
                       type="button"
                       onClick={() => handleDeleteArticlePlan(article)}
-                      style={{ marginTop: 4 }}
+                      style={{ ...getButtonStyle("delete", isArticleDeleting), marginTop: 4 }}
                     >
                       {isArticleDeleting ? "Deleting..." : "Delete"}
                     </button>
@@ -2103,6 +2816,7 @@ export default function UserDashboard() {
                 type="text"
                 value={articleEditName}
                 onChange={(e) => setArticleEditName(e.target.value)}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {articleEditFieldErrors.name && (
@@ -2117,6 +2831,7 @@ export default function UserDashboard() {
                 type="text"
                 value={articleEditCoAuthors}
                 onChange={(e) => setArticleEditCoAuthors(e.target.value)}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {articleEditFieldErrors.coAuthors && (
@@ -2133,6 +2848,7 @@ export default function UserDashboard() {
                     const nextId = e.target.value;
                     setArticleEditJournalId(nextId);
                   }}
+                  disabled
                   style={{ width: "100%", marginTop: 4 }}
                 >
                 <option value="">Select journal</option>
@@ -2150,9 +2866,10 @@ export default function UserDashboard() {
                     value={newJournalName}
                     onChange={(e) => setNewJournalName(e.target.value)}
                     placeholder="New journal name"
+                    disabled
                     style={{ flex: 1 }}
                   />
-                  <button type="button" onClick={handleCreateJournal} disabled={isJournalCreating}>
+                  <button type="button" onClick={handleCreateJournal} disabled>
                     {isJournalCreating ? "Creating..." : "Add Journal"}
                   </button>
                 </div>
@@ -2196,11 +2913,11 @@ export default function UserDashboard() {
                 </div>
               )}
             </div>
-            <button type="button" onClick={handleEditArticlePlan} disabled={isArticleEditing}>
+            <button type="button" onClick={handleEditArticlePlan} disabled={isArticleEditing} style={getButtonStyle("update", isArticleEditing)}>
               {isArticleEditing ? "Saving..." : "Save"}
             </button>
             {" "}
-            <button type="button" onClick={closeArticleEditModal} disabled={isArticleEditing}>
+            <button type="button" onClick={closeArticleEditModal} disabled={isArticleEditing} style={getButtonStyle("cancel", isArticleEditing)}>
               Cancel
             </button>
             {articleEditMessage && (
@@ -2293,11 +3010,11 @@ export default function UserDashboard() {
                 <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.workDone}</div>
               )}
             </div>
-            <button type="button" onClick={handleSaveStudentWorkFromModal} disabled={isStudentWorkSaving}>
+            <button type="button" onClick={handleSaveStudentWorkFromModal} disabled={isStudentWorkSaving} style={getButtonStyle("add", isStudentWorkSaving)}>
               {isStudentWorkSaving ? "Saving..." : "Save Student Work"}
             </button>
             {" "}
-            <button type="button" onClick={closeStudentWorkModal} disabled={isStudentWorkSaving}>
+            <button type="button" onClick={closeStudentWorkModal} disabled={isStudentWorkSaving} style={getButtonStyle("cancel", isStudentWorkSaving)}>
               Cancel
             </button>
             {studentWorkModalMessage && (
@@ -2331,7 +3048,7 @@ export default function UserDashboard() {
                     <button
                       type="button"
                       onClick={() => handleDeleteStudentWorkPlan(work)}
-                      style={{ marginTop: 4 }}
+                      style={{ ...getButtonStyle("delete", isStudentWorkDeleting), marginTop: 4 }}
                     >
                       {isStudentWorkDeleting ? "Deleting..." : "Delete"}
                     </button>
@@ -2369,6 +3086,7 @@ export default function UserDashboard() {
                 type="text"
                 value={studentWorkEditForm.name}
                 onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, name: e.target.value }))}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {studentWorkEditFieldErrors.name && (
@@ -2381,6 +3099,7 @@ export default function UserDashboard() {
                 type="text"
                 value={studentWorkEditForm.studentName}
                 onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, studentName: e.target.value }))}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {studentWorkEditFieldErrors.studentName && (
@@ -2393,6 +3112,7 @@ export default function UserDashboard() {
                 type="text"
                 value={studentWorkEditForm.studentSurname}
                 onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, studentSurname: e.target.value }))}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               />
               {studentWorkEditFieldErrors.studentSurname && (
@@ -2404,6 +3124,7 @@ export default function UserDashboard() {
               <select
                 value={studentWorkEditForm.degree}
                 onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, degree: e.target.value }))}
+                disabled
                 style={{ width: "100%", marginTop: 4 }}
               >
                 <option value="">Select degree</option>
@@ -2429,11 +3150,11 @@ export default function UserDashboard() {
                 <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.workDone}</div>
               )}
             </div>
-            <button type="button" onClick={handleEditStudentWorkPlan} disabled={isStudentWorkEditing}>
+            <button type="button" onClick={handleEditStudentWorkPlan} disabled={isStudentWorkEditing} style={getButtonStyle("update", isStudentWorkEditing)}>
               {isStudentWorkEditing ? "Saving..." : "Save"}
             </button>
             {" "}
-            <button type="button" onClick={closeStudentWorkEditModal} disabled={isStudentWorkEditing}>
+            <button type="button" onClick={closeStudentWorkEditModal} disabled={isStudentWorkEditing} style={getButtonStyle("cancel", isStudentWorkEditing)}>
               Cancel
             </button>
             {studentWorkEditMessage && (

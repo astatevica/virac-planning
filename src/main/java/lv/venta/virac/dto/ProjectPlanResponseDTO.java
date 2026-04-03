@@ -29,14 +29,14 @@ public class ProjectPlanResponseDTO {
 	@Min(value = 10000, message = "number must be at least 10000")
 	private int number;
 	
-	@Min(value = 11, message = "managementId must be at least 2")
+	@Min(value = 1, message = "managementId must be at least 2")
 	private int managementId;
 	
-	@NotBlank(message = "Semester is required")
+	//@NotBlank(message = "Semester is required")
 	//TODO: can add date validation
 	private LocalDate startDate;
 	
-	@NotBlank(message = "Faculty is required")
+	//@NotBlank(message = "Faculty is required")
 	//TODO: can add date validation
 	private LocalDate endDate;
 	
