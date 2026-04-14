@@ -31,7 +31,7 @@ public class CRUDCoursePlanController {
 		this.coursePlanService = coursePlanService;
 	}
 
-	@GetMapping
+	@GetMapping("/all")
     public ResponseEntity<ArrayList<CoursePlanDTO>> getAll() throws Exception {
 
         ArrayList<CoursePlan> coursePlans = coursePlanService.retrieveAll();
@@ -66,7 +66,7 @@ public class CRUDCoursePlanController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody CoursePlanDTO dto,
             BindingResult result) throws Exception {
@@ -80,7 +80,7 @@ public class CRUDCoursePlanController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
             @Valid @RequestBody CoursePlanDTO dto,
@@ -95,7 +95,7 @@ public class CRUDCoursePlanController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
     	coursePlanService.deleteById(id);
         return ResponseEntity.noContent().build();

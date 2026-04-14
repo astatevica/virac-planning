@@ -31,7 +31,7 @@ public class CRUDJournalController {
 		this.jourService = jourService;
 	}
 
-	@GetMapping
+	@GetMapping("/all")
     public ResponseEntity<ArrayList<JournalDTO>> getAllJournals() throws Exception {
 
         ArrayList<Journal> journals = jourService.retrieveAll();
@@ -61,7 +61,7 @@ public class CRUDJournalController {
         ));
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<Void> create(
             @Valid @RequestBody JournalDTO dto,
             BindingResult result) throws Exception {
@@ -75,7 +75,7 @@ public class CRUDJournalController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
             @Valid @RequestBody JournalDTO dto,
@@ -90,7 +90,7 @@ public class CRUDJournalController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
         jourService.deleteById(id);
         return ResponseEntity.noContent().build();

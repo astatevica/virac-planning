@@ -30,7 +30,7 @@ public class CRUDProjManagController {
 	        this.projService = projService;
 	    }
 	    
-	    @GetMapping
+	    @GetMapping("/all")
 	    public ResponseEntity<ArrayList<ProjectManagementDTO>> getAll()
 	            throws Exception {
 
@@ -65,14 +65,9 @@ public class CRUDProjManagController {
 	        );
 	    }
 	    
-	    @PostMapping
+	    @PostMapping("/add")
 	    public ResponseEntity<Void> create(
 	            @RequestBody ProjectManagementDTO dto) throws Exception {
-
-	    	System.out.println("MANAGEMENT ID: " + dto.getIdProjectManag());
-	        System.out.println("EMPLOYEE ID: " + dto.getEmployeeId());
-	        System.out.println("START DATE: " + dto.getStartDate());
-	        System.out.println("END DATE: " + dto.getEndDate());
 
 	        projService.create(
 	        	dto.getEmployeeId(),
@@ -83,7 +78,7 @@ public class CRUDProjManagController {
 	        return ResponseEntity.status(HttpStatus.CREATED).build();
 	    }
 
-	    @PutMapping("/{id}")
+	    @PutMapping("/update/{id}")
 	    public ResponseEntity<Void> update(
 	            @PathVariable("id") int id,
 	            @RequestBody ProjectManagementDTO dto) throws Exception {
@@ -98,7 +93,7 @@ public class CRUDProjManagController {
 	        return ResponseEntity.ok().build();
 	    }
 
-	    @DeleteMapping("/{id}")
+	    @DeleteMapping("/delete/{id}")
 	    public ResponseEntity<Void> delete(
 	            @PathVariable("id") int id) throws Exception {
 

@@ -31,7 +31,7 @@ public class CRUDProjectController {
 		this.projService = projectService;
 	}
 	
-	@GetMapping
+	@GetMapping("/all")
 	@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ArrayList<ProjectDTO>> getAll()
             throws Exception {
@@ -74,18 +74,10 @@ public class CRUDProjectController {
 	        );
     }
     
-    @PostMapping
+    @PostMapping("/add")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> create(
             @RequestBody ProjectDTO dto) throws Exception {
-
-    	System.out.println("PROJECT ID: " + dto.getIdProject());
-        System.out.println("NAME: " + dto.getName());
-        System.out.println("NUMBER: " + dto.getNumber());
-        System.out.println("MANAGEMENT ID: " + dto.getManagementId());
-        System.out.println("START DATE: " + dto.getStartDate());
-        System.out.println("END DATE: " + dto.getEndDate());
-        System.out.println("ACRONYM: " + dto.getAcronym());
 
         projService.create(
         	dto.getName(),
@@ -99,7 +91,7 @@ public class CRUDProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
@@ -118,7 +110,7 @@ public class CRUDProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(
             @PathVariable("id") int id) throws Exception {

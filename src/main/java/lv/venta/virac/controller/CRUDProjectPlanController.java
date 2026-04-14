@@ -31,7 +31,7 @@ public class CRUDProjectPlanController {
 		this.projPlanService = projPlanService;
 	}
 
-	@GetMapping
+	@GetMapping("/all")
     public ResponseEntity<ArrayList<ProjectPlanDTO>> getAllProjectPlans() throws Exception {
 
         ArrayList<ProjectPlan> projectPlans = projPlanService.retrieveAll();
@@ -64,7 +64,7 @@ public class CRUDProjectPlanController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody ProjectPlanDTO dto,
             BindingResult result) throws Exception {
@@ -78,7 +78,7 @@ public class CRUDProjectPlanController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
             @Valid @RequestBody ProjectPlanDTO dto,
@@ -93,7 +93,7 @@ public class CRUDProjectPlanController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
         projPlanService.deleteById(id);
         return ResponseEntity.noContent().build();

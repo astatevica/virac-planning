@@ -31,7 +31,7 @@ public class CRUDArticlePlanController {
 		this.artPlanService = artPlanService;
 	}
 	
-	@GetMapping
+	@GetMapping("/all")
     public ResponseEntity<ArrayList<ArticlePlanDTO>> getAll() throws Exception {
 
         ArrayList<ArticlePlan> artPlans = artPlanService.retrieveAll();
@@ -68,7 +68,7 @@ public class CRUDArticlePlanController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody ArticlePlanDTO dto,
             BindingResult result) throws Exception {
@@ -82,7 +82,7 @@ public class CRUDArticlePlanController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
             @Valid @RequestBody ArticlePlanDTO dto,
@@ -97,7 +97,7 @@ public class CRUDArticlePlanController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
     	artPlanService.deleteById(id);
         return ResponseEntity.noContent().build();

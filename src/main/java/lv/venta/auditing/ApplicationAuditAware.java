@@ -35,7 +35,6 @@ public class ApplicationAuditAware implements AuditorAware<Integer>{
  
 	    //retrieves all information from logged in user
 	    if (principal instanceof User currentUser) {
-			System.out.println(currentUser);
 	        return Optional.ofNullable(currentUser.getIdUser());
 	    }
 

@@ -31,7 +31,7 @@ public class CRUDEmployeeController {
 		this.emplService = emplService;
 	}
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ArrayList<EmployeeDTO>> getAllDEmployees() throws Exception {
 
         ArrayList<Employee> employee = emplService.retrieveAll();
@@ -64,7 +64,7 @@ public class CRUDEmployeeController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody EmployeeDTO dto,
             BindingResult result) throws Exception {
@@ -78,7 +78,7 @@ public class CRUDEmployeeController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
             @Valid @RequestBody EmployeeDTO dto,
@@ -93,7 +93,7 @@ public class CRUDEmployeeController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
         emplService.deleteById(id);
         return ResponseEntity.noContent().build();

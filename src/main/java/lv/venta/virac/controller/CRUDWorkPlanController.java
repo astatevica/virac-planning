@@ -31,7 +31,7 @@ public class CRUDWorkPlanController {
 		this.wpService = wpService;
 	}
 	
-	@GetMapping
+	@GetMapping("/all")
     public ResponseEntity<ArrayList<WorkPlanDTO>> getAllWorkPlan() throws Exception {
 
         ArrayList<WorkPlan> workPlan = wpService.retrieveAll();
@@ -65,7 +65,7 @@ public class CRUDWorkPlanController {
     	                wp.getWorkDone()));
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody WorkPlanDTO dto,
             BindingResult result) throws Exception {
@@ -79,7 +79,7 @@ public class CRUDWorkPlanController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
             @Valid @RequestBody WorkPlanDTO dto,
@@ -94,7 +94,7 @@ public class CRUDWorkPlanController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
         wpService.deleteById(id);
         return ResponseEntity.noContent().build();

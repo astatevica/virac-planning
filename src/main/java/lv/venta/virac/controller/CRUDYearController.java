@@ -32,7 +32,7 @@ public class CRUDYearController {
 		this.yearService = yearService;
 	}
 
-	@GetMapping
+	@GetMapping("/all")
 	@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public ResponseEntity<ArrayList<YearDTO>> getAll() throws Exception {
 
@@ -64,7 +64,7 @@ public class CRUDYearController {
      	            ));
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody YearDTO dto,
             BindingResult result) throws Exception {
@@ -78,7 +78,7 @@ public class CRUDYearController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(@PathVariable("id") int id,
             @Valid @RequestBody YearDTO dto,BindingResult result) throws Exception {
 
@@ -91,7 +91,7 @@ public class CRUDYearController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
     	yearService.deleteById(id);
         return ResponseEntity.noContent().build();

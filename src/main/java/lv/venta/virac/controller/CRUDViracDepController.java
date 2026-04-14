@@ -31,7 +31,7 @@ public class CRUDViracDepController {
         this.depService = depService;
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<ArrayList<DepartmentDTO>> getAllDepartments() throws Exception {
 
         ArrayList<ViracDepartment> departments = depService.retrieveAll();
@@ -62,7 +62,7 @@ public class CRUDViracDepController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody DepartmentDTO dto,
             BindingResult result) throws Exception {
@@ -75,7 +75,7 @@ public class CRUDViracDepController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(
             @PathVariable("id") int id,
             @Valid @RequestBody DepartmentDTO dto,
@@ -89,7 +89,7 @@ public class CRUDViracDepController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
         depService.deleteById(id);
         return ResponseEntity.noContent().build();

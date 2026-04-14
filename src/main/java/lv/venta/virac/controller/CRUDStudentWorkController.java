@@ -31,7 +31,7 @@ public class CRUDStudentWorkController {
 		this.swService = swService;
 	}
 	
-	@GetMapping
+	@GetMapping("/all")
     public ResponseEntity<ArrayList<StudentWorkDTO>> getAllStudentWork() throws Exception {
 
         ArrayList<StudentWork> studentWork = swService.retrieveAll();
@@ -57,7 +57,6 @@ public class CRUDStudentWorkController {
             @PathVariable("id") int id) throws Exception {
 
         StudentWork sw = swService.retrieveById(id);
-        System.out.println(sw);
         return ResponseEntity.ok(
         		new StudentWorkDTO(
     	                sw.getIdStudWork(),
@@ -69,7 +68,7 @@ public class CRUDStudentWorkController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody StudentWorkDTO dto,
             BindingResult result) throws Exception {
@@ -83,7 +82,7 @@ public class CRUDStudentWorkController {
     }
 
 
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Void> update(@PathVariable("id") int id,
             @Valid @RequestBody StudentWorkDTO dto, BindingResult result) throws Exception {
 
@@ -96,7 +95,7 @@ public class CRUDStudentWorkController {
     }
 
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
         swService.deleteById(id);
         return ResponseEntity.noContent().build();
