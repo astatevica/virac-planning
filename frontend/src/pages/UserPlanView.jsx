@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import api from "../api/api";
+import UserPlanService from "../services/UserPlanService";
 
+const hasItems = (items) => Array.isArray(items) && items.length > 0;
+
+const formatValue = (value) => {
+  if (value === null || value === undefined || value === "") return "-";
+  return value;
+};
+
+const itemStyle = {
+  marginBottom: "8px",
+  paddingBottom: "8px",
+  borderBottom: "1px solid #d6dde5",
+};
 
 export default function UserPlanView() {
   const { id } = useParams();
@@ -12,133 +24,238 @@ export default function UserPlanView() {
   useEffect(() => {
     const loadFullPlan = async () => {
       try {
-        const fullPlanRes = await api.get(`/user/full-plan/${id}`);
+        const fullPlanRes = await UserPlanService.getFullPlan(id);
         setFullPlan(fullPlanRes.data);
       } catch (err) {
         console.error(err);
       }
     };
+
     loadFullPlan();
   }, [id]);
 
   if (!fullPlan) return <p>Loading...</p>;
 
   return (
-    <div style={{ maxWidth: 1100, margin: "auto" }}>
-      {fullPlan && (
-      <>
-        <h3>Full Plan</h3>
+    <div style={styles.page}>
+      <h2>Full Plan</h2>
 
-        <table border="1" cellPadding="5">
+      <table style={styles.table}>
           <thead>
             <tr>
-              <th>Activity</th>
-              <th>Planned</th>
-              <th>Done</th>
+              <th style={styles.headCell}>Activity</th>
+              <th style={styles.headCell}>Planned</th>
+              <th style={styles.headCell}>Done</th>
             </tr>
           </thead>
 
           <tbody>
-
             <tr>
-              <td>Projects</td>
-              <td>{fullPlan.numOfProjects}</td>
-              <td>
-                {fullPlan.projects?.map(p => (
-                  <div key={p.idProject}>{p.name}</div>
-                ))}
+              <td style={styles.labelCell}>Projects</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.numOfProjects)}</td>
+              <td style={styles.contentCell}>
+                {hasItems(fullPlan.projects) ? (
+                  fullPlan.projects.map((project) => (
+                    <div key={`${project.idPlan}-${project.idProject}`} style={itemStyle}>
+                      <div><strong>Name:</strong> {formatValue(project.name)}</div>
+                      <div><strong>Number:</strong> {formatValue(project.number)}</div>
+                      <div><strong>Start date:</strong> {formatValue(project.startDate)}</div>
+                      <div><strong>End date:</strong> {formatValue(project.endDate)}</div>
+                      <div><strong>Acronym:</strong> {formatValue(project.acronym)}</div>
+                      <div><strong>Tasks:</strong> {formatValue(project.tasks)}</div>
+                      <div><strong>Work done:</strong> {formatValue(project.workDone)}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={styles.emptyText}>-</div>
+                )}
               </td>
             </tr>
 
             <tr>
-              <td>Articles</td>
-              <td>{fullPlan.numOfArticles}</td>
-              <td>
-                {fullPlan.articles?.map(a => (
-                  <div key={a.idScientificArticles}>{a.title}</div>
-                ))}
+              <td style={styles.labelCell}>Articles</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.numOfArticles)}</td>
+              <td style={styles.contentCell}>
+                {hasItems(fullPlan.articles) ? (
+                  fullPlan.articles.map((article) => (
+                    <div key={`${article.idPlan}-${article.idArticle}`} style={itemStyle}>
+                      <div><strong>Name:</strong> {formatValue(article.name)}</div>
+                      <div><strong>Co-authors:</strong> {formatValue(article.coAuthors)}</div>
+                      <div><strong>Journal ID:</strong> {formatValue(article.idJournal)}</div>
+                      <div><strong>Comments:</strong> {formatValue(article.articleComments)}</div>
+                      <div><strong>Publication link:</strong> {formatValue(article.publicationLink)}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={styles.emptyText}>-</div>
+                )}
               </td>
             </tr>
 
             <tr>
-              <td>Courses</td>
-              <td>{fullPlan.numOfCourses}</td>
-              <td>
-                {fullPlan.courses?.map(c => (
-                  <div key={c.idCourse}>{c.name}</div>
-                ))}
+              <td style={styles.labelCell}>Courses</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.numOfCourses)}</td>
+              <td style={styles.contentCell}>
+                {hasItems(fullPlan.courses) ? (
+                  fullPlan.courses.map((course) => (
+                    <div key={`${course.idPlan}-${course.idCourse}`} style={itemStyle}>
+                      <div><strong>Name:</strong> {formatValue(course.name)}</div>
+                      <div><strong>ECTS:</strong> {formatValue(course.ectsCredits)}</div>
+                      <div><strong>Semester:</strong> {formatValue(course.semester)}</div>
+                      <div><strong>Faculty:</strong> {formatValue(course.faculty)}</div>
+                      <div><strong>Work done:</strong> {formatValue(course.workDone)}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={styles.emptyText}>-</div>
+                )}
               </td>
             </tr>
 
             <tr>
-              <td>Student Work</td>
-              <td>{fullPlan.numOfStudWork}</td>
-              <td>
-                {fullPlan.studentWork?.map(sw => (
-                  <div key={sw.idStudentWork}>{sw.title}</div>
-                ))}
+              <td style={styles.labelCell}>Student Work</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.numOfStudWork)}</td>
+              <td style={styles.contentCell}>
+                {hasItems(fullPlan.studentWork) ? (
+                  fullPlan.studentWork.map((work) => (
+                    <div key={`${work.idPlan}-${work.idStudWork}`} style={itemStyle}>
+                      <div><strong>Work name:</strong> {formatValue(work.name)}</div>
+                      <div><strong>Student name:</strong> {formatValue(work.studentName)}</div>
+                      <div><strong>Student surname:</strong> {formatValue(work.studentSurname)}</div>
+                      <div><strong>Degree:</strong> {formatValue(work.degree)}</div>
+                      <div><strong>Work done:</strong> {formatValue(work.workDone)}</div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={styles.emptyText}>-</div>
+                )}
               </td>
             </tr>
 
             <tr>
-              <td>Participation in Conferences</td>
-              <td>{fullPlan.partInConf}</td>
-              <td>{fullPlan.partInConfEnd}</td>
+              <td style={styles.labelCell}>Participation in Conferences</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.partInConf)}</td>
+              <td style={styles.contentCell}>{formatValue(fullPlan.partInConfEnd)}</td>
             </tr>
 
             <tr>
-              <td>Committee Abroad Conferences</td>
-              <td>{fullPlan.comAbConf}</td>
-              <td>{fullPlan.comAbConfEnd}</td>
+              <td style={styles.labelCell}>Committee Abroad Conferences</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.comAbConf)}</td>
+              <td style={styles.contentCell}>{formatValue(fullPlan.comAbConfEnd)}</td>
             </tr>
 
             <tr>
-              <td>Promotion of Research</td>
-              <td>{fullPlan.promoOfResearch}</td>
-              <td>{fullPlan.promoOfResearchEnd}</td>
+              <td style={styles.labelCell}>Promotion of Research</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.promoOfResearch)}</td>
+              <td style={styles.contentCell}>{formatValue(fullPlan.promoOfResearchEnd)}</td>
             </tr>
 
             <tr>
-              <td>Administrative Work</td>
-              <td>{fullPlan.adminWork}</td>
-              <td>{fullPlan.adminWorkEnd}</td>
+              <td style={styles.labelCell}>Administrative Work</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.adminWork)}</td>
+              <td style={styles.contentCell}>{formatValue(fullPlan.adminWorkEnd)}</td>
             </tr>
 
             <tr>
-              <td>Project Applications Submitted</td>
-              <td>{fullPlan.projApplicSub}</td>
-              <td>{fullPlan.projApplicSubEnd}</td>
+              <td style={styles.labelCell}>Project Applications Submitted</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.projApplicSub)}</td>
+              <td style={styles.contentCell}>{formatValue(fullPlan.projApplicSubEnd)}</td>
             </tr>
 
             <tr>
-              <td>Skills Development</td>
-              <td>{fullPlan.skillsDevelopment}</td>
-              <td>{fullPlan.skillsDevelopmentEnd}</td>
+              <td style={styles.labelCell}>Skills Development</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.skillsDevelopment)}</td>
+              <td style={styles.contentCell}>{formatValue(fullPlan.skillsDevelopmentEnd)}</td>
             </tr>
 
             <tr>
-              <td>Participation in Seminars</td>
-              <td>{fullPlan.participationInSeminars}</td>
-              <td>{fullPlan.participationInSeminarsEnd}</td>
+              <td style={styles.labelCell}>Participation in Seminars</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.participationInSeminars)}</td>
+              <td style={styles.contentCell}>{formatValue(fullPlan.participationInSeminarsEnd)}</td>
             </tr>
 
             <tr>
-              <td>Other Jobs</td>
-              <td>{fullPlan.otherJobs}</td>
-              <td>{fullPlan.otherJobsEnd}</td>
+              <td style={styles.labelCell}>Other Jobs</td>
+              <td style={styles.countCell}>{formatValue(fullPlan.otherJobs)}</td>
+              <td style={styles.contentCell}>{formatValue(fullPlan.otherJobsEnd)}</td>
             </tr>
-
           </tbody>
-        </table>
-      </>
-    )}
-    
-      <button onClick={() => navigate("/user/dashboard")}>
-        Back to Dashboard
-      </button>
-      <button onClick={() => navigate("/user/plans")}>
-        Back to Archive
-      </button>
+      </table>
+
+      <div style={styles.buttonRow}>
+        <button style={styles.primaryButton} onClick={() => navigate("/user/dashboard")}>
+          Back to Dashboard
+        </button>
+        <button style={styles.secondaryButton} onClick={() => navigate("/user/plans")}>
+          Back to Archive
+        </button>
+      </div>
     </div>
   );
 }
+
+const styles = {
+  page: {
+    maxWidth: 1100,
+    margin: "0 auto",
+    padding: "20px",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    border: "1px solid #aeb6bf",
+    background: "#fff",
+  },
+  headCell: {
+    textAlign: "left",
+    padding: "10px 12px",
+    background: "#f6f8fa",
+    border: "1px solid #b7c0c8",
+  },
+  labelCell: {
+    padding: "10px 12px",
+    border: "1px solid #b7c0c8",
+    verticalAlign: "top",
+    fontWeight: 600,
+    width: "22%",
+  },
+  countCell: {
+    padding: "10px 12px",
+    border: "1px solid #b7c0c8",
+    verticalAlign: "top",
+    width: "10%",
+  },
+  contentCell: {
+    textAlign: "left",
+    padding: "10px 12px",
+    border: "1px solid #b7c0c8",
+    verticalAlign: "top",
+  },
+  emptyText: {
+    color: "#64748b",
+  },
+  buttonRow: {
+    display: "flex",
+    gap: 12,
+    marginTop: 20,
+    flexWrap: "wrap",
+  },
+  primaryButton: {
+    padding: "10px 16px",
+    borderRadius: 4,
+    border: "1px solid #b7c0c8",
+    background: "#f6f8fa",
+    color: "#111827",
+    cursor: "pointer",
+    fontWeight: 500,
+  },
+  secondaryButton: {
+    padding: "10px 16px",
+    borderRadius: 4,
+    border: "1px solid #b7c0c8",
+    background: "#ffffff",
+    color: "#111827",
+    cursor: "pointer",
+    fontWeight: 500,
+  },
+};

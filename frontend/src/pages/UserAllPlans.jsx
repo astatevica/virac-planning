@@ -3,6 +3,15 @@ import UserPlanService from "../services/UserPlanService";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
 
+const buttonStyle = {
+  background: "#0d6efd",
+  color: "#fff",
+  border: "1px solid #0d6efd",
+  borderRadius: "4px",
+  padding: "6px 12px",
+  cursor: "pointer",
+};
+
 export default function UserAllPlans() {
 
   const navigate = useNavigate();
@@ -127,48 +136,50 @@ export default function UserAllPlans() {
 
       <h3>Filters</h3>
 
-      <label>Year:</label>
-      <select
-        value={selectedYear}
-        onChange={e => {
-          setSelectedProject("");
-          setSelectedYear(e.target.value);
-        }}
-      >
-        <option value="">All</option>
-        {years.map(y => (
-          <option key={y.idYear} value={y.idYear}>
-            {y.yearNumber}
-          </option>
-        ))}
-      </select>
+      <div style={{ marginBottom: 16 }}>
+        <label>Year:</label>{" "}
+        <select
+          value={selectedYear}
+          onChange={e => {
+            setSelectedProject("");
+            setSelectedYear(e.target.value);
+          }}
+        >
+          <option value="">All</option>
+          {years.map(y => (
+            <option key={y.idYear} value={y.idYear}>
+              {y.yearNumber}
+            </option>
+          ))}
+        </select>
 
-      <label style={{ marginLeft: 15 }}>Project:</label>
-      <select
-        value={selectedProject}
-        onChange={e => {
-          setSelectedYear("");
-          setSelectedProject(e.target.value);
-        }}
-      >
-        <option value="">All</option>
-        {projects.map(p => (
-          <option key={p.idProject} value={p.idProject}>
-            {p.name}
-          </option>
-        ))}
-      </select>
+        <label style={{ marginLeft: 15 }}>Project:</label>{" "}
+        <select
+          value={selectedProject}
+          onChange={e => {
+            setSelectedYear("");
+            setSelectedProject(e.target.value);
+          }}
+        >
+          <option value="">All</option>
+          {projects.map(p => (
+            <option key={p.idProject} value={p.idProject}>
+              {p.name}
+            </option>
+          ))}
+        </select>
 
-      <button
-        onClick={() => {
-          setSelectedYear("");
-          setSelectedProject("");
-          loadPlans();
-        }}
-        style={{ marginLeft: 10 }}
-      >
-        Clear
-      </button>
+        <button
+          onClick={() => {
+            setSelectedYear("");
+            setSelectedProject("");
+            loadPlans();
+          }}
+          style={{ ...buttonStyle, marginLeft: 10 }}
+        >
+          Clear
+        </button>
+      </div>
 
       {noResults && (
         <p style={{ color: "orange", fontWeight: "bold" }}>
@@ -176,35 +187,40 @@ export default function UserAllPlans() {
         </p>
       )}
 
-      <hr />
-
-      <table border="1" cellPadding="5">
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          border: "1px solid #aeb6bf",
+          background: "#fff"
+        }}
+      >
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Year</th>
-            <th>Projects count</th>
-            <th>Project name</th>
-            <th>Articles</th>
-            <th>Courses</th>
-            <th>Student Work</th>
-            <th>Actions</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>ID</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Year</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Projects count</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Project name</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Articles</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Courses</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Student Work</th>
+            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Actions</th>
           </tr>
         </thead>
         <tbody>
           {plans.length === 0 ? (
             <tr>
-              <td colSpan="7" style={{ textAlign: "center", color: "gray" }}>
+              <td colSpan="8" style={{ padding: "12px" }}>
                 No plans found
               </td>
             </tr>
           ) : (
             plans.map(pl => (
               <tr key={pl.idPlan}>
-                <td>{pl.idPlan}</td>
-                <td>{yearMap[pl.idYear] || pl.idYear}</td>
-                <td>{pl.numOfProjects}</td>
-                <td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.idPlan}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{yearMap[pl.idYear] || pl.idYear}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfProjects}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>
                   {planProjects[pl.idPlan]?.length > 0 ? (
                     planProjects[pl.idPlan].map(p => (
                       <div key={p.idProjectPlan}>
@@ -215,12 +231,15 @@ export default function UserAllPlans() {
                     ""
                   )}
                 </td>
-                <td>{pl.numOfArticles}</td>
-                <td>{pl.numOfCourses}</td>
-                <td>{pl.numOfStudWork}</td>
-                <td>
-                  <button onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)}>
-                    View
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfArticles}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfCourses}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfStudWork}</td>
+                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>
+                  <button
+                    style={buttonStyle}
+                    onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)}
+                  >
+                    Open
                   </button>
                 </td>
               </tr>
