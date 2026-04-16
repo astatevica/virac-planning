@@ -61,7 +61,7 @@ public class CRUDJournalController {
         ));
     }
 
-    @PostMapping("/create")
+    @PostMapping("/add")
     public ResponseEntity<Void> create(
             @Valid @RequestBody JournalDTO dto,
             BindingResult result) throws Exception {

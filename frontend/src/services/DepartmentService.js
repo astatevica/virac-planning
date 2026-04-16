@@ -5,7 +5,7 @@ const API_URL = "/admin/department";
 class DepartmentService {
 
   getAll() {
-    return api.get(API_URL);
+    return api.get(`${API_URL}/all`);
   }
 
   getById(id) {
@@ -13,15 +13,15 @@ class DepartmentService {
   }
 
   create(department) {
-    return api.post(API_URL, department);
+    return api.post(`${API_URL}/add`, department);
   }
 
   update(id, department) {
-    return api.put(`${API_URL}/${id}`, department);
+    return api.put(`${API_URL}/update/${id}`, department);
   }
 
   delete(id) {
-    return api.delete(`${API_URL}/${id}`);
+    return api.delete(`${API_URL}/delete/${id}`);
   }
 }
 

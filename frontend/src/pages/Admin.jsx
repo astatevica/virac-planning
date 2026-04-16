@@ -29,10 +29,6 @@ const Admin = () => {
     loadEmployees();
   }, []);
 
-  // =========================
-  // LOAD DATA
-  // =========================
-
   const loadUsers = async () => {
     try {
       const res = await api.get(`${API}/all-users`);
@@ -44,16 +40,12 @@ const Admin = () => {
 
   const loadEmployees = async () => {
     try {
-      const res = await api.get(`${API}/employee`);
+      const res = await api.get(`${API}/employee/all`);
       setEmployees(res.data);
     } catch {
       alert("Failed to load employees");
     }
   };
-
-  // =========================
-  // FORM HANDLING
-  // =========================
 
   const handleChange = (e) => {
     setForm({
@@ -73,10 +65,6 @@ const Admin = () => {
     });
     setEditId(null);
   };
-
-  // =========================
-  // CREATE / UPDATE
-  // =========================
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -121,10 +109,6 @@ const Admin = () => {
       alert("Delete failed");
     }
   };
-
-  // =========================
-  // RENDER
-  // =========================
 
   return (
     <div>
@@ -191,7 +175,7 @@ const Admin = () => {
           <option value="">Select Employee</option>
           {employees.map(emp => (
             <option key={emp.idEmployee} value={emp.id}>
-              ID:{emp.id} - {emp.name} {emp.surname}
+              ID:{emp.idEmployee} - {emp.name} {emp.surname}
             </option>
           ))}
         </select>

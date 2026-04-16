@@ -546,7 +546,7 @@ export default function UserDashboard() {
   useEffect(() => {
     const loadCurrentYearPlans = async () => {
       try {
-        const yearsRes = await api.get("/year");
+        const yearsRes = await api.get("/year/all");
 
         const yearObj = yearsRes.data.find((y) => y.yearNumber === currentYear);
         if (!yearObj) {

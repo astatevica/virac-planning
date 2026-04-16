@@ -52,7 +52,7 @@ export default function UserAllPlans() {
   const loadFilters = async () => {
     try {
       const [yearRes] = await Promise.all([
-        api.get("/year")
+        api.get("/year/all")
       ]);
 
       setYears(yearRes.data);
