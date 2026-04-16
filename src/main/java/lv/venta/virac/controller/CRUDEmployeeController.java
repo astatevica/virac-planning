@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,7 @@ import jakarta.validation.Valid;
 import lv.venta.virac.dto.EmployeeDTO;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.service.ICRUDEmployeeService;
+import lv.venta.virac.user.User;
 
 @RestController
 @RequestMapping("/api/admin/employee")
@@ -118,6 +120,36 @@ public class CRUDEmployeeController {
                     .toList());
         
         return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/filter/department")
+    public ResponseEntity<ArrayList<EmployeeDTO>> getEmployeesByDepartment(
+            Authentication authentication){
+
+	    	try {
+	    		User user = (User) authentication.getPrincipal();
+			    String nameDepartment = user.getEmployee().getViracDepartment().getName();
+			    
+	        ArrayList<Employee> employees =
+	                emplService.selectAllEmployeesByDepartment(nameDepartment);
+	
+	        ArrayList<EmployeeDTO> response = new ArrayList<>(
+	                employees.stream()
+	                    .map(emp -> new EmployeeDTO(
+	                    	emp.getIdEmployee(),
+	                    	emp.getName(),
+	                    	emp.getSurname(),
+	                    	emp.getViracDepartment().getName(),
+	                    	emp.getPosition()
+	                    ))
+	                    .toList());
+	        
+	        return ResponseEntity.ok(response);
+       
+    	}catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).build();
+	    }
     }
 
 }

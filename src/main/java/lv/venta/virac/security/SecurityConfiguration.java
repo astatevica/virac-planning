@@ -43,16 +43,24 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 //PUBLIC ENDPOINTS
                 .requestMatchers("/api/auth/**","/error").permitAll()
-
+                
+                //USER & ADMIN & USER_DEPART
+                .requestMatchers("/api/year/**").hasAnyRole("ADMIN","USER","USER_DEPART")
+                
+                //USER_DEPART
+                .requestMatchers("/api/admin/employee/filter/department").hasRole("USER_DEPART") //all employees by department
+                .requestMatchers("/api/admin/plan/filter/employee/{idEmployee}").hasRole("USER_DEPART") //all plans for specific employee
+                .requestMatchers("/api/admin/plan/{id}").hasRole("USER_DEPART") //specific employee plan
+                .requestMatchers("/api/admin/plan/filter/department").hasRole("USER_DEPART") //all plans by department
+                .requestMatchers("/api/admin/plan/filter/department/year/{idYear}").hasRole("USER_DEPART")//Filters plans by year and department  
+                .requestMatchers("/api/admin/department/credentials").hasRole("USER_DEPART")//Credentials for Department
+                
                 //ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 
                 //USER
-                .requestMatchers("/api/user/**").hasRole("USER")
-                
-                //USER & ADMIN
-                .requestMatchers("/api/year/**").hasAnyRole("ADMIN","USER")
-                                                
+                .requestMatchers("/api/user/**").hasRole("USER")                            
+                                            
                 //EVERYTHING ELSE
                 .requestMatchers("/api/auth/logout").authenticated()
                 .anyRequest().authenticated()

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,7 @@ import jakarta.validation.Valid;
 import lv.venta.virac.dto.DepartmentDTO;
 import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.service.ICRUDViracDepService;
+import lv.venta.virac.user.User;
 
 @RestController
 @RequestMapping("/api/admin/department")
@@ -94,4 +96,22 @@ public class CRUDViracDepController {
         depService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    
+    //For Department Head Department credentials
+    @GetMapping("/credentials")
+    public ResponseEntity<DepartmentDTO> getById(
+            Authentication authentication){
+    	try {
+    		User user = (User) authentication.getPrincipal();
+		    int idDepartment = user.getEmployee().getViracDepartment().getIdDepartment();
+	        ViracDepartment dep = depService.retrieveById(idDepartment);
+	        return ResponseEntity.ok(
+	            new DepartmentDTO(dep.getIdDepartment(), dep.getName(), dep.getHeadName(),dep.getHeadSurname())
+	        );
+    	}catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).build();
+	    }    
+    }
+
 }

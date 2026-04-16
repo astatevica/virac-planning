@@ -18,12 +18,12 @@ const Login = () => {
 
     const role = localStorage.getItem("role");
 
-    if (role === "ADMIN") {
+    if (role === "ADMIN" || role === "USER_DEPART") {
       navigate("/admin/dashboard");
     } else if (role === "USER"){
       navigate("/user/dashboard");
     }else {
-      navigate("/");
+      navigate("/login");
     }
 
   } catch {

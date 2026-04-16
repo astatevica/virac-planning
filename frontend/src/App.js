@@ -26,6 +26,7 @@ import WorkPlanList from "./components/WorkPlanList";
 import PlanView from "./components/PlanView";
 import Home from "./pages/Home";
 import Admin from "./pages/Admin";
+import DepartmentPlans from "./pages/DepartmentPlans";
 import UserDashboard from "./pages/UserDashboard";
 import UserAllPlans from "./pages/UserAllPlans";
 import UserPlanView from "./pages/UserPlanView";
@@ -46,8 +47,13 @@ function App() {
             <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
 
             {/*PROTECTED ROUTES*/}
-            <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
+            <Route element={<ProtectedRoute allowedRoles={["ADMIN", "USER_DEPART"]} />}>
               <Route path="/admin/dashboard" element={<Admin />} />
+              <Route path="/admin/department-plans" element={<DepartmentPlans />} />
+              <Route path="/admin/plans/:id" element={<PlanView />} />
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={["ADMIN"]} />}>
               <Route path="/admin/departments" element={<DepartmentList />} />
               <Route path="/admin/employee" element={<EmployeeList />} />
               <Route path="/admin/project-management" element={<ProjectManagementList />} />
@@ -62,7 +68,6 @@ function App() {
               <Route path="/admin/course-plan" element={<CoursePlanList />} />
               <Route path="/admin/year" element={<YearList />} />
               <Route path="/admin/plan" element={<PlanList />} />
-              <Route path="/admin/plans/:id" element={<PlanView />} />
             </Route>
 
             {/*PROTECTED ROUTES*/}

@@ -29,6 +29,9 @@ public interface ICRUDPlanService extends ICRUDBase<Plan>{
 	//Filter by Department
 	public abstract ArrayList<Plan> selectAllPlansByDepartment(String nameDepartment) throws Exception;
 	
+	//Filter by Department
+	public abstract ArrayList<Plan> selectAllPlansByDepartmentAndYear(int idDepartment, int idYear) throws Exception;
+	
 	//Filter by Employee and Year (User/Archive)
 	public abstract ArrayList<Plan> selectAllPlansByEmployeeAndYear(int idEmployee, int idYear) throws Exception;
 	
@@ -44,15 +47,6 @@ public interface ICRUDPlanService extends ICRUDBase<Plan>{
 			String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
 			String adminWork, String adminWorkEnd, String projApplicSub, String projApplicSubEnd, String skillsDevelopment,
 			String skillsDevelopmentEnd, String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd) throws Exception;
-	
-	//addProjectToPlan
-	//removeProjectFromPlan
-	//addArticelToPlan
-	//removeArticleFromPlan
-	//addCourseToPlan
-	//removeCourseFromPlan
-	//addStudentWorkToPlan
-	//removeStudentWorkFromPlan
 	
 
 }

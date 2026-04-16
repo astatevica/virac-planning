@@ -1,35 +1,76 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PlanService from "../services/PlanService";
 import api from "../api/api";
+import { useAuth } from "../auth/AuthContext";
 
 const API = "/admin";
 
 export default function PlanView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { role } = useAuth();
 
   const [plan, setPlan] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [years, setYears] = useState([]);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    PlanService.getById(id).then(res => setPlan(res.data));
-    api.get(`${API}/employee`).then(res => setEmployees(res.data));
-    api.get(`${API}/year`).then(res => setYears(res.data));
-  }, [id]);
+    const loadPlanView = async () => {
+      try {
+        const planRes = await PlanService.getById(id);
+        setPlan(planRes.data);
+        setLoadError("");
+      } catch {
+        setLoadError("Failed to load plan.");
+      }
 
+      try {
+        const yearsRes = await api.get("/year/all");
+        setYears(yearsRes.data);
+      } catch {
+        setYears([]);
+      }
+
+      if (role === "ADMIN") {
+        try {
+          const employeesRes = await api.get(`${API}/employee/all`);
+          setEmployees(employeesRes.data);
+        } catch {
+          setEmployees([]);
+        }
+      } else if (location.state?.employee) {
+        setEmployees([location.state.employee]);
+      } else {
+        setEmployees([]);
+      }
+    };
+
+    loadPlanView();
+  }, [id, location.state, role]);
+
+  if (loadError) return <p>{loadError}</p>;
   if (!plan) return <p>Loading...</p>;
 
-  const employee = employees.find(e => e.id === plan.idEmployee);
-  const year = years.find(y => y.idYear === plan.idYear);
+  const employee = employees.find((entry) => entry.id === plan.idEmployee);
+  const year = years.find((entry) => entry.idYear === plan.idYear);
+  const fallbackEmployeeName =
+    location.state?.employeeName || `Employee ID: ${plan.idEmployee}`;
+  const fallbackYearNumber = location.state?.yearNumber || plan.idYear;
 
   return (
     <div style={{ maxWidth: 1100, margin: "auto" }}>
       <h2>Plan Details</h2>
 
-      <p><strong>Employee:</strong> {employee?.name} {employee?.surname}</p>
-      <p><strong>Year:</strong> {year?.yearNumber}</p>
+      <p>
+        <strong>Employee:</strong>{" "}
+        {employee ? `${employee.name} ${employee.surname}` : fallbackEmployeeName}
+      </p>
+      <p>
+        <strong>Year:</strong> {year?.yearNumber || fallbackYearNumber}
+      </p>
 
       <hr />
 
@@ -66,8 +107,12 @@ export default function PlanView() {
 
       <br />
 
-      <button onClick={() => navigate("/admin/plan")}>
-        ← Back to Plans
+      <button
+        onClick={() =>
+          navigate(role === "USER_DEPART" ? "/admin/dashboard" : "/admin/plan")
+        }
+      >
+        Back
       </button>
     </div>
   );

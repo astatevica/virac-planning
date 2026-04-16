@@ -76,7 +76,7 @@ public class ViracPlaningIApplication {
 				yearRepo.saveAll((Arrays.asList(year1, year2, year3, year4)));
 		
 				//ViracDepartmentTable DONE
-				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology", "Karina", "Šķirmante");
+				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology", "Department", "Department");
 				ViracDepartment dep2 = new ViracDepartment("Astronomy and Astrophysics", "Juris", "Kalvāns");
 				ViracDepartment dep3 = new ViracDepartment("Engineering & Technical Operations group(ETO/ETOG)", "Juris", "Freimanis");
 				ViracDepartment dep4 = new ViracDepartment("Test", "Test", "Test");
@@ -89,8 +89,10 @@ public class ViracPlaningIApplication {
 				Employee emp3 = new Employee("Māra", "Klausa", dep3 , "Tehniskais speciālists");
 				Employee emp4 = new Employee("ADMIN", "TEST", dep4 , "ADMIN test profile");
 				Employee emp5 = new Employee("USER", "TEST", dep4 , "USER test profile");
+				Employee emp6 = new Employee("DEPARTMENT", "TEST", dep1 , "Pētnieks");
+				Employee emp7 = new Employee("Lauris", "Baigais", dep1 , "Pētnieks");
 				
-				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3, emp4, emp5)));
+				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7)));
 				
 				//UserTable
 				User user1 = User.builder()
@@ -111,7 +113,15 @@ public class ViracPlaningIApplication {
 						.firstname("USER").lastname("TEST").email("user@venta.lv").
 						password(encoder.encode("user123")).role(Role.USER).employee(emp5).build();
 				
-				userRepo.saveAll((Arrays.asList(user1,user2,user3,user4,user5)));
+				User user6 = User.builder()
+						.firstname("DEPARTMENT").lastname("TEST").email("department@venta.lv").
+						password(encoder.encode("department123")).role(Role.USER_DEPART).employee(emp6).build();
+				
+				User user7 = User.builder()
+						.firstname("Lauris").lastname("Baigais").email("lauris@venta.lv").
+						password(encoder.encode("lauris123")).role(Role.USER).employee(emp7).build();
+				
+				userRepo.saveAll((Arrays.asList(user1,user2,user3,user4,user5,user6,user7)));
 				
 				//PlanTable DONE
 				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.plan_open);

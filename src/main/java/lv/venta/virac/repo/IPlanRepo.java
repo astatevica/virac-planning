@@ -21,6 +21,9 @@ public interface IPlanRepo extends CrudRepository<Plan, Integer>{
 	//Filter by Department
 	public abstract ArrayList<Plan> findByEmployee_ViracDepartment_IdDepartment(int department);
 	
+	//Filter by Employee and Department
+	public abstract ArrayList<Plan> findByEmployee_ViracDepartment_IdDepartmentAndYear_IdYear(int idDepartment, int idYear);
+	
 	//Filter by Employee and Year
 	public abstract ArrayList<Plan> findByEmployee_IdEmployeeAndYear_IdYear(int idEmplyee, int idYear);
 		

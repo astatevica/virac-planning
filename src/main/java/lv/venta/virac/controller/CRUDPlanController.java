@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,7 @@ import jakarta.validation.Valid;
 import lv.venta.virac.dto.PlanDTO;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.service.ICRUDPlanService;
+import lv.venta.virac.user.User;
 
 @RestController
 @RequestMapping("/api/admin/plan")
@@ -58,7 +60,6 @@ public class CRUDPlanController {
             @PathVariable("id") int id) throws Exception {
 
         Plan pl = planService.retrieveById(id);
-        System.out.println(pl);
         return ResponseEntity.ok(
         		new PlanDTO(
      	               pl.getIdPlan(), pl.getEmployee().getIdEmployee(), pl.getYear().getIdYear(),pl.getNumOfProjects(),
@@ -182,6 +183,66 @@ public class CRUDPlanController {
         	            .toList()
         	    );
         return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/filter/department")
+    public ResponseEntity<ArrayList<PlanDTO>> selectAllPlansByDepartment(Authentication authentication){
+
+    	try {
+    		User user = (User) authentication.getPrincipal();
+		    String department = user.getEmployee().getViracDepartment().getName();
+		    
+	        ArrayList<Plan> plans =
+	                planService.selectAllPlansByDepartment(department);
+	
+	        ArrayList<PlanDTO> response =
+	        	    new ArrayList<>(
+	        	    		plans.stream()
+	        	            .map(pl -> new PlanDTO(
+	        	               pl.getIdPlan(), pl.getEmployee().getIdEmployee(), pl.getYear().getIdYear(),pl.getNumOfProjects(),
+	        	               pl.getNumOfArticles(),pl.getPartInConf(),pl.getPartInConfEnd(),pl.getComAbConf(),
+	        	               pl.getComAbConfEnd(),pl.getNumOfCourses(),pl.getNumOfStudWork(),pl.getPromoOfResearch(),
+	        	               pl.getPromoOfResearchEnd(),pl.getAdminWork(),pl.getAdminWorkEnd(), pl.getProjApplicSub(),
+	        	               pl.getProjApplicSubEnd(),pl.getSkillsDevelopment(),pl.getSkillsDevelopmentEnd(),
+	        	               pl.getParticipationInSeminars(),pl.getParticipationInSeminarsEnd(),pl.getOtherJobs(),pl.getOtherJobsEnd()
+	        	            ))
+	        	            .toList()
+	        	    );
+	        return ResponseEntity.ok(response);
+    	}catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).build();
+	    }
+    }
+    
+    @GetMapping("/filter/department/year/{idYear}")
+    public ResponseEntity<ArrayList<PlanDTO>> selectAllPlansByDepartmentAndYear(@PathVariable("idYear") int idYear,
+    		Authentication authentication){
+    	try {
+    		User user = (User) authentication.getPrincipal();
+		    int idDepartment = user.getEmployee().getViracDepartment().getIdDepartment();
+		    
+	        ArrayList<Plan> plans =
+	                planService.selectAllPlansByDepartmentAndYear(idDepartment, idYear);
+	
+	        ArrayList<PlanDTO> response =
+	        	    new ArrayList<>(
+	        	    		plans.stream()
+	        	            .map(pl -> new PlanDTO(
+	        	               pl.getIdPlan(), pl.getEmployee().getIdEmployee(), pl.getYear().getIdYear(),pl.getNumOfProjects(),
+	        	               pl.getNumOfArticles(),pl.getPartInConf(),pl.getPartInConfEnd(),pl.getComAbConf(),
+	        	               pl.getComAbConfEnd(),pl.getNumOfCourses(),pl.getNumOfStudWork(),pl.getPromoOfResearch(),
+	        	               pl.getPromoOfResearchEnd(),pl.getAdminWork(),pl.getAdminWorkEnd(), pl.getProjApplicSub(),
+	        	               pl.getProjApplicSubEnd(),pl.getSkillsDevelopment(),pl.getSkillsDevelopmentEnd(),
+	        	               pl.getParticipationInSeminars(),pl.getParticipationInSeminarsEnd(),pl.getOtherJobs(),pl.getOtherJobsEnd()
+	        	            ))
+	        	            .toList()
+	        	    );
+	        return ResponseEntity.ok(response);
+	    }catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).build();
+	    }
     }
 
 }

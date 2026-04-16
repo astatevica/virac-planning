@@ -33,7 +33,7 @@ public class CRUDYearController {
 	}
 
 	@GetMapping("/all")
-	@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+	@PreAuthorize("hasAnyRole('ADMIN', 'USER', 'USER_DEPART')")
     public ResponseEntity<ArrayList<YearDTO>> getAll() throws Exception {
 
         ArrayList<Year> year = yearService.retrieveAll();

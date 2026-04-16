@@ -222,7 +222,6 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 		if(result.isEmpty()) {
 			throw new Exception("Plan with ID Emplyee: " + idEmployee + " and ID Project: "+ idProject + " does not exist");
 		}
-		System.out.println(result);
 		return result;
 	}
 
@@ -361,6 +360,15 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
         }
 	
 		
+	}
+
+	@Override
+	public ArrayList<Plan> selectAllPlansByDepartmentAndYear(int idDepartment, int idYear) throws Exception {
+		ArrayList<Plan> result = planRepo.findByEmployee_ViracDepartment_IdDepartmentAndYear_IdYear(idDepartment, idYear);
+		if(result.isEmpty()) {
+			throw new Exception("Plan with ID Department: " + idDepartment + " and ID Year: "+ idYear + " does not exist");
+		}
+		return result;
 	}
 
 }

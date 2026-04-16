@@ -41,16 +41,21 @@ class AuthService {
   }
 
   getRole() {
+    const decoded = this.getDecodedToken();
+
+    return (
+      decoded?.role ||
+      decoded?.authorities?.[0]?.replace("ROLE_", "") ||
+      null
+    );
+  }
+
+  getDecodedToken() {
     const token = localStorage.getItem("accessToken");
     if (!token) return null;
 
     try {
-      const decoded = jwtDecode(token);
-
-      return decoded.role 
-        || decoded.authorities?.[0]?.replace("ROLE_", "") 
-        || null;
-
+      return jwtDecode(token);
     } catch (e) {
       console.error("Invalid token", e);
       return null;

@@ -9,8 +9,7 @@ const Navigation = () => {
   const role = localStorage.getItem("role"); // from JWT
   const isAdmin = role === "ADMIN";
   const isUser = role === "USER";
-  console.log(role);
-  console.log(localStorage.getItem("role"));
+  const isDepartmentHead = role === "USER_DEPART";
 
   const logout = () => {
     AuthService.logout().then(() => {
@@ -25,9 +24,16 @@ const Navigation = () => {
       
       <ul style={styles.ul}>      
         <li>
-          {isAdmin &&(
+          {(isAdmin || isDepartmentHead) &&(
             <NavLink to="admin/dashboard" style={styles.link}>
-              Home
+              Dashboard
+            </NavLink>
+          )}
+        </li>
+        <li>
+          {isDepartmentHead &&(
+            <NavLink to="admin/department-plans" style={styles.link}>
+              Plans
             </NavLink>
           )}
         </li>
