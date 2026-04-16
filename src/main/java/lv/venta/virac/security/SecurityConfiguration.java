@@ -57,6 +57,8 @@ public class SecurityConfiguration {
                 
                 //ADMIN
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/plan/{id}").hasRole("ADMIN")
+                .requestMatchers("/api/admin/plan/all").hasRole("ADMIN")
                 
                 //USER
                 .requestMatchers("/api/user/**").hasRole("USER")                            

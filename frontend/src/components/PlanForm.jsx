@@ -77,8 +77,8 @@ export default function PlanForm({ selectedPlan, onSuccess, onCancel }) {
   });
 
   useEffect(() => {
-    axios.get(`${API}/employee`).then(res => setEmployees(res.data));
-    axios.get(`${API}/year`).then(res => setYears(res.data));
+    axios.get(`${API}/admin/employee/all`).then(res => setEmployees(res.data));
+    axios.get(`${API}/year/all`).then(res => setYears(res.data));
   }, []);
 
 
@@ -105,8 +105,8 @@ export default function PlanForm({ selectedPlan, onSuccess, onCancel }) {
     console.log("Sending:", plan);
 
     const request = plan.idPlan
-      ? axios.put(`${API}/plan/${plan.idPlan}`, plan) // UPDATE
-      : axios.post(`${API}/plan`, plan);              // CREATE
+      ? axios.put(`${API}/admin/plan/update/${plan.idPlan}`, plan) // UPDATE
+      : axios.post(`${API}/admin/plan/add`, plan);              // CREATE
 
     request
       .then(() => {

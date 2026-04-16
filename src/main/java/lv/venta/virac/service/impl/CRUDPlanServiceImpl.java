@@ -83,6 +83,74 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
         
         return foundPlan;
 	}
+	
+	@Override
+	public FullPlanDTO retrieveFullPlan(int idPlan) throws Exception {
+		Plan plan = retrieveById(idPlan);
+	    if(plan == null) {
+	    	throw new Exception("All plans currently is closed");
+	    }
+	    
+	    FullPlanDTO dto = modelMapper.map(plan, FullPlanDTO.class);
+	    
+	    // PROJECTS
+	    ArrayList<ProjectPlanResponseDTO> projects =
+	            projectPlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
+	                    .stream()
+	                    .map(pp -> modelMapper.map(pp.getProject(), ProjectPlanResponseDTO.class))
+	                    .collect(Collectors.toCollection(ArrayList::new));
+	    
+	    for(ProjectPlanResponseDTO temp:projects) {
+	    	temp.setTasks(projectPlanRepo.findByPlan_IdPlanAndProject_IdProject(plan.getIdPlan(), temp.getIdProject()).getTasks());
+			temp.setWorkDone(projectPlanRepo.findByPlan_IdPlanAndProject_IdProject(plan.getIdPlan(), temp.getIdProject()).getWorkDone());
+		}
+
+	    // ARTICLES
+	    ArrayList<ScientificArticlesResponseDTO> articles =
+	            articlePlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
+	                    .stream()
+	                    .filter(pp -> !pp.getScientificArticles().isDeleted())
+	                    .map(ap -> modelMapper.map(ap.getScientificArticles(), ScientificArticlesResponseDTO.class))
+	                    .collect(Collectors.toCollection(ArrayList::new));
+	    
+	    for(ScientificArticlesResponseDTO temp:articles) {
+		   temp.setArticleComments(articlePlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(plan.getIdPlan(),
+				   temp.getIdArticle()).getArticleComments());
+		   temp.setPublicationLink(articlePlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(plan.getIdPlan(),
+				   temp.getIdArticle()).getPublicationLink());
+	   }
+
+	    // COURSES
+	    ArrayList<CoursePlanResponseDTO> courses =
+	            coursePlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
+	                    .stream()
+	                    .filter(pp -> !pp.getCourse().isDeleted())
+	                    .map(cp -> modelMapper.map(cp.getCourse(), CoursePlanResponseDTO.class))
+	                    .collect(Collectors.toCollection(ArrayList::new));
+	   
+	   for(CoursePlanResponseDTO temp:courses) {
+		   temp.setWorkDone(coursePlanRepo.findByPlan_IdPlanAndCourse_IdCourse(plan.getIdPlan(), temp.getIdCourse()).getWorkDone());
+	   }
+
+	    // STUDENT WORK
+	    ArrayList<WorkPlanResponseDTO> studentWork =
+	            studentWorkPlanRepo.findByPlan_IdPlanAndDeletedFalse(plan.getIdPlan())
+	                    .stream()
+	                    .filter(pp -> !pp.getStudentWork().isDeleted())
+	                    .map(sw -> modelMapper.map(sw.getStudentWork(), WorkPlanResponseDTO.class))
+	                    .collect(Collectors.toCollection(ArrayList::new));
+	    
+	    for(WorkPlanResponseDTO temp:studentWork) {
+		   temp.setWorkDone(studentWorkPlanRepo.findByPlan_IdPlanAndStudentWork_IdStudWork(plan.getIdPlan(), temp.getIdStudWork()).getWorkDone());
+	   }
+
+	    dto.setProjects(projects);
+	    dto.setArticles(articles);
+	    dto.setCourses(courses);
+	    dto.setStudentWork(studentWork);
+	    
+		return dto;
+	}
 
 	@Override
 	public void deleteById(int id) throws Exception {

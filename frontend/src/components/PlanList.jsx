@@ -52,9 +52,9 @@ const PlanList = () => {
   const loadFilters = async () => {
     try {
       const [empRes, yearRes, depRes] = await Promise.all([
-        api.get(`${API}/employee`),
-        api.get(`${API}/year`),
-        api.get(`${API}/department`)
+        api.get(`${API}/employee/all`),
+        api.get(`/year/all`),
+        api.get(`${API}/department/all`)
       ]);
 
       setEmployees(empRes.data);
