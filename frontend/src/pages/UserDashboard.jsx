@@ -253,6 +253,31 @@ export default function UserDashboard() {
     cursor: disabled ? "not-allowed" : "pointer"
   });
 
+  const downloadBlobFile = (blob, filename) => {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleExportPlan = async (idPlan, type) => {
+    try {
+      const response =
+        type === "pdf"
+          ? await UserPlanService.exportPlanPdf(idPlan)
+          : await UserPlanService.exportPlanDocx(idPlan);
+
+      downloadBlobFile(response.data, `plan-${idPlan}.${type}`);
+    } catch (err) {
+      console.error(`Failed to export ${type.toUpperCase()} for plan ${idPlan}`, err);
+      alert(`Failed to export ${type.toUpperCase()}.`);
+    }
+  };
+
   const toDateInputValue = (value) => {
     if (!value) return "";
     if (typeof value === "string") return value.slice(0, 10);
@@ -1741,6 +1766,22 @@ export default function UserDashboard() {
                 <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>
                   <button onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)} style={getButtonStyle("view")}>
                     Open
+                  </button>
+                  {" "}
+                  <button
+                    type="button"
+                    onClick={() => handleExportPlan(pl.idPlan, "docx")}
+                    style={getButtonStyle("view")}
+                  >
+                    DOCX
+                  </button>
+                  {" "}
+                  <button
+                    type="button"
+                    onClick={() => handleExportPlan(pl.idPlan, "pdf")}
+                    style={getButtonStyle("view")}
+                  >
+                    PDF
                   </button>
                 </td>
               </tr>

@@ -24,6 +24,12 @@ const getPlanView = (idPlan) =>
 const getFullPlan = (idPlan) =>
   api.get(`${API}/full-plan/${idPlan}`);
 
+const exportPlanDocx = (idPlan) =>
+  api.get(`/export/docx/${idPlan}`, { responseType: "blob" });
+
+const exportPlanPdf = (idPlan) =>
+  api.get(`/export/pdf/${idPlan}`, { responseType: "blob" });
+
 const updatePlanForUserByOpenPlan = (planDto) =>
   api.put(`${API}/update/current-year/plan`, planDto);
 
@@ -107,6 +113,8 @@ const UserPlanService = {
   getAllProjects,
   getPlanView,
   getFullPlan,
+  exportPlanDocx,
+  exportPlanPdf,
   updatePlanForUserByOpenPlan,
   searchCoursesAutocomplete,
   searchProjectsAutocomplete,

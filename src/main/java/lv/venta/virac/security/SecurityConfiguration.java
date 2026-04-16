@@ -43,6 +43,7 @@ public class SecurityConfiguration {
             .authorizeHttpRequests(auth -> auth
                 //PUBLIC ENDPOINTS
                 .requestMatchers("/api/auth/**","/error").permitAll()
+                .requestMatchers("/api/export/**","/error").permitAll()
                 
                 //USER & ADMIN & USER_DEPART
                 .requestMatchers("/api/year/**").hasAnyRole("ADMIN","USER","USER_DEPART")
