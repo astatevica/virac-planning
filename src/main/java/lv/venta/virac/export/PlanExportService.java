@@ -5,6 +5,4 @@ import lv.venta.virac.dto.FullPlanDTO;
 public interface PlanExportService {
 
 	public abstract byte[] generateDocx(FullPlanDTO dto) throws Exception;
-	
-	public abstract byte[] convertToPdf(byte[] docxBytes) throws Exception;
 }

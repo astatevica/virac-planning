@@ -1775,14 +1775,14 @@ export default function UserDashboard() {
                   >
                     DOCX
                   </button>
-                  {" "}
+                  {/* {" "}
                   <button
                     type="button"
                     onClick={() => handleExportPlan(pl.idPlan, "pdf")}
                     style={getButtonStyle("view")}
                   >
                     PDF
-                  </button>
+                  </button> */}
                 </td>
               </tr>
             ))

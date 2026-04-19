@@ -56,7 +56,6 @@ public class CRUDYearController {
             @PathVariable("id") int id) throws Exception {
 
         Year y = yearService.retrieveById(id);
-        System.out.println(y);
         return ResponseEntity.ok(
         		new YearDTO(
      	               y.getIdYear(),
