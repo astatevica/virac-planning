@@ -88,7 +88,7 @@ public class ViracPlaningIApplication {
 				Employee emp2 = new Employee("Juris", "Kalvāns", dep2 , "Nodaļas vadītājs, Vadošais pētnieks");
 				Employee emp3 = new Employee("Māra", "Klausa", dep3 , "Tehniskais speciālists");
 				Employee emp4 = new Employee("ADMIN", "TEST", dep4 , "ADMIN test profile");
-				Employee emp5 = new Employee("USER", "TEST", dep4 , "USER test profile");
+				Employee emp5 = new Employee("USER", "TEST", dep1 , "USER test profile");
 				Employee emp6 = new Employee("DEPARTMENT", "TEST", dep1 , "Pētnieks");
 				Employee emp7 = new Employee("Lauris", "Baigais", dep1 , "Pētnieks");
 				

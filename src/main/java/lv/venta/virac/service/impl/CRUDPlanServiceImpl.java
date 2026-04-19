@@ -246,11 +246,10 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 
 	@Override
 	public ArrayList<Plan> selectAllPlansByEmployee(int idEmployee) throws Exception {
-		ArrayList<Plan> result = planRepo.findByEmployee_IdEmployee(idEmployee);
+		ArrayList<Plan> result = planRepo.findByEmployee_IdEmployeeOrderByYear_YearNumberDesc(idEmployee);
 		if(result.isEmpty()) {
 			throw new Exception("Plan with Employee ID: " + idEmployee + " does not exist");
 		}
-		System.out.println(result);
 		return result;
 	}
 

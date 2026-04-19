@@ -13,7 +13,7 @@ import lv.venta.virac.model.enums.PlanStatus;
 public interface IPlanRepo extends CrudRepository<Plan, Integer>{
 	
 	//Filter by Employee
-	public abstract ArrayList<Plan> findByEmployee_IdEmployee(int employee);
+	public abstract ArrayList<Plan> findByEmployee_IdEmployeeOrderByYear_YearNumberDesc(int employee);
 	
 	//Filter by Year
 	public abstract ArrayList<Plan> findByYear_IdYear(int year);
