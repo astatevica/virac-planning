@@ -396,6 +396,7 @@ const AdminUserManagement = () => {
         <select name="role" value={form.role} onChange={handleChange}>
           <option value="">Select Role</option>
           <option value="ADMIN">ADMIN</option>
+          <option value="USER_DEPART">USER_DEPART</option>
           <option value="USER">USER</option>
         </select>
 
@@ -406,7 +407,7 @@ const AdminUserManagement = () => {
         >
           <option value="">Select Employee</option>
           {employees.map((emp) => (
-            <option key={emp.idEmployee} value={emp.id}>
+            <option key={emp.idEmployee} value={emp.idEmployee}>
               ID:{emp.idEmployee} - {emp.name} {emp.surname}
             </option>
           ))}

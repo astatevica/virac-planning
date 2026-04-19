@@ -129,8 +129,8 @@ const PlanList = () => {
         <select value={selectedEmployee} onChange={e => setSelectedEmployee(e.target.value)}>
           <option value="">All</option>
           {employees.map(e => (
-            <option key={e.idEmployee} value={e.id}>
-              ID:{e.id} - {e.name} {e.surname}
+            <option key={e.idEmployee} value={e.idEmployee}>
+              ID:{e.idEmployee} - {e.name} {e.surname}
             </option>
           ))}
         </select>

@@ -146,7 +146,7 @@ const ProjectManagementList = () => {
         <select value={employeeId} onChange={e => setEmployeeId(e.target.value)}>
           <option value="">Select employee</option>
           {employees.map(emp => (
-            <option key={emp.id} value={emp.id}>
+            <option key={emp.idEmployee} value={emp.idEmployee}>
               {emp.name} {emp.surname}
             </option>
           ))}
@@ -170,8 +170,8 @@ const ProjectManagementList = () => {
         <select value={filterEmployeeId} onChange={e => setFilterEmployeeId(e.target.value)}>
           <option value="">All employees</option>
           {employees.map(emp => (
-            <option key={emp.id} value={emp.id}>
-              {emp.id} {emp.name} {emp.surname}
+            <option key={emp.idEmployee} value={emp.idEmployee}>
+              {emp.idEmployee} {emp.name} {emp.surname}
             </option>
           ))}
         </select>
@@ -194,7 +194,7 @@ const ProjectManagementList = () => {
           <li key={pm.idProjectManag}>
             {"Employee id: "}<b>{pm.employeeId}</b>
             {" | "}
-            {pm.startDate} → {pm.endDate}
+            {pm.startDate} līdz {pm.endDate}
             <button onClick={() => startEdit(pm)}>Update</button>
             <button onClick={() => deleteManagement(pm.idProjectManag)}>Delete</button>
           </li>

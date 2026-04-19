@@ -44,6 +44,7 @@ public class SecurityConfiguration {
                 //PUBLIC ENDPOINTS
                 .requestMatchers("/api/auth/**","/error").permitAll()
                 .requestMatchers("/api/export/**","/error").permitAll()
+                //.requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
                 
                 //USER & ADMIN & USER_DEPART
                 .requestMatchers("/api/year/**").hasAnyRole("ADMIN","USER","USER_DEPART")

@@ -19,7 +19,7 @@ public interface IPlanRepo extends CrudRepository<Plan, Integer>{
 	public abstract ArrayList<Plan> findByYear_IdYear(int year);
 	
 	//Filter by Department
-	public abstract ArrayList<Plan> findByEmployee_ViracDepartment_IdDepartment(int department);
+	public abstract ArrayList<Plan> findByEmployee_ViracDepartment_IdDepartmentOrderByYear_YearNumberDesc(int department);
 	
 	//Filter by Employee and Department
 	public abstract ArrayList<Plan> findByEmployee_ViracDepartment_IdDepartmentAndYear_IdYear(int idDepartment, int idYear);

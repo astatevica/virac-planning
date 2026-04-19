@@ -185,7 +185,7 @@ export default function PlanForm({ selectedPlan, onSuccess, onCancel }) {
       <select name="idEmployee" value={plan.idEmployee} onChange={handleChange} required>
         <option value="">-- Select Employee --</option>
         {employees.map(e => (
-          <option key={e.idEmployee} value={e.id}>
+          <option key={e.idEmployee} value={e.idEmployee}>
             {e.name} {e.surname}
           </option>
         ))}
