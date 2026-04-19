@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import DepartmentHeadService from "../services/DepartmentHeadService";
+import { exportPlanFile } from "../utils/planExport";
 
 const getEmployeeKey = (employee) => String(employee.idEmployee ?? employee.id);
 
@@ -74,6 +75,10 @@ export default function DepartmentPlans() {
     years.map((year) => [String(year.idYear), year.yearNumber])
   );
 
+  const handleExportDocx = (idPlan) => {
+    exportPlanFile(idPlan, "docx");
+  };
+
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto" }}>
       <h2>Department Plans</h2>
@@ -143,6 +148,13 @@ export default function DepartmentPlans() {
                       }
                     >
                       View plan
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleExportDocx(plan.idPlan)}
+                      style={{ marginLeft: 8 }}
+                    >
+                      DOCX
                     </button>
                   </td>
                 </tr>

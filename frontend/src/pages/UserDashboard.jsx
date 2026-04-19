@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserPlanService from "../services/UserPlanService";
 import api from "../api/api";
+import { exportPlanFile } from "../utils/planExport";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
@@ -253,29 +254,8 @@ export default function UserDashboard() {
     cursor: disabled ? "not-allowed" : "pointer"
   });
 
-  const downloadBlobFile = (blob, filename) => {
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    window.URL.revokeObjectURL(url);
-  };
-
   const handleExportPlan = async (idPlan, type) => {
-    try {
-      const response =
-        type === "pdf"
-          ? await UserPlanService.exportPlanPdf(idPlan)
-          : await UserPlanService.exportPlanDocx(idPlan);
-
-      downloadBlobFile(response.data, `plan-${idPlan}.${type}`);
-    } catch (err) {
-      console.error(`Failed to export ${type.toUpperCase()} for plan ${idPlan}`, err);
-      alert(`Failed to export ${type.toUpperCase()}.`);
-    }
+    await exportPlanFile(idPlan, type);
   };
 
   const toDateInputValue = (value) => {
@@ -1775,14 +1755,6 @@ export default function UserDashboard() {
                   >
                     DOCX
                   </button>
-                  {/* {" "}
-                  <button
-                    type="button"
-                    onClick={() => handleExportPlan(pl.idPlan, "pdf")}
-                    style={getButtonStyle("view")}
-                  >
-                    PDF
-                  </button> */}
                 </td>
               </tr>
             ))

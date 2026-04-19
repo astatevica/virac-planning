@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import UserPlanService from "../services/UserPlanService";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
+import { exportPlanFile } from "../utils/planExport";
 
 const buttonStyle = {
   background: "#0d6efd",
@@ -26,6 +27,10 @@ export default function UserAllPlans() {
 
   const [filterError, setFilterError] = useState("");
   const [noResults, setNoResults] = useState(false);
+
+  const handleExportDocx = (idPlan) => {
+    exportPlanFile(idPlan, "docx");
+  };
 
   useEffect(() => {
     loadPlans();
@@ -240,6 +245,12 @@ export default function UserAllPlans() {
                     onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)}
                   >
                     Open
+                  </button>
+                  <button
+                    style={{ ...buttonStyle, marginLeft: 8 }}
+                    onClick={() => handleExportDocx(pl.idPlan)}
+                  >
+                    DOCX
                   </button>
                 </td>
               </tr>

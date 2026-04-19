@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import UserPlanService from "../services/UserPlanService";
+import { exportPlanFile } from "../utils/planExport";
 
 const hasItems = (items) => Array.isArray(items) && items.length > 0;
 
@@ -33,6 +34,10 @@ export default function UserPlanView() {
 
     loadFullPlan();
   }, [id]);
+
+  const handleExportDocx = () => {
+    exportPlanFile(id, "docx");
+  };
 
   if (!fullPlan) return <p>Loading...</p>;
 
@@ -183,6 +188,9 @@ export default function UserPlanView() {
       </table>
 
       <div style={styles.buttonRow}>
+        <button style={styles.docxButton} onClick={handleExportDocx}>
+          Download DOCX
+        </button>
         <button style={styles.primaryButton} onClick={() => navigate("/user/dashboard")}>
           Back to Dashboard
         </button>
@@ -246,6 +254,15 @@ const styles = {
     border: "1px solid #b7c0c8",
     background: "#f6f8fa",
     color: "#111827",
+    cursor: "pointer",
+    fontWeight: 500,
+  },
+  docxButton: {
+    padding: "10px 16px",
+    borderRadius: 4,
+    border: "1px solid #0d6efd",
+    background: "#0d6efd",
+    color: "#fff",
     cursor: "pointer",
     fontWeight: 500,
   },

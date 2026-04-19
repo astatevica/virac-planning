@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { useAuth } from "../auth/AuthContext";
 import DepartmentHeadService from "../services/DepartmentHeadService";
+import { exportPlanFile } from "../utils/planExport";
 
 const API = "/admin";
 
@@ -74,6 +75,10 @@ const DepartmentHeadDashboard = () => {
   const visiblePlans = selectedYear
     ? employeePlans.filter((plan) => String(plan.idYear) === selectedYear)
     : employeePlans;
+
+  const handleExportDocx = (idPlan) => {
+    exportPlanFile(idPlan, "docx");
+  };
 
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -218,6 +223,13 @@ const DepartmentHeadDashboard = () => {
                         }
                       >
                         View plan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleExportDocx(plan.idPlan)}
+                        style={{ marginLeft: 8 }}
+                      >
+                        DOCX
                       </button>
                     </td>
                   </tr>

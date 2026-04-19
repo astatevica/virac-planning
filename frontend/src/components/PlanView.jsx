@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import PlanService from "../services/PlanService";
 import api from "../api/api";
 import { useAuth } from "../auth/AuthContext";
+import { exportPlanFile } from "../utils/planExport";
 
 const API = "/admin";
 
@@ -74,6 +75,10 @@ export default function PlanView() {
   const fallbackEmployeeName =
     location.state?.employeeName || `Employee ID: ${fullPlan.idEmployee}`;
   const fallbackYearNumber = location.state?.yearNumber || fullPlan.idYear;
+
+  const handleExportDocx = () => {
+    exportPlanFile(id, "docx");
+  };
 
   return (
     <div style={styles.page}>
@@ -231,6 +236,12 @@ export default function PlanView() {
 
       <div style={styles.buttonRow}>
         <button
+          style={styles.secondaryButton}
+          onClick={handleExportDocx}
+        >
+          Download DOCX
+        </button>
+        <button
           style={styles.primaryButton}
           onClick={() =>
             navigate(role === "USER_DEPART" ? "/admin/dashboard" : "/admin/plan")
@@ -295,6 +306,15 @@ const styles = {
     border: "1px solid #b7c0c8",
     background: "#f6f8fa",
     color: "#111827",
+    cursor: "pointer",
+    fontWeight: 500,
+  },
+  secondaryButton: {
+    padding: "10px 16px",
+    borderRadius: 4,
+    border: "1px solid #0d6efd",
+    background: "#0d6efd",
+    color: "#fff",
     cursor: "pointer",
     fontWeight: 500,
   },

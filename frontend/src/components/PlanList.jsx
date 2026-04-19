@@ -3,6 +3,7 @@ import PlanService from "../services/PlanService";
 import PlanForm from "./PlanForm";
 import api from "../api/api";
 import { useNavigate } from "react-router-dom";
+import { exportPlanFile } from "../utils/planExport";
 
 
 const API = "/admin";
@@ -41,6 +42,10 @@ const PlanList = () => {
     PlanService.delete(id)
       .then(loadPlans)
       .catch(err => alert(err.response?.data || "Delete failed"));
+  };
+
+  const handleExportDocx = (idPlan) => {
+    exportPlanFile(idPlan, "docx");
   };
 
   // const loadFilters = () => {
@@ -204,6 +209,7 @@ const PlanList = () => {
                   <button onClick={() => setEditingPlan(pl)}>Edit</button> 
                   <button onClick={() => deletePlan(pl.idPlan)}>Delete</button>
                   <button onClick={() => navigate(`/admin/plans/${pl.idPlan}`)}>View</button>
+                  <button onClick={() => handleExportDocx(pl.idPlan)}>DOCX</button>
                 </td>
               </tr>
             ))
