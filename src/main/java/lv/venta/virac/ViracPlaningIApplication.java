@@ -68,12 +68,13 @@ public class ViracPlaningIApplication {
 			public void run(String... args) throws Exception {
 				
 				//YearTable DONE
+				Year year = new Year(2022);
 				Year year1 = new Year(2023);
 				Year year2 = new Year(2024);
 				Year year3 = new Year(2025);
 				Year year4 = new Year(2026);
 				
-				yearRepo.saveAll((Arrays.asList(year1, year2, year3, year4)));
+				yearRepo.saveAll((Arrays.asList(year, year1, year2, year3, year4)));
 		
 				//ViracDepartmentTable DONE
 				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology", "Juris", "Uplejs");
@@ -138,7 +139,7 @@ public class ViracPlaningIApplication {
 						password(encoder.encode("admin123")).role(Role.ADMIN).employee(x).build();
 				User userY = User.builder()
 						.firstname("USER").lastname("USER").email("user.u@venta.lv").
-						password(encoder.encode("zaiga123")).role(Role.USER).employee(y).build();
+						password(encoder.encode("user123")).role(Role.USER).employee(y).build();
 				User userZ = User.builder()
 						.firstname("DEPARTMENT").lastname("DEPARTMENT").email("department.d@venta.lv").
 						password(encoder.encode("department123")).role(Role.USER_DEPART).employee(z).build();
@@ -146,7 +147,7 @@ public class ViracPlaningIApplication {
 				userRepo.saveAll((Arrays.asList(user1,user2,user3,user4,user5,user6,user7,user8,user9,userX,userY,userZ)));
 				
 				//PlanTable DONE
-				Plan plan1 = new Plan(emp1, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.plan_open);
+				Plan plan1 = new Plan(emp1, year, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.plan_open);
 				Plan plan2 = new Plan(emp5, year4, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.planned_frozen);
 				Plan plan3 = new Plan(emp5, year3, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.done_frozen);
 				Plan plan4 = new Plan(emp5, year2, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.done_frozen);
@@ -155,8 +156,36 @@ public class ViracPlaningIApplication {
 				Plan p1_1 = new Plan(emp1, year1, 1, 1, "Conf. research", "Done", "Topics discussed", "OK", 1, 1, "Paper promo", "Done", "Board meetings", "OK", null, null, "Course A", "Completed", "No plans", "Java Conf", null, "Event X", PlanStatus.done_frozen);
 				Plan p1_2 = new Plan(emp1, year2, 1, 1, "Participation", "Done", "Topics", "OK", 2, 2, "Papers", "In progress", "Board", "OK", null, null, "Course B", null, "Future", "Conf Y", null, "X-mas", PlanStatus.plan_open);
 				Plan p1_3 = new Plan(emp1, year3, 1, 1, "Conferences", null, null, null, 2, 0, "Promotion", null, "Board", null, null, null, "Course C", null, "None", null, null, "Events", PlanStatus.plan_open);
-				Plan p1_4 = new Plan(emp1, year4, 0, 0, "TBD", null, null, null, 0, 0, "TBD", null, "Meetings", null, null, null, "None", null, "None", null, null, "None", PlanStatus.planned_frozen);
-
+				Plan p1_4 = new Plan(
+					    emp1,               // idEmployee
+					    year4,              // idYear (2026)
+					    2,                  // numOfProjects
+					    2,                  // numOfArticles
+					    "Participation in IEEE International Conference on Software Engineering and AI Research 2026", // partInConf
+					    null,               // partInConfEnd (Vēl nav noticis)
+					    "Presenting a paper on 'AI-Driven Code Quality Evolution'", // comAbConf
+					    null,               // comAbConfEnd
+					    1,                  // numOfCourses
+					    2,                  // numOfStudWork
+					    "Submission of two research papers to 'Journal of Systems and Software'", // promoOfResearch
+					    null,               // promoOfResearchEnd
+					    "Acting as a lead developer for the Departmental Resource Management System", // adminWork
+					    null,               // adminWorkEnd
+					    "Submission of a Horizon Europe grant application for sustainable IT solutions", // projApplicSub
+					    null,               // projApplicSubEnd
+					    "Advanced Deep Learning specialization and certification", // skillsDevelopment
+					    null,               // skillsDevelopmentEnd
+					    "Monthly internal research seminars on emerging technologies", // participationInSeminars
+					    null,               // participationInSeminarsEnd
+					    "Co-organizing the University's Annual IT Research Symposium 2026", // otherJobs
+					    null,               // otherJobsEnd
+					    PlanStatus.planned_frozen // Status
+					);
+//				int idEmployee, int idYear, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd, 
+//				String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
+//				String adminWork, String adminWorkEnd, String projApplicSub, String projApplicSubEnd, String skillsDevelopment,
+//				String skillsDevelopmentEnd, String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd
+				
 				// --- EMP2 (Juris Uplejs) ---
 				Plan p2_1 = new Plan(emp2, year1, 1, 1, "Strategy", "Finished", "Management", "Good", 3, 3, "PR", "Done", "VeA Meeting", "Success", null, null, "Leadership", "Done", "N/A", "Seminars", null, "Ventspils Day", PlanStatus.done_frozen);
 				Plan p2_2 = new Plan(emp2, year2, 2, 1, "Academic", "Ongoing", "Planning", "Normal", 1, 1, "Articles", "Submitted", "Board", "OK", null, null, "IT Course", "Active", "N/A", "Webinar", null, "Summer Camp", PlanStatus.plan_open);
@@ -205,36 +234,36 @@ public class ViracPlaningIApplication {
 				        p8_1, p8_2, p8_3, p8_4, p9_1, p9_2, p9_3, p9_4));
 				
 				//CourseTable DONE
-				Course c1 = new Course("Programmatūras inženierija I", 6, "pavasara", "ITF");
-				Course c2 = new Course("Programmēšanas inženierija II", 3, "rudens", "ITF");
-				Course c3 = new Course("Datu bāzes I", 3, "rudens", "ITF");
-				Course c4 = new Course("Angļu valoda programmētājiem I", 3, "rudens", "ITF");
-				Course c5 = new Course("Uzņēmējdarbības pamati", 3, "rudens", "ITF");
-				Course c6 = new Course("Civilā aizsardzība", 1, "rudens", "ITF");
-				Course c7 = new Course("Matemātika programmētājiem", 12, "rudens", "ITF");
-				Course c8 = new Course("IT nozares tiesību pamati un standarti", 3, "rudens", "ITF");
-				Course c9 = new Course("Ilgtspējīga vides attīstība", 3, "rudens", "ITF");
-				Course c10 = new Course("Programmēšanas pamati JAVA", 6, "rudens", "ITF");
-				Course c11 = new Course("IT projektu vadīšana", 3, "rudens", "ITF");
-				Course c12 = new Course("Programmēšana JAVA", 3, "rudens", "ITF");
-				Course c13 = new Course("Tīmekļa lietotņu izstrāde", 6, "pavasara", "ITF");
-				Course c14 = new Course("Programmatūras testēšana un automatizācija", 3, "pavasara", "ITF");
-				Course c15 = new Course("Datu struktūras un algoritmi", 3, "pavasara", "ITF");
-				Course c16 = new Course("Datu bāzes II", 3, "pavasara", "ITF");
+				Course c1 = new Course("Software Engineering I", 6, "spring", "ITF");
+				Course c2 = new Course("Programming Engineering II", 3, "autumn", "ITF");
+				Course c3 = new Course("Databases I", 3, "autumn", "ITF");
+				Course c4 = new Course("English for Programmers I", 3, "autumn", "ITF");
+				Course c5 = new Course("Fundamentals of Entrepreneurship", 3, "autumn", "ITF");
+				Course c6 = new Course("Civil Protection", 1, "autumn", "ITF");
+				Course c7 = new Course("Mathematics for Programmers", 12, "autumn", "ITF");
+				Course c8 = new Course("Basics of IT Law and Standards", 3, "autumn", "ITF");
+				Course c9 = new Course("Sustainable Environmental Development", 3, "autumn", "ITF");
+				Course c10 = new Course("Fundamentals of Programming in JAVA", 6, "autumn", "ITF");
+				Course c11 = new Course("IT Project Management", 3, "autumn", "ITF");
+				Course c12 = new Course("Programming in JAVA", 3, "autumn", "ITF");
+				Course c13 = new Course("Web Application Development", 6, "spring", "ITF");
+				Course c14 = new Course("Software Testing and Automation", 3, "spring", "ITF");
+				Course c15 = new Course("Data Structures and Algorithms", 3, "spring", "ITF");
+				Course c16 = new Course("Databases II", 3, "spring", "ITF");
 				
 				courseRepo.saveAll((Arrays.asList(c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16)));
 				
 				//CoursePlanTable DONE
-				CoursePlan cp1 = new CoursePlan(plan1, c3, "Nepieciešams atjaunot izdales materiālus");
-				CoursePlan cp2 = new CoursePlan(plan1, c1, "Vidējais vērtējums: 8.5/10");
-				CoursePlan cp3 = new CoursePlan(plan1, c2, "Novadīts veiksmīgi. Visi studenti nokārtoja gala eksāmenu.");
-				CoursePlan cp4 = new CoursePlan(plan2, c2, "Novadīts veiksmīgi. Lieliska studentu iesaiste.");
+				CoursePlan cp1 = new CoursePlan(plan1, c3, "Handout materials need to be updated");
+				CoursePlan cp2 = new CoursePlan(plan1, c1, "Average grade: 8.5/10");
+				CoursePlan cp3 = new CoursePlan(plan1, c2, "Successfully conducted. All students passed the final exam.");
+				CoursePlan cp4 = new CoursePlan(plan2, c2, "Successfully conducted. Excellent student engagement.");
 				
 				// --- Rimants Kalniņš (emp1) kursi ---
-				CoursePlan cp5 = new CoursePlan(p1_1, c1, "Novadīts veiksmīgi. Vidējais vērtējums 9.2");
-				CoursePlan cp6 = new CoursePlan(p1_2, c10, "Procesā: studenti apgūst OOP pamatus");
-				CoursePlan cp7 = new CoursePlan(p1_3, c12, "Plānots: nepieciešama jauna IntelliJ licence");
-				CoursePlan cp8 = new CoursePlan(p1_4, c15, "Sagatavošanā");
+				CoursePlan cp5 = new CoursePlan(p1_1, c1, "Successfully conducted. Average grade: 9.2");
+				CoursePlan cp6 = new CoursePlan(p1_2, c10, "In progress: students are learning OOP fundamentals");
+				CoursePlan cp7 = new CoursePlan(p1_3, c12, "Planned: new IntelliJ license required");
+				CoursePlan cp8 = new CoursePlan(p1_4, c15, "In preparation");
 
 				// --- Juris Uplejs (emp2) kursi ---
 				CoursePlan cp9 = new CoursePlan(p2_1, c11, "Pabeigts: izcili rezultāti projektu prezentācijās");
@@ -331,18 +360,19 @@ public class ViracPlaningIApplication {
 				scientArtRepo.saveAll((Arrays.asList(scArt1,scArt2,scArt3,scArt4,scArt5,scArt6,scArt7)));
 				
 				//ArticlePlanTable DONE
-				ArticlePlan artPlan1 = new ArticlePlan(plan1, scArt2, "Izstrāde pabeigta 2024.gadā beigās", "https://arxiv.org/abs/2402.09082");
-				ArticlePlan artPlan2 = new ArticlePlan(plan1, scArt1, "Izstrāde pabeigta 2024.gada sākumā", "https://doi.org/10.1049/sfw2/5579438");
-				ArticlePlan artPlan3 = new ArticlePlan(plan1, scArt3, "Publicēts un recenzēts 2025. gada martā", "https://doi.org/10.1145/3377811.3380338");
-				ArticlePlan artPlan4 = new ArticlePlan(plan2,scArt4, "Procesa stadija: Gaida recenzenta atbildi","https://arxiv.org/abs/2103.10111");
-				ArticlePlan artPlan5 = new ArticlePlan(plan2,scArt5,"Izstrāde pārtraukta datu trūkuma dēļ","https://doi.org/10.1109/ICSE.2019.00031");
-				ArticlePlan artPlan6 = new ArticlePlan(plan3,scArt6,"Sagatavots iesniegšanai konferencē","https://arxiv.org/abs/2301.04567");
-				ArticlePlan artPlan7 = new ArticlePlan(plan1,scArt2,"Nepieciešama papildu analīze pirms publicēšanas","https://doi.org/10.1007/s11219-023-09612-z");
+				ArticlePlan artPlan1 = new ArticlePlan(plan1, scArt2, "Development completed in late 2024", "https://arxiv.org/abs/2402.09082");
+				ArticlePlan artPlan2 = new ArticlePlan(plan1, scArt1, "Development completed in early 2024", "https://doi.org/10.1049/sfw2/5579438");
+				ArticlePlan artPlan3 = new ArticlePlan(plan1, scArt3, "Published and peer-reviewed in March 2025", "https://doi.org/10.1145/3377811.3380338");
+				ArticlePlan artPlan4 = new ArticlePlan(plan2, scArt4, "Status: Awaiting reviewer response", "https://arxiv.org/abs/2103.10111");
+				ArticlePlan artPlan5 = new ArticlePlan(plan2, scArt5, "Development discontinued due to lack of data", "https://doi.org/10.1109/ICSE.2019.00031");
+				ArticlePlan artPlan6 = new ArticlePlan(plan3, scArt6, "Prepared for conference submission", "https://arxiv.org/abs/2301.04567");
+				ArticlePlan artPlan7 = new ArticlePlan(plan1, scArt2, "Additional analysis required before publication", "https://doi.org/10.1007/s11219-023-09612-z");
+
 				// --- EMP1 (Rimants Kalniņš) ---
-				ArticlePlan ap1_1 = new ArticlePlan(p1_1, scArt1, "Publicēts: Journal of Systems and Software", "https://doi.org/10.1016/j.jss.2023.01");
-				ArticlePlan ap1_2 = new ArticlePlan(p1_2, scArt4, "Pabeigta datu vākšana un pirmā melnraksta izveide", "https://arxiv.org/abs/2401.12345");
-				ArticlePlan ap1_3 = new ArticlePlan(p1_3, scArt7, "Procesa stadija: Raksta struktūras plānošana", null);
-				ArticlePlan ap1_4 = new ArticlePlan(p1_4, scArt1, "Plānots veikt atkārtotu pētījumu jaunā vidē", null);
+				ArticlePlan ap1_1 = new ArticlePlan(p1_1, scArt1, "Published: Journal of Systems and Software", "https://doi.org/10.1016/j.jss.2023.01");
+				ArticlePlan ap1_2 = new ArticlePlan(p1_2, scArt4, "Data collection completed; first draft created", "https://arxiv.org/abs/2401.12345");
+				ArticlePlan ap1_3 = new ArticlePlan(p1_3, scArt7, "Status: Planning article structure", null);
+				ArticlePlan ap1_4 = new ArticlePlan(p1_4, scArt1, "Planned to conduct a repeat study in a new environment", null);
 
 				// --- EMP2 (Juris Uplejs) ---
 				ArticlePlan ap2_1 = new ArticlePlan(p2_1, scArt2, "Publicēts un prezentēts konferencē", "https://doi.org/10.1007/s11219-023-1");
@@ -396,40 +426,32 @@ public class ViracPlaningIApplication {
 				));
 				
 				//StudentWorkTable DONE
-				StudentWork stw1 = new StudentWork("VIRAC personāla plānošanas sistēmas izstrāde", "Annija", "Stateviča", Degree.pirma_cikla);
-				StudentWork stw2 = new StudentWork("Gaisabalons.lv klientu vadības sistēmas klientu reģistrācijas un automatizētas apziņošanas moduļa prototipa projektēšana un izstrāde",
-						"Raivis", "Dzenis", Degree.bakalaurs);
-				StudentWork stw3 = new StudentWork("Viedās mājas energoefektivitātes monitoringa sistēmas izstrāde", 
-					    "Kārlis", "Bērziņš", Degree.doktors);
-				StudentWork stw4 = new StudentWork("SIA 'Logi24' noliktavas uzskaites procesa digitalizācija un mobilās lietotnes prototipēšana", 
-				    "Marta", "Zariņa", Degree.pirma_cikla);
-				StudentWork stw5 = new StudentWork("Datu šifrēšanas algoritmu salīdzinošā analīze un to implementācija Python vidē", 
-				    "Jānis", "Ozols", Degree.bakalaurs);
-				StudentWork stw6 = new StudentWork("Mākslīgā intelekta tērzēšanas bota integrācija e-komercijas platformas klientu atbalsta automatizācijai", 
-				    "Elīna", "Kalniņa", Degree.magistrs);
-				StudentWork stw7 = new StudentWork("Pašvaldības publisko iepirkumu vizualizācijas rīka izstrāde, izmantojot React un D3.js bibliotēkas", 
-				    "Artūrs", "Vītols", Degree.pirma_cikla);
-				StudentWork stw8 = new StudentWork("Blokķēdes tehnoloģijā balstīta balsošanas sistēmas prototipa izstrāde studentu pašpārvaldes vēlēšanām", 
-				    "Laura", "Priede", Degree.cits);
-				StudentWork stw9 = new StudentWork("Mašīnmācīšanās modeļu izmantošana koda kvalitātes automātiskai novērtēšanai CI/CD konveijerā", 
-				    "Dāvis", "Siliņš", Degree.doktors);
+				StudentWork stw1 = new StudentWork("Development of the VIRAC Personnel Planning System", "Annija", "Stateviča", Degree.pirma_cikla);
+				StudentWork stw2 = new StudentWork("Design and Prototype Development of a Client Registration and Automated Notification Module for Gaisabalons.lv CRM", "Raivis", "Dzenis", Degree.bakalaurs);
+				StudentWork stw3 = new StudentWork("Development of a Smart Home Energy Efficiency Monitoring System", "Kārlis", "Bērziņš", Degree.doktors);
+				StudentWork stw4 = new StudentWork("Digitalization of Warehouse Inventory Processes and Mobile App Prototyping for SIA 'Logi24'", "Marta", "Zariņa", Degree.pirma_cikla);
+				StudentWork stw5 = new StudentWork("Comparative Analysis of Data Encryption Algorithms and Their Implementation in Python", "Jānis", "Ozols", Degree.bakalaurs);
+				StudentWork stw6 = new StudentWork("AI Chatbot Integration for Customer Support Automation in E-commerce Platforms", "Elīna", "Kalniņa", Degree.magistrs);
+				StudentWork stw7 = new StudentWork("Development of a Visualization Tool for Local Government Public Procurement Using React and D3.js", "Artūrs", "Vītols", Degree.pirma_cikla);
+				StudentWork stw8 = new StudentWork("Development of a Blockchain-Based Voting System Prototype for Student Council Elections", "Laura", "Priede", Degree.cits);
+				StudentWork stw9 = new StudentWork("Using Machine Learning Models for Automated Code Quality Assessment in CI/CD Pipelines", "Dāvis", "Siliņš", Degree.doktors);
 		
 				studWorkRepo.saveAll(Arrays.asList(stw1,stw2,stw3,stw4,stw5,stw6,stw7,stw8,stw9));
 				
 				//WorkPlanTable DONE
-				WorkPlan wp1 = new WorkPlan(stw1, plan1, "Izstrādes stadija: 90%");
-				WorkPlan wp2 = new WorkPlan(stw2, plan1, "Aizstāvēts uz 9 ballēm");
-				WorkPlan wp3 = new WorkPlan(stw3, plan1, "Darbs pabeigts, gaida aizstāvēšanu");
-				WorkPlan wp4 = new WorkPlan(stw4, plan2, "Aizstāvēts uz 8 ballēm");
-				WorkPlan wp5 = new WorkPlan(stw5, plan2, "Nepieciešami labojumi praktiskajā daļā");
-				WorkPlan wp6 = new WorkPlan(stw6, plan1, "Aizstāvēts uz 10 ballēm (Izcili)");
-				WorkPlan wp7 = new WorkPlan(stw7, plan3, "Pārtraukts pēc studenta vēlēšanās");
-				WorkPlan wp8 = new WorkPlan(stw8, plan1, "Recenzenta vērtējums: 7 balles");
-				WorkPlan wp9 = new WorkPlan(stw9, plan2, "Izstrādes stadija: 50%, kavējas termiņi");
-				
-				// --- EMP1 (Rimants Kalniņš - Pētnieks) ---
-				WorkPlan wp10 = new WorkPlan(stw1, p1_1, "Sekmīgi pabeigts un sistēma nodota ekspluatācijā");
-				WorkPlan wp11 = new WorkPlan(stw2, p1_2, "Aizstāvēts ar izcilību");
+				WorkPlan wp1 = new WorkPlan(stw1, plan1, "Development stage: 90%");
+				WorkPlan wp2 = new WorkPlan(stw2, plan1, "Defended with a grade of 9");
+				WorkPlan wp3 = new WorkPlan(stw3, plan1, "Thesis completed, awaiting defense");
+				WorkPlan wp4 = new WorkPlan(stw4, plan2, "Defended with a grade of 8");
+				WorkPlan wp5 = new WorkPlan(stw5, plan2, "Corrections required in the practical section");
+				WorkPlan wp6 = new WorkPlan(stw6, plan1, "Defended with a grade of 10 (Excellent)");
+				WorkPlan wp7 = new WorkPlan(stw7, plan3, "Discontinued at the student's request");
+				WorkPlan wp8 = new WorkPlan(stw8, plan1, "Reviewer's evaluation: 7 points");
+				WorkPlan wp9 = new WorkPlan(stw9, plan2, "Development stage: 50%, deadlines delayed");
+
+				// --- EMP1 (Rimants Kalniņš - Researcher) ---
+				WorkPlan wp10 = new WorkPlan(stw1, p1_1, "Successfully completed and system commissioned");
+				WorkPlan wp11 = new WorkPlan(stw2, p1_2, "Defended with distinction");
 
 				// --- EMP2 (Juris Uplejs - Nodaļas vadītājs, Vadošais pētnieks)
 				WorkPlan wp12 = new WorkPlan(stw3, p2_1, "Doktora darbs pabeigts; publikācijas sagatavotas");
@@ -498,19 +520,19 @@ public class ViracPlaningIApplication {
 				ProjectPlan projPlan3 = new ProjectPlan(plan3, proj2, null, "Done");
 				ProjectPlan projPlan4 = new ProjectPlan(plan4, proj1, null, "Done");
 				ProjectPlan projPlan5 = new ProjectPlan(plan4, proj2, null, "Done");
-				ProjectPlan projPlan6 = new ProjectPlan(plan1, proj3, "Sistēmas arhitektūras izstrāde, datu modeļa definēšana", "Procesā");
-				ProjectPlan projPlan7 = new ProjectPlan(plan2, proj4, "Serveru konfigurācija, datu migrācijas skripti", "Gandrīz pabeigts");
-				ProjectPlan projPlan8 = new ProjectPlan(plan2, proj5, "Drošības protokolu pārbaude", "Pabeigts");
-				ProjectPlan projPlan9 = new ProjectPlan(plan3, proj6, "Lielo datu klastera uzstādīšana", "Kavējas: gaidām aparatūru");
-				ProjectPlan projPlan10 = new ProjectPlan(plan3, proj7, "Interviju veikšana ar lietotājiem", "Done");
-				ProjectPlan projPlan11 = new ProjectPlan(plan4, proj8, "API dokumentācijas sagatavošana", "Plānots");
-				ProjectPlan projPlan12 = new ProjectPlan(plan4, proj9, "Modeļu apmācība uz testa datiem", "Testēšanas fāze");
-				
+				ProjectPlan projPlan6 = new ProjectPlan(plan1, proj3, "System architecture design, data model definition", "In Progress");
+				ProjectPlan projPlan7 = new ProjectPlan(plan2, proj4, "Server configuration, data migration scripts", "Almost finished");
+				ProjectPlan projPlan8 = new ProjectPlan(plan2, proj5, "Security protocol verification", "Completed");
+				ProjectPlan projPlan9 = new ProjectPlan(plan3, proj6, "Big data cluster setup", "Delayed: awaiting hardware");
+				ProjectPlan projPlan10 = new ProjectPlan(plan3, proj7, "Conducting user interviews", "Done");
+				ProjectPlan projPlan11 = new ProjectPlan(plan4, proj8, "API documentation preparation", "Planned");
+				ProjectPlan projPlan12 = new ProjectPlan(plan4, proj9, "Model training on test data", "Testing phase");
+
 				// --- EMP1 (Rimants Kalniņš) ---
-				ProjectPlan pp1_1 = new ProjectPlan(p1_1, proj3, "Sensoru datu apstrādes algoritmu izstrāde", "Done");
-				ProjectPlan pp1_2 = new ProjectPlan(p1_2, proj6, "Datu vizualizācijas moduļa integrācija", "In Progress");
-				ProjectPlan pp1_3 = new ProjectPlan(p1_3, proj9, "Modeļu validācija uz reāliem datiem", "Plānots");
-				ProjectPlan pp1_4 = new ProjectPlan(p1_4, proj3, "Sistēmas mērogošanas testi", "Reserved");
+				ProjectPlan pp1_1 = new ProjectPlan(p1_1, proj3, "Development of sensor data processing algorithms", "Done");
+				ProjectPlan pp1_2 = new ProjectPlan(p1_2, proj6, "Data visualization module integration", "In Progress");
+				ProjectPlan pp1_3 = new ProjectPlan(p1_3, proj9, "Model validation on real-world data", "Planned");
+				ProjectPlan pp1_4 = new ProjectPlan(p1_4, proj3, "System scalability testing", "Reserved");
 
 				// --- EMP2 (Juris Uplejs) ---
 				ProjectPlan pp2_1 = new ProjectPlan(p2_1, proj1, "Projekta dokumentācijas vadība", "Done");

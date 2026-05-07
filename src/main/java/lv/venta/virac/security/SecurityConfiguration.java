@@ -44,10 +44,14 @@ public class SecurityConfiguration {
                 //PUBLIC ENDPOINTS
                 .requestMatchers("/api/auth/**","/error").permitAll()
                 .requestMatchers("/api/export/**","/error").permitAll()
-                //.requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
+                
                 
                 //USER & ADMIN & USER_DEPART
                 .requestMatchers("/api/year/**").hasAnyRole("ADMIN","USER","USER_DEPART")
+                
+//                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
+//                .requestMatchers("/api/admin/plan/{id}").hasRole("ADMIN")
+//                .requestMatchers("/api/admin/plan/all").hasRole("ADMIN")
                 
                 //USER_DEPART
                 .requestMatchers("/api/admin/employee/filter/department").hasRole("USER_DEPART") //all employees by department
