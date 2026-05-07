@@ -66,8 +66,6 @@ public class CRUDWorkPlanServiceImpl implements ICRUDWorkPlanService{
 	@Override
 	public void create(int idStudWork, int idPlan, String workDone) throws Exception {
 		ArrayList<WorkPlan> workPlans = (ArrayList<WorkPlan>) workPlanRepo.findAll();
-		System.out.println(workPlans);
-		System.out.println("idStudWork: " + idStudWork + " idPlan: " + idPlan + " workDone: " + workDone );
 		
         if(idStudWork == 0 || idPlan == 0){
 			throw new Exception("The input parameters are incorrect");

@@ -1,7 +1,10 @@
 package lv.venta.virac.controller;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -10,6 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import lv.venta.virac.auth.AuthenticationService;
 import lv.venta.virac.auth.dto.RegisterRequest;
+import lv.venta.virac.errors.ErrorResponse;
+import lv.venta.virac.errors.FieldErrorDetail;
+import lv.venta.virac.scheduler.ICRUDPlanSchedulerService;
+import lv.venta.virac.scheduler.SchedulerDTO;
 import lv.venta.virac.user.CRUDUserServiceImpl;
 import lv.venta.virac.user.ICRUDUserService;
 import lv.venta.virac.user.User;
@@ -21,10 +28,13 @@ public class AdminController {
 	
 	private AuthenticationService authenticationService;
 	private ICRUDUserService userService;
+	private ICRUDPlanSchedulerService schedulerService;
 	
-	public AdminController(AuthenticationService authenticationService, CRUDUserServiceImpl userService) {
+	public AdminController(AuthenticationService authenticationService, CRUDUserServiceImpl userService,
+			ICRUDPlanSchedulerService schedulerService) {
 		this.authenticationService = authenticationService;
 		this.userService = userService;
+		this.schedulerService = schedulerService;
 	}
 
     @GetMapping("/dashboard")
@@ -69,7 +79,6 @@ public class AdminController {
             @PathVariable("id") int id) throws Exception {
 
         User us = userService.retrieveById(id);
-        System.out.println(us);
         return ResponseEntity.ok(
             new RegisterRequest(
             		us.getIdUser(),
@@ -109,5 +118,37 @@ public class AdminController {
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    
+    //Scheduler endpoint
+    @PutMapping("/update/scheduler")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateScheduler(@Valid @RequestBody SchedulerDTO dto,
+            BindingResult result){
+    	try {
+	
+		    if (result.hasErrors()) {
+	            // Convert FieldErrors to FieldErrorDetail objects
+	            List<FieldErrorDetail> errors = result.getFieldErrors().stream()
+	                    .map(error -> new FieldErrorDetail(
+	                            error.getField(),
+	                            error.getDefaultMessage(),
+	                            error.getRejectedValue()
+	                    ))
+	                    .collect(Collectors.toList());
+	 
+	            // Create ErrorResponse
+	            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);
+	 
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+	        }
+	
+		    schedulerService.update(dto);
+	        return ResponseEntity.ok().build();
+		}catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).body(new ArrayList<>());
+	    }
+    }
+    
 
 }

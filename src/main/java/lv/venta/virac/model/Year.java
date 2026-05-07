@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lv.venta.virac.scheduler.PlanSchedule;
 
 @Setter
 @Getter
@@ -46,6 +47,10 @@ public class Year extends Auditable{
 	@OneToMany(mappedBy = "year")
 	@ToString.Exclude
 	private Collection<Plan> plan;
+	
+	@OneToMany(mappedBy = "year")
+	@ToString.Exclude
+	private Collection<PlanSchedule> planSchedule;
 	
 	@Column(name = "deleted")
 	private boolean deleted = Boolean.FALSE;

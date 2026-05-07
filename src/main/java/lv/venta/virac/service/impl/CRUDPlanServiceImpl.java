@@ -8,10 +8,12 @@ import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lv.venta.virac.dto.CoursePlanResponseDTO;
 import lv.venta.virac.dto.FullPlanDTO;
 import lv.venta.virac.dto.ProjectPlanResponseDTO;
@@ -29,6 +31,7 @@ import lv.venta.virac.repo.IProjectPlanRepo;
 import lv.venta.virac.repo.IViracDepartmentRepo;
 import lv.venta.virac.repo.IWorkPlanRepo;
 import lv.venta.virac.repo.IYearRepo;
+import lv.venta.virac.scheduler.IPlanScheduleRepo;
 import lv.venta.virac.service.ICRUDPlanService;
 
 @Service
@@ -63,6 +66,9 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 
 	@Autowired
 	private IWorkPlanRepo studentWorkPlanRepo;
+	
+	@Autowired
+	private IPlanScheduleRepo planScheduleRepo;
 
 	@Override
 	public ArrayList<Plan> retrieveAll() throws Exception {
@@ -427,6 +433,45 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
         }
 	
 		
+	}
+	
+	@Scheduled(cron = "0 0 1 * * *")
+	@Transactional
+	public void processPlanStatuses() throws Exception{
+
+	    LocalDate today = LocalDate.now();
+
+	    ArrayList<Plan> plans = retrieveAll();
+	    
+	    //planScheduleRepo.findByYear_IdYear(today.getDayOfYear())).get
+	    LocalDate PlannedFreezeDate = planScheduleRepo.findByYear_IdYear(today.getDayOfYear()).getPlannedFreezeDate();
+	    LocalDate DoneFreezeDate = planScheduleRepo.findByYear_IdYear(today.getDayOfYear()).getDoneFreezeDate();
+	    
+	    for(Plan plan : plans) {
+
+	        //Status planned_frozen
+	        if(plan.getPlanStatus() == PlanStatus.plan_open &&
+	           !today.isBefore(PlannedFreezeDate)) {
+
+	            plan.setPlanStatus(PlanStatus.planned_frozen);
+	        }
+
+	        // done freeze
+	        if(plan.getPlanStatus() == PlanStatus.planned_frozen &&
+	           !today.isBefore(DoneFreezeDate)) {
+
+	            plan.setPlanStatus(PlanStatus.done_frozen);
+
+	            //Creates new year entity automatically
+	            Year newYear = new Year(today.getYear());
+	            for(Employee employee : employeeRepo.findAll()) {
+	            //TODO: needs to be updated if i want cleaner code
+	            create(employee.getIdEmployee(),
+	            		newYear.getIdYear(), 
+	            		0, 0, null, null, null, null, 0, 0, null, null, null, null, null, null, null, null, null, null, null, null);
+	            }
+	        }
+	    }
 	}
 
 	@Override

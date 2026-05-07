@@ -45,6 +45,9 @@ public interface ICRUDPlanService extends ICRUDBase<Plan>{
 	//Get full plan from idPlan
 	public abstract FullPlanDTO retrieveFullPlan(int idPlan) throws Exception;
 	
+	//Scheduler
+	public abstract void processPlanStatuses() throws Exception;
+	
 	//User can edit planDTO fields according plan status (plan_open, planned_frozen, done_frozen)
 	public abstract void updatePlanForUserByOpenPlan(int idEmployee, int numOfProjects, int numOfArticles, String partInConf, String partInConfEnd, 
 			String comAbConf, String comAbConfEnd, int numOfCourses, int numOfStudWork, String promoOfResearch, String promoOfResearchEnd,
