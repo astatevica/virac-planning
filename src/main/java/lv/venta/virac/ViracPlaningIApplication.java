@@ -40,6 +40,8 @@ import lv.venta.virac.repo.IStudentWorkRepo;
 import lv.venta.virac.repo.IViracDepartmentRepo;
 import lv.venta.virac.repo.IWorkPlanRepo;
 import lv.venta.virac.repo.IYearRepo;
+import lv.venta.virac.scheduler.IPlanScheduleRepo;
+import lv.venta.virac.scheduler.PlanSchedule;
 import lv.venta.virac.user.IUserRepo;
 import lv.venta.virac.user.Role;
 import lv.venta.virac.user.User;
@@ -60,7 +62,7 @@ public class ViracPlaningIApplication {
 			IProjectPlanRepo projPlanRepo, IProjectRepo projRepo,
 			IScientificArticlesRepo scientArtRepo, IStudentWorkRepo studWorkRepo,
 			IViracDepartmentRepo viracDepRepo, IWorkPlanRepo workPlanRepo, IUserRepo userRepo,
-			PasswordEncoder encoder)
+			IPlanScheduleRepo scheduleRepo, PasswordEncoder encoder)
 	{
 		return new CommandLineRunner() {
 			
@@ -75,6 +77,12 @@ public class ViracPlaningIApplication {
 				Year year4 = new Year(2026);
 				
 				yearRepo.saveAll((Arrays.asList(year, year1, year2, year3, year4)));
+				
+				//Scheduler TABLE
+				LocalDate pf = LocalDate.of(2026,2,1);
+		        LocalDate df = LocalDate.of(2026,12,25);
+				PlanSchedule schedule2026 = new PlanSchedule(year4,pf,df);
+				scheduleRepo.save(schedule2026);
 		
 				//ViracDepartmentTable DONE
 				ViracDepartment dep1 = new ViracDepartment("Electronics and Satellite Technology", "Juris", "Uplejs");

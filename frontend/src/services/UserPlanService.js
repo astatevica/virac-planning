@@ -105,6 +105,8 @@ const getJournalById = (idJournal) =>
 const createJournal = (dto) =>
   api.post(`${API}/journals/add`, dto);
 
+const getSchedulerByYear = (idYear) => api.get(`${API}/scheduler/${idYear}`)
+
 const UserPlanService = {
   getAll,
   getByYear,   
@@ -136,7 +138,8 @@ const UserPlanService = {
   getDegreeValues,
   getAllJournals,
   getJournalById,
-  createJournal
+  createJournal,
+  getSchedulerByYear
 };
 
 export default UserPlanService;

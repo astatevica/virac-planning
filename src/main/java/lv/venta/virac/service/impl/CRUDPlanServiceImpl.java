@@ -482,6 +482,14 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	            newYear.setYearNumber(targetYear);
 
 	            year = yearRepo.save(newYear);
+	            
+	            //Sets automatical date, that should be updated if needed
+	            PlanSchedule newSchedule = new PlanSchedule();
+	            newSchedule.setYear(newYear);
+	            newSchedule.setPlannedFreezeDate(LocalDate.of(targetYear, 2, 1));
+	            newSchedule.setDoneFreezeDate(LocalDate.of(targetYear, 12, 25));
+	            planScheduleRepo.save(newSchedule);
+	            
 	        }
 
 	      //Create next year plans 

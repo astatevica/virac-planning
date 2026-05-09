@@ -2,10 +2,151 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { useAuth } from "../auth/AuthContext";
+import AdminService from "../services/AdminService";
 import DepartmentHeadService from "../services/DepartmentHeadService";
 import { exportPlanFile } from "../utils/planExport";
+import "./Admin.css";
 
 const API = "/admin";
+
+const toDateInputValue = (value) => {
+  if (!value) return "";
+  return value.slice(0, 10);
+};
+
+const SchedulerUpdateSection = () => {
+  const [schedulerRow, setSchedulerRow] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const currentYearNumber = new Date().getFullYear();
+
+  useEffect(() => {
+    const loadScheduler = async () => {
+      try {
+        const yearsRes = await api.get("/year/all");
+        const years = yearsRes.data || [];
+
+        const currentYear = years.find(
+          (y) => Number(y.yearNumber) === currentYearNumber
+        );
+
+        if (!currentYear) {
+          setMessage("Year not found");
+          setSchedulerRow(null);
+          return;
+        }
+
+        const res = await AdminService.getSchedulerByYear(currentYear.idYear);
+        const data = res.data;
+
+        setSchedulerRow({
+          idYear: currentYear.idYear,
+          plannedFreezeDate: toDateInputValue(data?.plannedFreezeDate),
+          doneFreezeDate: toDateInputValue(data?.doneFreezeDate),
+        });
+      } catch {
+        setMessage("Load failed");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadScheduler();
+  }, [currentYearNumber]);
+
+  const handleChange = (field, value) => {
+    setSchedulerRow((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = async (row) => {
+    if (!row.plannedFreezeDate || !row.doneFreezeDate) {
+      setMessage("Both freeze dates are required.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      await AdminService.updateScheduler({
+        idYear: Number(row.idYear),
+        plannedFreezeDate: row.plannedFreezeDate,
+        doneFreezeDate: row.doneFreezeDate,
+      });
+      setMessage("Scheduler updated successfully.");
+    } catch {
+      setMessage("Failed to update scheduler.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <section className="admin-scheduler-section">
+      <h2 className="admin-scheduler-title">Scheduler for current year: {currentYearNumber}</h2>
+      <p className="admin-scheduler-warning">
+        This is the scheduler where the administrator can change the plan
+        submission deadline dates for curren year.
+      </p>
+
+      {message && (
+        <p className={message.toLowerCase().includes("success") ? "admin-message-success" : "admin-message-error"}>
+          {message}
+        </p>
+      )}
+
+      {isLoading ? (
+        <p>Loading scheduler...</p>
+      ) : !schedulerRow ? (
+        <p>No scheduler row available for {currentYearNumber}.</p>
+      ) : (
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Year</th>
+              <th>Planned Freeze Date</th>
+              <th>Done Freeze Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr key={schedulerRow.idYear}>
+              <td>{currentYearNumber}</td>
+              <td>
+                <input
+                  type="date"
+                  value={schedulerRow.plannedFreezeDate}
+                  onChange={(event) =>
+                    handleChange("plannedFreezeDate", event.target.value)
+                  }
+                />
+              </td>
+              <td>
+                <input
+                  type="date"
+                  value={schedulerRow.doneFreezeDate}
+                  onChange={(event) =>
+                    handleChange("doneFreezeDate", event.target.value)
+                  }
+                />
+              </td>
+              <td>
+                <button
+                  type="button"
+                  onClick={() => handleSave(schedulerRow)}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save"}
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      )}
+    </section>
+  );
+};
 
 const DepartmentHeadDashboard = () => {
   const navigate = useNavigate();
@@ -81,21 +222,13 @@ const DepartmentHeadDashboard = () => {
   };
 
   return (
-    <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+    <div className="admin-page-container">
       <h2>Department Dashboard</h2>
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+      {error && <p className="admin-message-error">{error}</p>}
 
       {departmentCredentials && (
-        <div
-          style={{
-            marginBottom: "20px",
-            padding: "16px",
-            border: "1px solid #d8e0ef",
-            borderRadius: "12px",
-            background: "#f7faff",
-          }}
-        >
+        <div className="admin-info-card">
           <div>
             <strong>Department:</strong> {departmentCredentials.name}
           </div>
@@ -105,41 +238,25 @@ const DepartmentHeadDashboard = () => {
         </div>
       )}
 
-      <div
-        style={{
-          display: "flex",
-          gap: "24px",
-          alignItems: "flex-start",
-          flexWrap: "wrap",
-        }}
-      >
-        <section style={{ flex: "1 1 320px", minWidth: "320px" }}>
+      <div className="admin-layout">
+        <section className="admin-sidebar-section">
           <h3>Employees</h3>
           {loadingEmployees ? (
             <p>Loading employees...</p>
           ) : employees.length === 0 ? (
             <p>No employees found in this department.</p>
           ) : (
-            <div style={{ display: "grid", gap: "10px" }}>
+            <div className="admin-employee-grid">
               {employees.map((employee) => (
                 <button
                   key={employee.id}
                   type="button"
                   onClick={() => loadEmployeePlans(employee)}
-                  style={{
-                    textAlign: "left",
-                    padding: "14px",
-                    border:
-                      selectedEmployee?.id === employee.id
-                        ? "2px solid #1f4b99"
-                        : "1px solid #cfd7e6",
-                    borderRadius: "12px",
-                    background:
-                      selectedEmployee?.id === employee.id
-                        ? "#eef4ff"
-                        : "#ffffff",
-                    cursor: "pointer",
-                  }}
+                  className={`admin-employee-button ${
+                    selectedEmployee?.id === employee.id
+                      ? "admin-employee-button-selected"
+                      : ""
+                  }`}
                 >
                   <strong>
                     {employee.name} {employee.surname}
@@ -155,7 +272,7 @@ const DepartmentHeadDashboard = () => {
           )}
         </section>
 
-        <section style={{ flex: "2 1 560px", minWidth: "360px" }}>
+        <section className="admin-main-section">
           <h3>
             {selectedEmployee
               ? `${selectedEmployee.name} ${selectedEmployee.surname} plans`
@@ -163,7 +280,7 @@ const DepartmentHeadDashboard = () => {
           </h3>
 
           {selectedEmployee && (
-            <div style={{ marginBottom: "12px" }}>
+            <div className="admin-filter-row">
               <label htmlFor="department-plan-year">Year:</label>{" "}
               <select
                 id="department-plan-year"
@@ -187,7 +304,7 @@ const DepartmentHeadDashboard = () => {
           ) : visiblePlans.length === 0 ? (
             <p>No plans found for the selected employee.</p>
           ) : (
-            <table border="1" cellPadding="6" width="100%">
+            <table className="admin-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -227,7 +344,7 @@ const DepartmentHeadDashboard = () => {
                       <button
                         type="button"
                         onClick={() => handleExportDocx(plan.idPlan)}
-                        style={{ marginLeft: 8 }}
+                        className="admin-inline-button"
                       >
                         DOCX
                       </button>
@@ -345,6 +462,8 @@ const AdminUserManagement = () => {
 
   return (
     <div>
+      <SchedulerUpdateSection />
+
       <h2>Users</h2>
 
       <ul>

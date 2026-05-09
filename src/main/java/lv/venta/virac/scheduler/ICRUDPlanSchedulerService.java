@@ -9,5 +9,8 @@ public interface ICRUDPlanSchedulerService extends ICRUDBase<PlanSchedule>{
 	
 	//U - update
 	public abstract void update(SchedulerDTO dto) throws Exception;
+	
+	//Get by Year ID
+	public abstract SchedulerDTO getByYearId(int idYear) throws Exception;
 
 }

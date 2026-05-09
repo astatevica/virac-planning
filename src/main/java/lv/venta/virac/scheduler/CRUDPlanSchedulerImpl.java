@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.hibernate.Filter;
 import org.hibernate.Session;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,9 @@ public class CRUDPlanSchedulerImpl implements ICRUDPlanSchedulerService{
 	
 	@PersistenceContext
     private EntityManager entityManager;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 	
 	@Override
 	public ArrayList<PlanSchedule> retrieveAll() throws Exception {
@@ -57,17 +61,17 @@ public class CRUDPlanSchedulerImpl implements ICRUDPlanSchedulerService{
 	public void create(SchedulerDTO dto) throws Exception {
 		ArrayList<PlanSchedule> planSchedules = (ArrayList<PlanSchedule>) scheduleRepo.findAll();
 		
-        if(dto.getYearId() == 0 || dto.getPlannedFreezeDate() == null || dto.getPlannedFreezeDate() == null){
+        if(dto.getIdYear() == 0){
 			throw new Exception("The input parameters are incorrect");
 		}
         
-        Year year = yearRepo.findById(dto.getYearId()).get();
+        Year year = yearRepo.findById(dto.getIdYear()).get();
         if(year == null) {
         	throw new Exception("Year id not found");
         }
         
         for (PlanSchedule pss : planSchedules) {
-            if (pss.getYear().getIdYear()==dto.getYearId() & pss.isDeleted( )== false) {
+            if (pss.getYear().getIdYear()==dto.getIdYear() & pss.isDeleted( )== false) {
                 throw new Exception("Plan Schedule with ID: " + pss.getIdPlanSchedule() + " already exists");
             }
         }
@@ -79,11 +83,11 @@ public class CRUDPlanSchedulerImpl implements ICRUDPlanSchedulerService{
 
 	@Override
 	public void update(SchedulerDTO dto) throws Exception {
-		PlanSchedule ps = scheduleRepo.findByYear_IdYear(dto.getYearId());
+		PlanSchedule ps = scheduleRepo.findByYear_IdYear(dto.getIdYear());
     	if (ps == null) throw new 
-    		Exception("Plan Schedule with (year id:" + dto.getYearId() + ") does not exist");    	
+    		Exception("Plan Schedule with (year id:" + dto.getIdYear() + ") does not exist");    	
     	   
-    	Year year = yearRepo.findById(dto.getYearId()).get();
+    	Year year = yearRepo.findById(dto.getIdYear()).get();
         if(year == null) {
         	throw new Exception("Year id not found");
         }
@@ -92,6 +96,21 @@ public class CRUDPlanSchedulerImpl implements ICRUDPlanSchedulerService{
         ps.setDoneFreezeDate(dto.getDoneFreezeDate());
         scheduleRepo.save(ps);
 		
+	}
+
+	@Override
+	public SchedulerDTO getByYearId(int idYear) throws Exception {
+        if (idYear < 1)throw new Exception("Invalid ID");
+
+        PlanSchedule foundPlanSchedules = scheduleRepo.findByYear_IdYear(idYear);
+
+        if (foundPlanSchedules == null)throw new Exception("Plan Schedule with the idYear: (" + idYear + ") does not exist!");
+
+        SchedulerDTO dto = modelMapper.map(foundPlanSchedules, SchedulerDTO.class);
+
+        dto.setIdYear(foundPlanSchedules.getYear().getIdYear());
+
+        return dto;
 	}
 
 }

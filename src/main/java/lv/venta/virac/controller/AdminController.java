@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -93,7 +94,7 @@ public class AdminController {
     
     @PutMapping("/update/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> update(
+    public ResponseEntity<Void> updateById(
             @PathVariable("id") int id,
             @Valid @RequestBody RegisterRequest us,
             BindingResult result) throws Exception {
@@ -114,7 +115,7 @@ public class AdminController {
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> delete(@PathVariable("id") int id) throws Exception {
+    public ResponseEntity<Void> deleteById(@PathVariable("id") int id) throws Exception {
         userService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
@@ -122,7 +123,7 @@ public class AdminController {
     //Scheduler endpoint
     @PutMapping("/update/scheduler")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateScheduler(@Valid @RequestBody SchedulerDTO dto,
+    public ResponseEntity<?> updateSchedulerByYear(@Valid @RequestBody SchedulerDTO dto,
             BindingResult result){
     	try {
 	
@@ -147,6 +148,21 @@ public class AdminController {
 		}catch(Exception e) {
 	    	e.printStackTrace();
 	        return ResponseEntity.status(500).body(new ArrayList<>());
+	    }
+    }
+    
+    //Scheduler endpoint
+    @GetMapping("/scheduler/{idYear}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<SchedulerDTO> getSchedulerByYear(@PathVariable("idYear") int idYear, Authentication authentication){
+    	try {
+	
+		    SchedulerDTO dto = schedulerService.getByYearId(idYear);
+	
+		    return ResponseEntity.ok(dto);
+		}catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).build();
 	    }
     }
     

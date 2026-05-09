@@ -46,6 +46,8 @@ import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.Project;
 import lv.venta.virac.model.ProjectPlan;
 import lv.venta.virac.model.ScientificArticles;
+import lv.venta.virac.scheduler.ICRUDPlanSchedulerService;
+import lv.venta.virac.scheduler.SchedulerDTO;
 import lv.venta.virac.service.ICRUDArticlePlanService;
 import lv.venta.virac.service.ICRUDCoursePlanService;
 import lv.venta.virac.service.ICRUDCourseService;
@@ -71,11 +73,12 @@ public class UserController {
 	private ICRUDArticlePlanService artPlanService;
 	private ICRUDJournalService journalService;
 	private ICRUDWorkPlanService studentWorkService;
+	private ICRUDPlanSchedulerService schedulerService;
 	
 	public UserController(ICRUDPlanService planService, ICRUDProjectPlanService projPlanService, 
 			ICRUDProjectService projService, ICRUDCourseService courseService,ICRUDCoursePlanService coursePlanService,
 			ICRUDScientificArticlesService articlesService, ICRUDArticlePlanService artPlanService, ICRUDJournalService journalService,
-			ICRUDWorkPlanService studentWorkService) {
+			ICRUDWorkPlanService studentWorkService,ICRUDPlanSchedulerService schedulerService) {
 		this.planService = planService;
 		this.projPlanService = projPlanService;
 		this.projService = projService;
@@ -85,6 +88,7 @@ public class UserController {
 		this.artPlanService = artPlanService;
 		this.journalService = journalService;
 		this.studentWorkService = studentWorkService;
+		this.schedulerService = schedulerService;
 	}
 
 	@GetMapping("/filter/plans/all")
@@ -849,6 +853,20 @@ public class UserController {
 		}catch(Exception e) {
 	    	e.printStackTrace();
 	        return ResponseEntity.status(500).body(new ArrayList<>());
+	    }
+    }
+	//---------------------------- SCHEDULER SECTION -------------------------------------//
+    //Scheduler endpoint
+    @GetMapping("/scheduler/{idYear}")
+    public ResponseEntity<SchedulerDTO> getSchedulerByYear(@PathVariable("idYear") int idYear, Authentication authentication){
+    	try {
+	
+		    SchedulerDTO dto = schedulerService.getByYearId(idYear);
+	
+		    return ResponseEntity.ok(dto);
+		}catch(Exception e) {
+	    	e.printStackTrace();
+	        return ResponseEntity.status(500).build();
 	    }
     }
 }
