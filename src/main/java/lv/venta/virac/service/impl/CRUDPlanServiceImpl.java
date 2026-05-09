@@ -32,6 +32,7 @@ import lv.venta.virac.repo.IViracDepartmentRepo;
 import lv.venta.virac.repo.IWorkPlanRepo;
 import lv.venta.virac.repo.IYearRepo;
 import lv.venta.virac.scheduler.IPlanScheduleRepo;
+import lv.venta.virac.scheduler.PlanSchedule;
 import lv.venta.virac.service.ICRUDPlanService;
 
 @Service
@@ -443,35 +444,56 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 
 	    ArrayList<Plan> plans = retrieveAll();
 	    
-	    //planScheduleRepo.findByYear_IdYear(today.getDayOfYear())).get
-	    LocalDate PlannedFreezeDate = planScheduleRepo.findByYear_IdYear(today.getDayOfYear()).getPlannedFreezeDate();
-	    LocalDate DoneFreezeDate = planScheduleRepo.findByYear_IdYear(today.getDayOfYear()).getDoneFreezeDate();
-	    
+	    //Finds schedule dates
+	    PlanSchedule schedule = planScheduleRepo.findByYear_YearNumber(today.getYear());
+	    LocalDate plannedFreezeDate = schedule.getPlannedFreezeDate();
+	    LocalDate doneFreezeDate = schedule.getDoneFreezeDate();
+		  
+		//Update statuses
 	    for(Plan plan : plans) {
 
 	        //Status planned_frozen
 	        if(plan.getPlanStatus() == PlanStatus.plan_open &&
-	           !today.isBefore(PlannedFreezeDate)) {
+	           !today.isBefore(plannedFreezeDate)) {
 
 	            plan.setPlanStatus(PlanStatus.planned_frozen);
 	        }
 
 	        // done freeze
 	        if(plan.getPlanStatus() == PlanStatus.planned_frozen &&
-	           !today.isBefore(DoneFreezeDate)) {
+	           !today.isBefore(doneFreezeDate)) {
 
 	            plan.setPlanStatus(PlanStatus.done_frozen);
-
-	            //Creates new year entity automatically
-	            Year newYear = new Year(today.getYear());
-	            for(Employee employee : employeeRepo.findAll()) {
-	            //TODO: needs to be updated if i want cleaner code
-	            create(employee.getIdEmployee(),
-	            		newYear.getIdYear(), 
-	            		0, 0, null, null, null, null, 0, 0, null, null, null, null, null, null, null, null, null, null, null, null);
-	            }
+	           
 	        }
 	    }
+	    
+	    // Create next year plans
+	    if (!today.isBefore(doneFreezeDate)) {
+
+	    	//If today is after DoneFreezeDate need to open new plan and create new year entity
+	        int targetYear = today.getYear() + 1;
+
+	        //Find if target Year already exists
+	        Year year = yearRepo.findByYearNumber(targetYear);
+
+	        if (year == null) {
+	            Year newYear = new Year();
+	            newYear.setYearNumber(targetYear);
+
+	            year = yearRepo.save(newYear);
+	        }
+
+	      //Create next year plans 
+		    for(Employee employee : employeeRepo.findAll()) {
+		    	boolean exists = planRepo.findFirstByEmployee_IdEmployeeAndYear_IdYear(employee.getIdEmployee(), year.getIdYear()) != null;
+	        	if(!exists){
+		            create(employee.getIdEmployee(),
+		            		year.getIdYear(), 
+		            		0, 0, null, null, null, null, 0, 0, null, null, null, null, null, null, null, null, null, null, null, null);
+		            }
+	        }
+		}
 	}
 
 	@Override
