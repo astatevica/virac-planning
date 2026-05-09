@@ -3,11 +3,20 @@ import { useNavigate } from "react-router-dom";
 import UserPlanService from "../services/UserPlanService";
 import api from "../api/api";
 import { exportPlanFile } from "../utils/planExport";
+import CurrentYearPlansTable from "../components/user-dashboard/CurrentYearPlansTable";
+import OpenPlanActivities from "../components/user-dashboard/OpenPlanActivities";
+import SchedulerDeadlineCard from "../components/user-dashboard/SchedulerDeadlineCard";
+import ArticleModals from "../components/user-dashboard/modals/ArticleModals";
+import CourseModals from "../components/user-dashboard/modals/CourseModals";
+import ProjectModals from "../components/user-dashboard/modals/ProjectModals";
+import StudentWorkModals from "../components/user-dashboard/modals/StudentWorkModals";
+import "./UserDashboard.css";
 
 export default function UserDashboard() {
   const navigate = useNavigate();
   const [plans, setPlans] = useState([]);
   const [currentYearId, setCurrentYearId] = useState(null);
+  const [scheduler, setScheduler] = useState(null);
   const [openPlan, setOpenPlan] = useState(null);
   const [openPlanProjects, setOpenPlanProjects] = useState([]);
   const [locallyDeletedProjectIds, setLocallyDeletedProjectIds] = useState([]);
@@ -267,6 +276,35 @@ export default function UserDashboard() {
       return `${value.year}-${mm}-${dd}`;
     }
     return "";
+  };
+
+  const formatSchedulerDate = (value) => {
+    const normalized = toDateInputValue(value);
+    if (!normalized) return "Not set";
+    return normalized;
+  };
+
+  const getDaysUntilDate = (value) => {
+    const normalized = toDateInputValue(value);
+    if (!normalized) return null;
+
+    const today = new Date();
+    const target = new Date(`${normalized}T00:00:00`);
+    const todayStart = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const diffMs = target.getTime() - todayStart.getTime();
+
+    return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  };
+
+  const getDeadlineClassName = (daysLeft) => {
+    if (daysLeft === null) return "user-dashboard-deadline-neutral";
+    if (daysLeft < 0) return "user-dashboard-deadline-expired";
+    if (daysLeft <= 14) return "user-dashboard-deadline-warning";
+    return "user-dashboard-deadline-ok";
   };
 
   const getProjectId = (project) =>
@@ -562,7 +600,12 @@ export default function UserDashboard() {
         const yearId = yearObj.idYear;
         setCurrentYearId(yearId);
 
-        const plansRes = await UserPlanService.getByYear(yearId);
+        const [plansRes, schedulerRes] = await Promise.all([
+          UserPlanService.getByYear(yearId),
+          UserPlanService.getSchedulerByYear(yearId).catch(() => ({ data: null }))
+        ]);
+
+        setScheduler(schedulerRes.data || null);
         setPlans(plansRes.data);
         if (plansRes.data.length > 0) {
           const firstPlan = { ...plansRes.data[0] };
@@ -1703,1479 +1746,261 @@ export default function UserDashboard() {
 
   const normalizedStatus = extractStatus(openPlan);
   const isPlannedFrozen = normalizedStatus === "planned_frozen";
+  const plannedDaysLeft = getDaysUntilDate(scheduler?.plannedFreezeDate);
+  const doneDaysLeft = getDaysUntilDate(scheduler?.doneFreezeDate);
+  const handleOpenPlanRowAction = (rowKey, actionIndex) => {
+    if (actionIndex === 0) {
+      if (rowKey === "projects") return openProjectModal();
+      if (rowKey === "courses") return openCourseModal();
+      if (rowKey === "studentWork") return openStudentWorkModal();
+      if (rowKey === "articles") return openArticleModal();
+    }
+
+    if (actionIndex === 1) {
+      if (rowKey === "projects") return openProjectDeleteModal();
+      if (rowKey === "courses") return openCourseDeleteModal();
+      if (rowKey === "studentWork") return openStudentWorkDeleteModal();
+      if (rowKey === "articles") return openArticleDeleteModal();
+    }
+
+    setSaveMessage("Action is not connected yet.");
+  };
 
   return (
-    <div>
+    <div className="user-dashboard-page">
       <h2>User Dashboard</h2>
-      <h3>
-        Current Year Plans ({currentYear})
-        {currentYearId && ` (ID: ${currentYearId})`}
-      </h3>
+      <CurrentYearPlansTable
+        currentYear={currentYear}
+        currentYearId={currentYearId}
+        plans={plans}
+        navigate={navigate}
+        handleExportPlan={handleExportPlan}
+        getButtonStyle={getButtonStyle}
+      />
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          border: "1px solid #aeb6bf",
-          background: "#fff"
-        }}
-      >
-        <thead>
-          <tr>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>ID</th>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Projects</th>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Articles</th>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Courses</th>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Student Work</th>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa" }}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {plans.length === 0 ? (
-            <tr>
-              <td colSpan="6" style={{ padding: "12px" }}>No plans for current year</td>
-            </tr>
-          ) : (
-            plans.map((pl) => (
-              <tr key={pl.idPlan}>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.idPlan}</td>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfProjects}</td>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfArticles}</td>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfCourses}</td>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>{pl.numOfStudWork}</td>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8" }}>
-                  <button onClick={() => navigate(`/user/full-plan/${pl.idPlan}`)} style={getButtonStyle("view")}>
-                    Open
-                  </button>
-                  {" "}
-                  <button
-                    type="button"
-                    onClick={() => handleExportPlan(pl.idPlan, "docx")}
-                    style={getButtonStyle("view")}
-                  >
-                    DOCX
-                  </button>
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+      <SchedulerDeadlineCard
+        scheduler={scheduler}
+        plannedDaysLeft={plannedDaysLeft}
+        doneDaysLeft={doneDaysLeft}
+        formatSchedulerDate={formatSchedulerDate}
+        getDeadlineClassName={getDeadlineClassName}
+      />
 
-      <br />
-      <button onClick={() => navigate("/user/plans")} style={getButtonStyle("view")}>View All Plans</button>
+      <OpenPlanActivities
+        openPlan={openPlan}
+        tableRows={tableRows}
+        isPlannedFrozen={isPlannedFrozen}
+        handleOpenPlanNumberChange={handleOpenPlanNumberChange}
+        handleOpenPlanTextChange={handleOpenPlanTextChange}
+        openPlanProjects={openPlanProjects}
+        openPlanCourses={openPlanCourses}
+        openPlanArticles={openPlanArticles}
+        openPlanStudentWorks={openPlanStudentWorks}
+        getProjectPlanId={getProjectPlanId}
+        getProjectId={getProjectId}
+        getStudentWorkId={getStudentWorkId}
+        getArticlePlanId={getArticlePlanId}
+        getArticleId={getArticleId}
+        formatProjectText={formatProjectText}
+        formatCourseText={formatCourseText}
+        formatArticleText={formatArticleText}
+        openProjectEditModal={openProjectEditModal}
+        openCourseEditModal={openCourseEditModal}
+        openStudentWorkEditModal={openStudentWorkEditModal}
+        openArticleEditModal={openArticleEditModal}
+        getButtonStyle={getButtonStyle}
+        onRowAction={handleOpenPlanRowAction}
+        handleSaveOpenPlan={handleSaveOpenPlan}
+        isSaving={isSaving}
+      />
+      <ProjectModals
+        openPlan={openPlan}
+        isProjectModalOpen={isProjectModalOpen}
+        projectSearch={projectSearch}
+        setProjectSearch={setProjectSearch}
+        setSelectedProject={setSelectedProject}
+        projectOptions={projectOptions}
+        setProjectOptions={setProjectOptions}
+        getProjectId={getProjectId}
+        toDateInputValue={toDateInputValue}
+        openPlanProjects={openPlanProjects}
+        projectModalFieldErrors={projectModalFieldErrors}
+        selectedProject={selectedProject}
+        formatProjectText={formatProjectText}
+        projectTasks={projectTasks}
+        setProjectTasks={setProjectTasks}
+        projectWorkDone={projectWorkDone}
+        setProjectWorkDone={setProjectWorkDone}
+        projectModalMessage={projectModalMessage}
+        setProjectModalMessage={setProjectModalMessage}
+        handleSaveProjectFromModal={handleSaveProjectFromModal}
+        isProjectSaving={isProjectSaving}
+        closeProjectModal={closeProjectModal}
+        getButtonStyle={getButtonStyle}
+        isProjectDeleteModalOpen={isProjectDeleteModalOpen}
+        isProjectDeleting={isProjectDeleting}
+        projectDeleteMessage={projectDeleteMessage}
+        getProjectPlanId={getProjectPlanId}
+        handleDeleteProjectPlan={handleDeleteProjectPlan}
+        closeProjectDeleteModal={closeProjectDeleteModal}
+        isProjectEditModalOpen={isProjectEditModalOpen}
+        projectEditTarget={projectEditTarget}
+        projectEditName={projectEditName}
+        setProjectEditName={setProjectEditName}
+        projectEditFieldErrors={projectEditFieldErrors}
+        projectEditNumber={projectEditNumber}
+        setProjectEditNumber={setProjectEditNumber}
+        projectEditManagementId={projectEditManagementId}
+        setProjectEditManagementId={setProjectEditManagementId}
+        projectEditStartDate={projectEditStartDate}
+        setProjectEditStartDate={setProjectEditStartDate}
+        projectEditEndDate={projectEditEndDate}
+        setProjectEditEndDate={setProjectEditEndDate}
+        projectEditAcronym={projectEditAcronym}
+        setProjectEditAcronym={setProjectEditAcronym}
+        projectEditTasks={projectEditTasks}
+        setProjectEditTasks={setProjectEditTasks}
+        projectEditWorkDone={projectEditWorkDone}
+        setProjectEditWorkDone={setProjectEditWorkDone}
+        projectEditMessage={projectEditMessage}
+        handleEditProjectPlan={handleEditProjectPlan}
+        isProjectEditing={isProjectEditing}
+        closeProjectEditModal={closeProjectEditModal}
+      />
 
-      <h2 style={{ marginTop: 20 }}>Open Plan Activities</h2>
+      <CourseModals
+        openPlan={openPlan}
+        isCourseModalOpen={isCourseModalOpen}
+        courseMode={courseMode}
+        setCourseMode={setCourseMode}
+        courseSearch={courseSearch}
+        setCourseSearch={setCourseSearch}
+        setSelectedCourse={setSelectedCourse}
+        courseOptions={courseOptions}
+        setCourseOptions={setCourseOptions}
+        selectedCourse={selectedCourse}
+        formatCourseText={formatCourseText}
+        openPlanCourses={openPlanCourses}
+        getWorkDoneText={getWorkDoneText}
+        newCourse={newCourse}
+        setNewCourse={setNewCourse}
+        courseWorkDone={courseWorkDone}
+        setCourseWorkDone={setCourseWorkDone}
+        courseModalFieldErrors={courseModalFieldErrors}
+        handleSaveCourseFromModal={handleSaveCourseFromModal}
+        isCourseSaving={isCourseSaving}
+        closeCourseModal={closeCourseModal}
+        getButtonStyle={getButtonStyle}
+        courseModalMessage={courseModalMessage}
+        isCourseDeleteModalOpen={isCourseDeleteModalOpen}
+        isCourseDeleting={isCourseDeleting}
+        courseDeleteMessage={courseDeleteMessage}
+        getCoursePlanId={getCoursePlanId}
+        handleDeleteCoursePlan={handleDeleteCoursePlan}
+        closeCourseDeleteModal={closeCourseDeleteModal}
+        isCourseEditModalOpen={isCourseEditModalOpen}
+        courseEditTarget={courseEditTarget}
+        courseEditName={courseEditName}
+        setCourseEditName={setCourseEditName}
+        courseEditEcts={courseEditEcts}
+        setCourseEditEcts={setCourseEditEcts}
+        courseEditSemester={courseEditSemester}
+        setCourseEditSemester={setCourseEditSemester}
+        courseEditFaculty={courseEditFaculty}
+        setCourseEditFaculty={setCourseEditFaculty}
+        courseEditWorkDone={courseEditWorkDone}
+        setCourseEditWorkDone={setCourseEditWorkDone}
+        courseEditFieldErrors={courseEditFieldErrors}
+        handleEditCoursePlan={handleEditCoursePlan}
+        isCourseEditing={isCourseEditing}
+        closeCourseEditModal={closeCourseEditModal}
+        courseEditMessage={courseEditMessage}
+      />
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          border: "1px solid #aeb6bf",
-          background: "#fff"
-        }}
-      >
-        <thead>
-          <tr>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa", width: "18%" }}>Activity</th>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa", width: "32%" }}>Planned</th>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa", width: "32%" }}>Done</th>
-            <th style={{ textAlign: "left", padding: "10px 12px", background: "#f6f8fa", width: "18%" }}>Buttons</th>
-          </tr>
-        </thead>
-        <tbody>
-          {!openPlan ? (
-            <tr>
-              <td colSpan="4" style={{ padding: "12px" }}>No open plan available.</td>
-            </tr>
-          ) : (
-            tableRows.map((row) => (
-              <tr key={row.key}>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8", verticalAlign: "top" }}>{row.label}</td>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8", verticalAlign: "top" }}>
-                  {row.type === "number" ? (
-                    <input
-                      type="number"
-                      name={row.planned}
-                      value={openPlan[row.planned] ?? ""}
-                      onChange={handleOpenPlanNumberChange}
-                      disabled={isPlannedFrozen}
-                      style={{ width: "100%" }}
-                    />
-                  ) : (
-                    <textarea
-                      name={row.planned}
-                      value={openPlan[row.planned] || ""}
-                      onChange={handleOpenPlanTextChange}
-                      disabled={isPlannedFrozen}
-                      rows={2}
-                      style={{ width: "100%", resize: "vertical" }}
-                    />
-                  )}
-                </td>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8", verticalAlign: "top" }}>
-                  {row.done.endsWith("DTO") ? (
-                    row.done === "ProjectDTO" ? (
-                      openPlanProjects.length > 0 ? (
-                        <ol style={{ margin: 0, paddingLeft: 20 }}>
-                          {openPlanProjects.map((project, idx) => (
-                            <li key={`${getProjectPlanId(project) || getProjectId(project) || idx}-${idx}`}>
-                              {formatProjectText(project)}
-                              {" "}
-                              <button type="button" onClick={() => openProjectEditModal(project)} style={getButtonStyle("edit")}>
-                                Edit
-                              </button>
-                            </li>
-                          ))}
-                        </ol>
-                      ) : (
-                        <span>No projects attached</span>
-                      )
-                    ) : row.done === "CourseDTO" ? (
-                      openPlanCourses.length > 0 ? (
-                        <ol style={{ margin: 0, paddingLeft: 20 }}>
-                          {openPlanCourses.map((course, idx) => (
-                            <li key={`${course.idCourse || idx}-${idx}`}>
-                              {formatCourseText(course)}
-                              {" "}
-                              <button type="button" onClick={() => openCourseEditModal(course)} style={getButtonStyle("edit")}>
-                                Edit
-                              </button>
-                            </li>
-                          ))}
-                        </ol>
-                      ) : (
-                        <span>No courses attached</span>
-                      )
-                    ) : row.done === "StudentWorkDTO" ? (
-                      openPlanStudentWorks.length > 0 ? (
-                        <ol style={{ margin: 0, paddingLeft: 20 }}>
-                          {openPlanStudentWorks.map((work, idx) => (
-                            <li key={`${getStudentWorkId(work) || idx}-${idx}`}>
-                              {`Name: ${work.name || ""} | Student: ${work.studentName || ""} ${work.studentSurname || ""} | Degree: ${work.degree || ""} | Work done: ${work.workDone || ""}`}
-                              {" "}
-                              <button type="button" onClick={() => openStudentWorkEditModal(work)} style={getButtonStyle("edit")}>
-                                Edit
-                              </button>
-                            </li>
-                          ))}
-                        </ol>
-                      ) : (
-                        <span>No student work attached</span>
-                      )
-                    ) : row.done === "ArticleDTO" ? (
-                      openPlanArticles.length > 0 ? (
-                        <ol style={{ margin: 0, paddingLeft: 20 }}>
-                          {openPlanArticles.map((article, idx) => (
-                            <li key={`${getArticlePlanId(article) || getArticleId(article) || idx}-${idx}`}>
-                              {formatArticleText(article)}
-                              {" "}
-                              <button type="button" onClick={() => openArticleEditModal(article)} style={getButtonStyle("edit")}>
-                                Edit
-                              </button>
-                            </li>
-                          ))}
-                        </ol>
-                      ) : (
-                        <span>No articles attached</span>
-                      )
-                    ) : (
-                      <span>{row.done}</span>
-                    )
-                  ) : (
-                    <textarea
-                      name={row.done}
-                      value={openPlan[row.done] || ""}
-                      onChange={handleOpenPlanTextChange}
-                      rows={2}
-                      style={{ width: "95%", resize: "vertical" }}
-                    />
-                  )}
-                </td>
-                <td style={{ padding: "10px 12px", border: "1px solid #b7c0c8", verticalAlign: "top" }}>
-                  {row.actions?.length ? (
-                    <>
-                      <button
-                        type="button"
-                        disabled={isPlannedFrozen}
-                        style={getButtonStyle("add", isPlannedFrozen)}
-                        onClick={
-                          row.key === "projects"
-                            ? openProjectModal
-                            : row.key === "courses"
-                            ? openCourseModal
-                            : row.key === "studentWork"
-                              ? openStudentWorkModal
-                            : row.key === "articles"
-                              ? openArticleModal
-                              : () => setSaveMessage(`${row.actions[0]} is not connected yet.`)
-                        }
-                      >
-                        {row.actions[0]}
-                      </button>
-                      {" "}
-                      <button
-                        type="button"
-                        disabled={isPlannedFrozen}
-                        style={getButtonStyle("delete", isPlannedFrozen)}
-                        onClick={
-                          row.key === "projects"
-                            ? openProjectDeleteModal
-                            : row.key === "courses"
-                            ? openCourseDeleteModal
-                            : row.key === "studentWork"
-                              ? openStudentWorkDeleteModal
-                            : row.key === "articles"
-                              ? openArticleDeleteModal
-                              : () => setSaveMessage(`${row.actions[1]} is not connected yet.`)
-                        }
-                      >
-                        {row.actions[1]}
-                      </button>
-                    </>
-                  ) : (
-                    ""
-                  )}
-                </td>
-              </tr>
-            ))
-          )}
-          {openPlan && (
-            <tr>
-              <td colSpan="2"></td>
-              <td>
-                <button type="button" onClick={handleSaveOpenPlan} disabled={isSaving} style={getButtonStyle("update", isSaving)}>
-                  {isSaving ? "Saving..." : "Save changes"}
-                </button>
-              </td>
-              <td></td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <ArticleModals
+        openPlan={openPlan}
+        isArticleModalOpen={isArticleModalOpen}
+        articleMode={articleMode}
+        setArticleMode={setArticleMode}
+        articleSearch={articleSearch}
+        setArticleSearch={setArticleSearch}
+        setSelectedArticle={setSelectedArticle}
+        articleOptions={articleOptions}
+        setArticleOptions={setArticleOptions}
+        openPlanArticles={openPlanArticles}
+        getArticleId={getArticleId}
+        articleModalFieldErrors={articleModalFieldErrors}
+        newArticle={newArticle}
+        setNewArticle={setNewArticle}
+        articleJournals={articleJournals}
+        newJournalName={newJournalName}
+        setNewJournalName={setNewJournalName}
+        handleCreateJournal={handleCreateJournal}
+        isJournalCreating={isJournalCreating}
+        journalMessage={journalMessage}
+        articleComments={articleComments}
+        setArticleComments={setArticleComments}
+        articleLink={articleLink}
+        setArticleLink={setArticleLink}
+        handleSaveArticleFromModal={handleSaveArticleFromModal}
+        isArticleSaving={isArticleSaving}
+        closeArticleModal={closeArticleModal}
+        getButtonStyle={getButtonStyle}
+        articleModalMessage={articleModalMessage}
+        isArticleDeleteModalOpen={isArticleDeleteModalOpen}
+        isArticleDeleting={isArticleDeleting}
+        articleDeleteMessage={articleDeleteMessage}
+        getArticlePlanId={getArticlePlanId}
+        formatArticleText={formatArticleText}
+        handleDeleteArticlePlan={handleDeleteArticlePlan}
+        closeArticleDeleteModal={closeArticleDeleteModal}
+        isArticleEditModalOpen={isArticleEditModalOpen}
+        articleEditTarget={articleEditTarget}
+        articleEditName={articleEditName}
+        setArticleEditName={setArticleEditName}
+        articleEditCoAuthors={articleEditCoAuthors}
+        setArticleEditCoAuthors={setArticleEditCoAuthors}
+        articleEditJournalId={articleEditJournalId}
+        setArticleEditJournalId={setArticleEditJournalId}
+        articleEditFieldErrors={articleEditFieldErrors}
+        articleEditComments={articleEditComments}
+        setArticleEditComments={setArticleEditComments}
+        articleEditLink={articleEditLink}
+        setArticleEditLink={setArticleEditLink}
+        handleEditArticlePlan={handleEditArticlePlan}
+        isArticleEditing={isArticleEditing}
+        closeArticleEditModal={closeArticleEditModal}
+        articleEditMessage={articleEditMessage}
+      />
 
-      {isProjectModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Add Project To Plan #{openPlan?.idPlan}</h3>
-            <div style={{ color: "green", marginTop: 4, marginBottom: 10 }}>
-              After adding Project you will be able to edit only "Tasks" and "Work done" fields.
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Project autocomplete</label>
-              <input
-                type="text"
-                value={projectSearch}
-                onChange={(e) => {
-                  setProjectSearch(e.target.value);
-                  setSelectedProject(null);
-                }}
-                placeholder="Type at least 2 characters..."
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectOptions.length > 0 && (
-                <div style={{ border: "1px solid #ccc", maxHeight: 160, overflowY: "auto", marginTop: 4 }}>
-                  {projectOptions.map((project) => (
-                    <div
-                      key={getProjectId(project) || project.name}
-                      onClick={() => {
-                        setSelectedProject(project);
-                        setProjectSearch(
-                          `${project.name} (Number: ${project.number}, Start: ${toDateInputValue(project.startDate)}, End: ${toDateInputValue(project.endDate)})`
-                        );
-                        setProjectOptions([]);
-                        const existing = openPlanProjects.find(
-                          (p) => Number(getProjectId(p)) === Number(getProjectId(project))
-                        );
-                        if (existing) {
-                          setProjectModalMessage("Project already attached to this plan.");
-                        } else {
-                          setProjectModalMessage("");
-                        }
-                      }}
-                      style={{ padding: "6px 8px", cursor: "pointer" }}
-                    >
-                      {project.name} | {project.acronym} | #{project.number}
-                    </div>
-                  ))}
-                </div>
-              )}
-              {projectModalFieldErrors.idProject && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {projectModalFieldErrors.idProject}
-                </div>
-              )}
-            </div>
-
-            {selectedProject && (
-              <div style={{ marginBottom: 10 }}>
-                <div>Selected: {formatProjectText(selectedProject)}</div>
-              </div>
-            )}
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Tasks</label>
-              <textarea
-                rows={3}
-                value={projectTasks}
-                onChange={(e) => setProjectTasks(e.target.value)}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectModalFieldErrors.tasks && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {projectModalFieldErrors.tasks}
-                </div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Work done</label>
-              <textarea
-                rows={3}
-                value={projectWorkDone}
-                onChange={(e) => setProjectWorkDone(e.target.value)}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectModalFieldErrors.workDone && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {projectModalFieldErrors.workDone}
-                </div>
-              )}
-            </div>
-
-            {projectModalMessage && (
-              <div style={{ color: "red", marginBottom: 10 }}>{projectModalMessage}</div>
-            )}
-
-            <button type="button" onClick={handleSaveProjectFromModal} disabled={isProjectSaving} style={getButtonStyle("add", isProjectSaving)}>
-              {isProjectSaving ? "Saving..." : "Save Project"}
-            </button>
-            {" "}
-            <button type="button" onClick={closeProjectModal} disabled={isProjectSaving} style={getButtonStyle("cancel", isProjectSaving)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {isCourseModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Add Course To Plan #{openPlan?.idPlan}</h3>
-            <div style={{ color: "green", marginTop: 4, marginBottom: 10 }}>
-              After adding Course you will be able to edit only "Work done" field.
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>
-                <input
-                  type="radio"
-                  name="courseMode"
-                  checked={courseMode === "existing"}
-                  onChange={() => setCourseMode("existing")}
-                />
-                {" "}Use existing course
-              </label>
-              {"  "}
-              <label>
-                <input
-                  type="radio"
-                  name="courseMode"
-                  checked={courseMode === "new"}
-                  onChange={() => setCourseMode("new")}
-                />
-                {" "}Create new course
-              </label>
-            </div>
-
-            {courseMode === "existing" ? (
-              <div style={{ marginBottom: 10 }}>
-                <label>Course autocomplete</label>
-                <input
-                  type="text"
-                  value={courseSearch}
-                  onChange={(e) => {
-                    setCourseSearch(e.target.value);
-                    setSelectedCourse(null);
-                  }}
-                  placeholder="Type at least 2 characters..."
-                  style={{ width: "100%", marginTop: 4 }}
-                />
-                {courseOptions.length > 0 && (
-                  <div style={{ border: "1px solid #ccc", maxHeight: 160, overflowY: "auto", marginTop: 4 }}>
-                    {courseOptions.map((course) => (
-                      <div
-                        key={course.idCourse}
-                        onClick={() => {
-                          setSelectedCourse(course);
-                          setCourseSearch(
-                            `${course.name} (ECTS: ${course.ectsCredits}, ${course.semester}, ${course.faculty})`
-                          );
-                          setCourseOptions([]);
-                        }}
-                        style={{ padding: 8, cursor: "pointer", borderBottom: "1px solid #eee" }}
-                      >
-                        {course.name} | ECTS: {course.ectsCredits} | Semester: {course.semester} | Faculty: {course.faculty}
-                        {(() => {
-                          const existing = openPlanCourses.find(
-                            (c) => Number(c?.idCourse) === Number(course.idCourse)
-                          );
-                          const wd = existing ? getWorkDoneText(existing) : "";
-                          return wd ? ` | Work done: ${wd}` : "";
-                        })()}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div style={{ marginBottom: 10 }}>
-                <label>Name</label>
-                <input
-                  type="text"
-                  value={newCourse.name}
-                  onChange={(e) => setNewCourse((prev) => ({ ...prev, name: e.target.value }))}
-                  style={{ width: "100%", marginBottom: 6 }}
-                />
-                {courseModalFieldErrors.name && (
-                  <div style={{ color: "red", marginBottom: 6 }}>
-                    {courseModalFieldErrors.name}
-                  </div>
-                )}
-                <label>ECTS</label>
-                <input
-                  type="number"
-                  value={newCourse.ectsCredits}
-                  onChange={(e) => setNewCourse((prev) => ({ ...prev, ectsCredits: e.target.value }))}
-                  style={{ width: "100%", marginBottom: 6 }}
-                />
-                {courseModalFieldErrors.ectsCredits && (
-                  <div style={{ color: "red", marginBottom: 6 }}>
-                    {courseModalFieldErrors.ectsCredits}
-                  </div>
-                )}
-                <label>Semester</label>
-                <input
-                  type="text"
-                  value={newCourse.semester}
-                  onChange={(e) => setNewCourse((prev) => ({ ...prev, semester: e.target.value }))}
-                  style={{ width: "100%", marginBottom: 6 }}
-                />
-                {courseModalFieldErrors.semester && (
-                  <div style={{ color: "red", marginBottom: 6 }}>
-                    {courseModalFieldErrors.semester}
-                  </div>
-                )}
-                <label>Faculty</label>
-                <input
-                  type="text"
-                  value={newCourse.faculty}
-                  onChange={(e) => setNewCourse((prev) => ({ ...prev, faculty: e.target.value }))}
-                  style={{ width: "100%" }}
-                />
-                {courseModalFieldErrors.faculty && (
-                  <div style={{ color: "red", marginTop: 6 }}>
-                    {courseModalFieldErrors.faculty}
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Work done</label>
-              <textarea
-                rows={3}
-                value={courseWorkDone}
-                onChange={(e) => setCourseWorkDone(e.target.value)}
-                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
-              />
-              {courseModalFieldErrors.workDone && (
-                <div style={{ color: "red", marginTop: 4 }}>{courseModalFieldErrors.workDone}</div>
-              )}
-            </div>
-
-            <button type="button" onClick={handleSaveCourseFromModal} disabled={isCourseSaving} style={getButtonStyle("add", isCourseSaving)}>
-              {isCourseSaving ? "Saving..." : "Save Course"}
-            </button>
-            {" "}
-            <button type="button" onClick={closeCourseModal} disabled={isCourseSaving} style={getButtonStyle("cancel", isCourseSaving)}>
-              Cancel
-            </button>
-            {courseModalMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{courseModalMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isCourseDeleteModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Delete Course From Plan #{openPlan?.idPlan}</h3>
-
-            {openPlanCourses.length === 0 ? (
-              <p>No courses attached.</p>
-            ) : (
-              <ol style={{ paddingLeft: 20 }}>
-                {openPlanCourses.map((course, idx) => (
-                  <li key={`${getCoursePlanId(course) || idx}-${idx}`} style={{ marginBottom: 8 }}>
-                    <div>{formatCourseText(course)}</div>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteCoursePlan(course)}
-                      style={{ ...getButtonStyle("delete", isCourseDeleting), marginTop: 4 }}
-                    >
-                      {isCourseDeleting ? "Deleting..." : "Delete"}
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            )}
-
-            <button type="button" onClick={closeCourseDeleteModal} disabled={isCourseDeleting}>
-              Close
-            </button>
-            {courseDeleteMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{courseDeleteMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isCourseEditModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Edit Course Work Done</h3>
-            <div style={{ marginBottom: 10 }}>
-              <div>{courseEditTarget ? formatCourseText(courseEditTarget) : ""}</div>
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Name</label>
-              <input
-                type="text"
-                value={courseEditName}
-                onChange={(e) => setCourseEditName(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {courseEditFieldErrors.name && (
-                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.name}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>ECTS</label>
-              <input
-                type="number"
-                value={courseEditEcts}
-                onChange={(e) => setCourseEditEcts(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {courseEditFieldErrors.ectsCredits && (
-                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.ectsCredits}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Semester</label>
-              <input
-                type="text"
-                value={courseEditSemester}
-                onChange={(e) => setCourseEditSemester(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {courseEditFieldErrors.semester && (
-                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.semester}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Faculty</label>
-              <input
-                type="text"
-                value={courseEditFaculty}
-                onChange={(e) => setCourseEditFaculty(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {courseEditFieldErrors.faculty && (
-                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.faculty}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Work done</label>
-              <textarea
-                rows={3}
-                value={courseEditWorkDone}
-                onChange={(e) => setCourseEditWorkDone(e.target.value)}
-                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
-              />
-              {courseEditFieldErrors.workDone && (
-                <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.workDone}</div>
-              )}
-            </div>
-            <button type="button" onClick={handleEditCoursePlan} disabled={isCourseEditing} style={getButtonStyle("update", isCourseEditing)}>
-              {isCourseEditing ? "Saving..." : "Save"}
-            </button>
-            {" "}
-            <button type="button" onClick={closeCourseEditModal} disabled={isCourseEditing} style={getButtonStyle("cancel", isCourseEditing)}>
-              Cancel
-            </button>
-            {courseEditMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{courseEditMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isProjectDeleteModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 600, maxWidth: "95%", padding: 16 }}>
-            <h3>Delete Project From Plan #{openPlan?.idPlan}</h3>
-
-            {openPlanProjects.length === 0 ? (
-              <p>No projects attached to this plan.</p>
-            ) : (
-              <div style={{ maxHeight: 260, overflowY: "auto", border: "1px solid #ddd", padding: 8 }}>
-                {openPlanProjects.map((project, idx) => (
-                  <div key={`${getProjectPlanId(project) || getProjectId(project) || idx}-${idx}`} style={{ marginBottom: 8 }}>
-                    <div>{formatProjectText(project)}</div>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteProjectPlan(project)}
-                      disabled={isProjectDeleting}
-                      style={getButtonStyle("delete", isProjectDeleting)}
-                    >
-                      {isProjectDeleting ? "Deleting..." : "Delete"}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {projectDeleteMessage && (
-              <div style={{ color: "red", marginTop: 8 }}>{projectDeleteMessage}</div>
-            )}
-
-            <button type="button" onClick={closeProjectDeleteModal} disabled={isProjectDeleting}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-
-      {isProjectEditModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Edit Project</h3>
-            <div style={{ marginBottom: 10 }}>
-              <div>{projectEditTarget ? formatProjectText(projectEditTarget) : ""}</div>
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Name</label>
-              <input
-                type="text"
-                value={projectEditName}
-                onChange={(e) => setProjectEditName(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectEditFieldErrors.name && (
-                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.name}</div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Number</label>
-              <input
-                type="number"
-                value={projectEditNumber}
-                onChange={(e) => setProjectEditNumber(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectEditFieldErrors.number && (
-                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.number}</div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Management ID</label>
-              <input
-                type="number"
-                value={projectEditManagementId}
-                onChange={(e) => setProjectEditManagementId(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectEditFieldErrors.managementId && (
-                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.managementId}</div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Start Date</label>
-              <input
-                type="date"
-                value={projectEditStartDate}
-                onChange={(e) => setProjectEditStartDate(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectEditFieldErrors.startDate && (
-                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.startDate}</div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>End Date</label>
-              <input
-                type="date"
-                value={projectEditEndDate}
-                onChange={(e) => setProjectEditEndDate(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectEditFieldErrors.endDate && (
-                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.endDate}</div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Acronym</label>
-              <input
-                type="text"
-                value={projectEditAcronym}
-                onChange={(e) => setProjectEditAcronym(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectEditFieldErrors.acronym && (
-                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.acronym}</div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Tasks</label>
-              <textarea
-                rows={3}
-                value={projectEditTasks}
-                onChange={(e) => setProjectEditTasks(e.target.value)}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectEditFieldErrors.tasks && (
-                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.tasks}</div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Work done</label>
-              <textarea
-                rows={3}
-                value={projectEditWorkDone}
-                onChange={(e) => setProjectEditWorkDone(e.target.value)}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {projectEditFieldErrors.workDone && (
-                <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.workDone}</div>
-              )}
-            </div>
-
-            {projectEditMessage && (
-              <div style={{ color: "red", marginBottom: 10 }}>{projectEditMessage}</div>
-            )}
-
-            <button type="button" onClick={handleEditProjectPlan} disabled={isProjectEditing} style={getButtonStyle("update", isProjectEditing)}>
-              {isProjectEditing ? "Saving..." : "Save"}
-            </button>
-            {" "}
-            <button type="button" onClick={closeProjectEditModal} disabled={isProjectEditing} style={getButtonStyle("cancel", isProjectEditing)}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      {isArticleModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Add Article To Plan #{openPlan?.idPlan}</h3>
-            <div style={{ color: "green", marginTop: 4, marginBottom: 10 }}>
-              After adding Article you will be able to edit only "Comment" and "Link" fields.
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>
-                <input
-                  type="radio"
-                  name="articleMode"
-                  checked={articleMode === "existing"}
-                  onChange={() => setArticleMode("existing")}
-                />
-                {" "}Use existing article
-              </label>
-              {"  "}
-              <label>
-                <input
-                  type="radio"
-                  name="articleMode"
-                  checked={articleMode === "new"}
-                  onChange={() => setArticleMode("new")}
-                />
-                {" "}Create new article
-              </label>
-            </div>
-
-            {articleMode === "existing" ? (
-              <div style={{ marginBottom: 10 }}>
-                <label>Article autocomplete</label>
-                <input
-                  type="text"
-                  value={articleSearch}
-                  onChange={(e) => {
-                    setArticleSearch(e.target.value);
-                    setSelectedArticle(null);
-                  }}
-                  placeholder="Type at least 2 characters..."
-                  style={{ width: "100%", marginTop: 4 }}
-                />
-                {articleOptions.length > 0 && (
-                  <div style={{ border: "1px solid #ccc", maxHeight: 160, overflowY: "auto", marginTop: 4 }}>
-                    {articleOptions.map((article) => {
-                      const journalName =
-                        article.journalName ??
-                        article.journal ??
-                        article.journalTitle ??
-                        article.idJournal ??
-                        "";
-                      const idArticle =
-                        article.idArticle ??
-                        article.idScientificArticles ??
-                        article.idScientificArticle ??
-                        article.articleId ??
-                        null;
-                      return (
-                        <div
-                          key={idArticle || article.name}
-                          onClick={() => {
-                            setSelectedArticle(article);
-                            setArticleSearch(
-                              `${article.name} (Co-authors: ${article.coAuthors || "-"}, Journal: ${journalName || "-"})`
-                            );
-                            setArticleOptions([]);
-                          }}
-                          style={{ padding: 8, cursor: "pointer", borderBottom: "1px solid #eee" }}
-                        >
-                          {article.name} | Co-authors: {article.coAuthors || "-"} | Journal: {journalName || "-"}
-                          {(() => {
-                            const existing = openPlanArticles.find(
-                              (a) => Number(getArticleId(a)) === Number(idArticle)
-                            );
-                            const comments = existing ? getArticleComments(existing) : "";
-                            return comments ? ` | Comments: ${comments}` : "";
-                          })()}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div style={{ marginBottom: 10 }}>
-                <label>Name</label>
-                <input
-                  type="text"
-                  value={newArticle.name}
-                  onChange={(e) => setNewArticle((prev) => ({ ...prev, name: e.target.value }))}
-                  style={{ width: "100%", marginBottom: 6 }}
-                />
-                {articleModalFieldErrors.name && (
-                  <div style={{ color: "red", marginBottom: 6 }}>
-                    {articleModalFieldErrors.name}
-                  </div>
-                )}
-                <label>Co-authors</label>
-                <input
-                  type="text"
-                  value={newArticle.coAuthors}
-                  onChange={(e) => setNewArticle((prev) => ({ ...prev, coAuthors: e.target.value }))}
-                  style={{ width: "100%", marginBottom: 6 }}
-                />
-                {articleModalFieldErrors.coAuthors && (
-                  <div style={{ color: "red", marginBottom: 6 }}>
-                    {articleModalFieldErrors.coAuthors}
-                  </div>
-                )}
-                <label>Journal</label>
-                <select
-                  value={newArticle.idJournal}
-                  onChange={(e) => setNewArticle((prev) => ({ ...prev, idJournal: e.target.value }))}
-                  style={{ width: "100%", marginBottom: 6 }}
-                >
-                  <option value="">Select journal</option>
-                  {articleJournals.map((j) => (
-                    <option key={j.idJournal} value={j.idJournal}>
-                      {j.name}
-                    </option>
-                  ))}
-                </select>
-                {articleModalFieldErrors.idJournal && (
-                  <div style={{ color: "red", marginBottom: 6 }}>
-                    {articleModalFieldErrors.idJournal}
-                  </div>
-                )}
-                <div style={{ marginBottom: 6 }}>
-                  <label>Or create new journal</label>
-                  <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                    <input
-                      type="text"
-                      value={newJournalName}
-                      onChange={(e) => setNewJournalName(e.target.value)}
-                      placeholder="New journal name"
-                      style={{ flex: 1 }}
-                    />
-                    <button type="button" onClick={handleCreateJournal} disabled={isJournalCreating} style={getButtonStyle("add", isJournalCreating)}>
-                      {isJournalCreating ? "Creating..." : "Add Journal"}
-                    </button>
-                  </div>
-                  {journalMessage && (
-                    <div style={{ color: journalMessage.includes("created") ? "green" : "red", marginTop: 4 }}>
-                      {journalMessage}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Article comments</label>
-              <textarea
-                rows={2}
-                value={articleComments}
-                onChange={(e) => setArticleComments(e.target.value)}
-                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
-              />
-              {articleModalFieldErrors.articleComments && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {articleModalFieldErrors.articleComments}
-                </div>
-              )}
-            </div>
-
-            <div style={{ marginBottom: 10 }}>
-              <label>Publication link</label>
-              <input
-                type="text"
-                value={articleLink}
-                onChange={(e) => setArticleLink(e.target.value)}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {articleModalFieldErrors.publicationLink && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {articleModalFieldErrors.publicationLink}
-                </div>
-              )}
-            </div>
-
-            <button type="button" onClick={handleSaveArticleFromModal} disabled={isArticleSaving} style={getButtonStyle("add", isArticleSaving)}>
-              {isArticleSaving ? "Saving..." : "Save Article"}
-            </button>
-            {" "}
-            <button type="button" onClick={closeArticleModal} disabled={isArticleSaving} style={getButtonStyle("cancel", isArticleSaving)}>
-              Cancel
-            </button>
-            {articleModalMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{articleModalMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isArticleDeleteModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Delete Article From Plan #{openPlan?.idPlan}</h3>
-
-            {openPlanArticles.length === 0 ? (
-              <p>No articles attached.</p>
-            ) : (
-              <ol style={{ paddingLeft: 20 }}>
-                {openPlanArticles.map((article, idx) => (
-                  <li key={`${getArticlePlanId(article) || getArticleId(article) || idx}-${idx}`} style={{ marginBottom: 8 }}>
-                    <div>{formatArticleText(article)}</div>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteArticlePlan(article)}
-                      style={{ ...getButtonStyle("delete", isArticleDeleting), marginTop: 4 }}
-                    >
-                      {isArticleDeleting ? "Deleting..." : "Delete"}
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            )}
-
-            <button type="button" onClick={closeArticleDeleteModal} disabled={isArticleDeleting}>
-              Close
-            </button>
-            {articleDeleteMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{articleDeleteMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isArticleEditModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Edit Article Plan</h3>
-            <div style={{ marginBottom: 10 }}>
-              <div>{articleEditTarget ? formatArticleText(articleEditTarget) : ""}</div>
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Name</label>
-              <input
-                type="text"
-                value={articleEditName}
-                onChange={(e) => setArticleEditName(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {articleEditFieldErrors.name && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {articleEditFieldErrors.name}
-                </div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Co-authors</label>
-              <input
-                type="text"
-                value={articleEditCoAuthors}
-                onChange={(e) => setArticleEditCoAuthors(e.target.value)}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {articleEditFieldErrors.coAuthors && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {articleEditFieldErrors.coAuthors}
-                </div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Journal</label>
-                <select
-                  value={articleEditJournalId}
-                  onChange={(e) => {
-                    const nextId = e.target.value;
-                    setArticleEditJournalId(nextId);
-                  }}
-                  disabled
-                  style={{ width: "100%", marginTop: 4 }}
-                >
-                <option value="">Select journal</option>
-                {articleJournals.map((j) => (
-                  <option key={j.idJournal} value={j.idJournal}>
-                    {j.name}
-                  </option>
-                ))}
-              </select>
-              <div style={{ marginTop: 6 }}>
-                <label>Or create new journal</label>
-                <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                  <input
-                    type="text"
-                    value={newJournalName}
-                    onChange={(e) => setNewJournalName(e.target.value)}
-                    placeholder="New journal name"
-                    disabled
-                    style={{ flex: 1 }}
-                  />
-                  <button type="button" onClick={handleCreateJournal} disabled>
-                    {isJournalCreating ? "Creating..." : "Add Journal"}
-                  </button>
-                </div>
-                {journalMessage && (
-                  <div style={{ color: journalMessage.includes("created") ? "green" : "red", marginTop: 4 }}>
-                    {journalMessage}
-                  </div>
-                )}
-              </div>
-              {articleEditFieldErrors.idJournal && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {articleEditFieldErrors.idJournal}
-                </div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Article comments</label>
-              <textarea
-                rows={2}
-                value={articleEditComments}
-                onChange={(e) => setArticleEditComments(e.target.value)}
-                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
-              />
-              {articleEditFieldErrors.articleComments && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {articleEditFieldErrors.articleComments}
-                </div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Publication link</label>
-              <input
-                type="text"
-                value={articleEditLink}
-                onChange={(e) => setArticleEditLink(e.target.value)}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {articleEditFieldErrors.publicationLink && (
-                <div style={{ color: "red", marginTop: 4 }}>
-                  {articleEditFieldErrors.publicationLink}
-                </div>
-              )}
-            </div>
-            <button type="button" onClick={handleEditArticlePlan} disabled={isArticleEditing} style={getButtonStyle("update", isArticleEditing)}>
-              {isArticleEditing ? "Saving..." : "Save"}
-            </button>
-            {" "}
-            <button type="button" onClick={closeArticleEditModal} disabled={isArticleEditing} style={getButtonStyle("cancel", isArticleEditing)}>
-              Cancel
-            </button>
-            {articleEditMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{articleEditMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isStudentWorkModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Add Student Work To Plan #{openPlan?.idPlan}</h3>
-            <div style={{ color: "green", marginTop: 4, marginBottom: 10 }}>
-              After adding Student Work you will be able to edit only "Work done" field.
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Work name</label>
-              <input
-                type="text"
-                value={newStudentWork.name}
-                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, name: e.target.value }))}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {studentWorkFieldErrors.name && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.name}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Student name</label>
-              <input
-                type="text"
-                value={newStudentWork.studentName}
-                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, studentName: e.target.value }))}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {studentWorkFieldErrors.studentName && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.studentName}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Student surname</label>
-              <input
-                type="text"
-                value={newStudentWork.studentSurname}
-                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, studentSurname: e.target.value }))}
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {studentWorkFieldErrors.studentSurname && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.studentSurname}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Degree</label>
-              <select
-                value={newStudentWork.degree}
-                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, degree: e.target.value }))}
-                style={{ width: "100%", marginTop: 4 }}
-              >
-                <option value="">Select degree</option>
-                {degreeOptions.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
-              {studentWorkFieldErrors.degree && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.degree}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Work done</label>
-              <textarea
-                rows={2}
-                value={newStudentWork.workDone}
-                onChange={(e) => setNewStudentWork((prev) => ({ ...prev, workDone: e.target.value }))}
-                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
-              />
-              {studentWorkFieldErrors.workDone && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkFieldErrors.workDone}</div>
-              )}
-            </div>
-            <button type="button" onClick={handleSaveStudentWorkFromModal} disabled={isStudentWorkSaving} style={getButtonStyle("add", isStudentWorkSaving)}>
-              {isStudentWorkSaving ? "Saving..." : "Save Student Work"}
-            </button>
-            {" "}
-            <button type="button" onClick={closeStudentWorkModal} disabled={isStudentWorkSaving} style={getButtonStyle("cancel", isStudentWorkSaving)}>
-              Cancel
-            </button>
-            {studentWorkModalMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{studentWorkModalMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isStudentWorkDeleteModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Delete Student Work From Plan #{openPlan?.idPlan}</h3>
-            {openPlanStudentWorks.length === 0 ? (
-              <p>No student work attached.</p>
-            ) : (
-              <ol style={{ paddingLeft: 20 }}>
-                {openPlanStudentWorks.map((work, idx) => (
-                  <li key={`${getStudentWorkId(work) || idx}-${idx}`} style={{ marginBottom: 8 }}>
-                    {`Name: ${work.name || ""} | Student: ${work.studentName || ""} ${work.studentSurname || ""} | Degree: ${work.degree || ""}`}
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteStudentWorkPlan(work)}
-                      style={{ ...getButtonStyle("delete", isStudentWorkDeleting), marginTop: 4 }}
-                    >
-                      {isStudentWorkDeleting ? "Deleting..." : "Delete"}
-                    </button>
-                  </li>
-                ))}
-              </ol>
-            )}
-            <button type="button" onClick={closeStudentWorkDeleteModal} disabled={isStudentWorkDeleting}>
-              Close
-            </button>
-            {studentWorkDeleteMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{studentWorkDeleteMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {isStudentWorkEditModalOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000
-          }}
-        >
-          <div style={{ background: "#fff", width: 700, maxWidth: "95%", padding: 16 }}>
-            <h3>Edit Student Work</h3>
-            <div style={{ marginBottom: 10 }}>
-              <label>Work name</label>
-              <input
-                type="text"
-                value={studentWorkEditForm.name}
-                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, name: e.target.value }))}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {studentWorkEditFieldErrors.name && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.name}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Student name</label>
-              <input
-                type="text"
-                value={studentWorkEditForm.studentName}
-                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, studentName: e.target.value }))}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {studentWorkEditFieldErrors.studentName && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.studentName}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Student surname</label>
-              <input
-                type="text"
-                value={studentWorkEditForm.studentSurname}
-                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, studentSurname: e.target.value }))}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              />
-              {studentWorkEditFieldErrors.studentSurname && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.studentSurname}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Degree</label>
-              <select
-                value={studentWorkEditForm.degree}
-                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, degree: e.target.value }))}
-                disabled
-                style={{ width: "100%", marginTop: 4 }}
-              >
-                <option value="">Select degree</option>
-                {degreeOptions.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
-              {studentWorkEditFieldErrors.degree && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.degree}</div>
-              )}
-            </div>
-            <div style={{ marginBottom: 10 }}>
-              <label>Work done</label>
-              <textarea
-                rows={2}
-                value={studentWorkEditForm.workDone}
-                onChange={(e) => setStudentWorkEditForm((prev) => ({ ...prev, workDone: e.target.value }))}
-                style={{ width: "100%", marginTop: 4, resize: "vertical" }}
-              />
-              {studentWorkEditFieldErrors.workDone && (
-                <div style={{ color: "red", marginTop: 4 }}>{studentWorkEditFieldErrors.workDone}</div>
-              )}
-            </div>
-            <button type="button" onClick={handleEditStudentWorkPlan} disabled={isStudentWorkEditing} style={getButtonStyle("update", isStudentWorkEditing)}>
-              {isStudentWorkEditing ? "Saving..." : "Save"}
-            </button>
-            {" "}
-            <button type="button" onClick={closeStudentWorkEditModal} disabled={isStudentWorkEditing} style={getButtonStyle("cancel", isStudentWorkEditing)}>
-              Cancel
-            </button>
-            {studentWorkEditMessage && (
-              <p style={{ color: "red", marginTop: 8 }}>{studentWorkEditMessage}</p>
-            )}
-          </div>
-        </div>
-      )}
+      <StudentWorkModals
+        openPlan={openPlan}
+        isStudentWorkModalOpen={isStudentWorkModalOpen}
+        newStudentWork={newStudentWork}
+        setNewStudentWork={setNewStudentWork}
+        studentWorkFieldErrors={studentWorkFieldErrors}
+        degreeOptions={degreeOptions}
+        handleSaveStudentWorkFromModal={handleSaveStudentWorkFromModal}
+        isStudentWorkSaving={isStudentWorkSaving}
+        closeStudentWorkModal={closeStudentWorkModal}
+        getButtonStyle={getButtonStyle}
+        studentWorkModalMessage={studentWorkModalMessage}
+        isStudentWorkDeleteModalOpen={isStudentWorkDeleteModalOpen}
+        openPlanStudentWorks={openPlanStudentWorks}
+        getStudentWorkId={getStudentWorkId}
+        handleDeleteStudentWorkPlan={handleDeleteStudentWorkPlan}
+        isStudentWorkDeleting={isStudentWorkDeleting}
+        closeStudentWorkDeleteModal={closeStudentWorkDeleteModal}
+        studentWorkDeleteMessage={studentWorkDeleteMessage}
+        isStudentWorkEditModalOpen={isStudentWorkEditModalOpen}
+        studentWorkEditForm={studentWorkEditForm}
+        setStudentWorkEditForm={setStudentWorkEditForm}
+        studentWorkEditFieldErrors={studentWorkEditFieldErrors}
+        handleEditStudentWorkPlan={handleEditStudentWorkPlan}
+        isStudentWorkEditing={isStudentWorkEditing}
+        closeStudentWorkEditModal={closeStudentWorkEditModal}
+        studentWorkEditMessage={studentWorkEditMessage}
+      />
 
       {saveMessage && (
         <p style={{ color: saveMessage.toLowerCase().includes("success") ? "green" : "red" }}>
@@ -3185,3 +2010,4 @@ export default function UserDashboard() {
     </div>
   );
 }
+

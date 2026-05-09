@@ -1,0 +1,100 @@
+.user-dashboard-page {
+  width: 100%;
+}
+
+.user-dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #aeb6bf;
+  background: #fff;
+}
+
+.user-dashboard-table-head {
+  text-align: left;
+  padding: 10px 12px;
+  background: #f6f8fa;
+}
+
+.user-dashboard-table-cell {
+  padding: 10px 12px;
+  border: 1px solid #b7c0c8;
+}
+
+.user-dashboard-empty-cell {
+  padding: 12px;
+}
+
+.user-dashboard-actions-row {
+  margin-top: 16px;
+}
+
+.user-dashboard-scheduler-card {
+  margin-top: 20px;
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid #d7deea;
+  border-radius: 8px;
+  background: #f7faff;
+}
+
+.user-dashboard-scheduler-row-gap {
+  margin-top: 8px;
+}
+
+.user-dashboard-deadline-neutral {
+  color: #333;
+  font-weight: 700;
+}
+
+.user-dashboard-deadline-expired {
+  color: #5e5252;
+  font-weight: 700;
+}
+
+.user-dashboard-deadline-warning {
+  color: #ef6c00;
+  font-weight: 700;
+}
+
+.user-dashboard-deadline-ok {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.user-dashboard-section-title {
+  margin-top: 20px;
+}
+
+.user-dashboard-col-activity {
+  width: 18%;
+}
+
+.user-dashboard-col-content {
+  width: 32%;
+}
+
+.user-dashboard-col-buttons {
+  width: 18%;
+}
+
+.user-dashboard-cell-top {
+  vertical-align: top;
+}
+
+.user-dashboard-input {
+  width: 100%;
+}
+
+.user-dashboard-textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.user-dashboard-textarea-done {
+  width: 95%;
+}
+
+.user-dashboard-inline-list {
+  margin: 0;
+  padding-left: 20px;
+}
