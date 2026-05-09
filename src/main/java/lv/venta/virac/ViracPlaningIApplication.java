@@ -8,7 +8,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lv.venta.virac.model.ArticlePlan;
 import lv.venta.virac.model.Course;
@@ -62,7 +61,7 @@ public class ViracPlaningIApplication {
 			IProjectPlanRepo projPlanRepo, IProjectRepo projRepo,
 			IScientificArticlesRepo scientArtRepo, IStudentWorkRepo studWorkRepo,
 			IViracDepartmentRepo viracDepRepo, IWorkPlanRepo workPlanRepo, IUserRepo userRepo,
-			IPlanScheduleRepo scheduleRepo, PasswordEncoder encoder)
+			IPlanScheduleRepo scheduleRepo)
 	{
 		return new CommandLineRunner() {
 			
@@ -108,51 +107,63 @@ public class ViracPlaningIApplication {
 				Employee x = new Employee("ADMIN", "TEST", dep4 , "ADMIN test profile");
 				Employee y = new Employee("USER", "TEST", dep4 , "USER test profile");
 				Employee z = new Employee("DEPARTMENT", "TEST", dep4 , "DEPARTMENT test profile");
+				Employee ldap = new Employee("LDAP", "SEARCH", dep4 , "LDAP test profile");
 				
-				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7, emp8, emp9, x, y, z)));
+				emploRepo.saveAll((Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7, emp8, emp9, x, y, z, ldap)));
 				
 				//UserTable
 				User user1 = User.builder()
 						.firstname("Rimants").lastname("Kalniņš").email("rimants.k@venta.lv").
-						password(encoder.encode("rimants123")).role(Role.USER).employee(emp1).build();
+						password("rimants123").role(Role.USER).employee(emp1).build();
 				User user2 = User.builder()
 						.firstname("Juris").lastname("Uplejs").email("juris.u@venta.lv").
-						password(encoder.encode("juris123")).role(Role.USER_DEPART).employee(emp2).build();
+						password("juris123").role(Role.USER_DEPART).employee(emp2).build();
 				User user3 = User.builder()
 						.firstname("Māra").lastname("Dižā").email("mara.d@venta.lv").
-						password(encoder.encode("mara123")).role(Role.USER).employee(emp3).build();
+						password("mara123").role(Role.USER).employee(emp3).build();
 				
 				User user4 = User.builder()
 						.firstname("Anrijs").lastname("Baltacis").email("anrijs.b@venta.lv").
-						password(encoder.encode("anrijs123")).role(Role.USER).employee(emp4).build();
+						password("anrijs123").role(Role.USER).employee(emp4).build();
 				User user5 = User.builder()
 						.firstname("Madars").lastname("Zviedrs").email("madars.z@venta.lv").
-						password(encoder.encode("madars123")).role(Role.USER_DEPART).employee(emp5).build();
+						password("madars123").role(Role.USER_DEPART).employee(emp5).build();
 				User user6 = User.builder()
 						.firstname("Laura").lastname("Akmeņkalna").email("laura.a@venta.lv").
-						password(encoder.encode("laura123")).role(Role.USER).employee(emp6).build();
+						password("laura123").role(Role.USER).employee(emp6).build();
 				
 				User user7 = User.builder()
 						.firstname("Ārija").lastname("Kalvāne").email("arija.k@venta.lv").
-						password(encoder.encode("arija123")).role(Role.USER).employee(emp7).build();
+						password("arija123").role(Role.USER).employee(emp7).build();
 				User user8 = User.builder()
 						.firstname("Zaiga").lastname("Buša").email("zaiga.b@venta.lv").
-						password(encoder.encode("zaiga123")).role(Role.USER_DEPART).employee(emp8).build();
+						password("zaiga123").role(Role.USER_DEPART).employee(emp8).build();
 				User user9 = User.builder()
 						.firstname("Andra").lastname("Puķe").email("andra.p@venta.lv").
-						password(encoder.encode("andra123")).role(Role.USER).employee(emp9).build();
+						password("andra123").role(Role.USER).employee(emp9).build();
 				
 				User userX = User.builder()
 						.firstname("ADMIN").lastname("ADMIN").email("admin.a@venta.lv").
-						password(encoder.encode("admin123")).role(Role.ADMIN).employee(x).build();
+						password("admin123").role(Role.ADMIN).employee(x).build();
 				User userY = User.builder()
 						.firstname("USER").lastname("USER").email("user.u@venta.lv").
-						password(encoder.encode("user123")).role(Role.USER).employee(y).build();
+						password("user123").role(Role.USER).employee(y).build();
 				User userZ = User.builder()
 						.firstname("DEPARTMENT").lastname("DEPARTMENT").email("department.d@venta.lv").
-						password(encoder.encode("department123")).role(Role.USER_DEPART).employee(z).build();
+						password("department123").role(Role.USER_DEPART).employee(z).build();
 				
-				userRepo.saveAll((Arrays.asList(user1,user2,user3,user4,user5,user6,user7,user8,user9,userX,userY,userZ)));
+				User userLdap = User.builder()
+				        .firstname("LDAP")
+				        .lastname("SEARCH")
+				        .email("ldapsearch@vea.lv")
+				        .password("")
+				        .role(Role.USER)
+				        .employee(ldap)
+				        .build();
+
+				userRepo.save(userLdap);
+				
+				userRepo.saveAll((Arrays.asList(user1,user2,user3,user4,user5,user6,user7,user8,user9,userX,userY,userZ,userLdap)));
 				
 				//PlanTable DONE
 				Plan plan1 = new Plan(emp1, year, 1, 1, "Participation in conferences", "Participated in 2 conferences" , "Discussed 2 topics", "Everithyng went well", 2, 2, "Promote 2 reaserch papers", "Did not promote anything", "Meetings witg VeA Board", "Everything went well", null, null, "Attend three courses", null, "Dont have plans", "Participated in Java conference", null, "Planned VIRAC Christmass event",PlanStatus.plan_open);

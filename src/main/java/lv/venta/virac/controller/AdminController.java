@@ -12,7 +12,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-import lv.venta.virac.auth.AuthenticationService;
 import lv.venta.virac.auth.dto.RegisterRequest;
 import lv.venta.virac.errors.ErrorResponse;
 import lv.venta.virac.errors.FieldErrorDetail;
@@ -27,13 +26,11 @@ import lv.venta.virac.user.User;
 @RequestMapping("/api/admin")
 public class AdminController {
 	
-	private AuthenticationService authenticationService;
 	private ICRUDUserService userService;
 	private ICRUDPlanSchedulerService schedulerService;
 	
-	public AdminController(AuthenticationService authenticationService, CRUDUserServiceImpl userService,
+	public AdminController(CRUDUserServiceImpl userService,
 			ICRUDPlanSchedulerService schedulerService) {
-		this.authenticationService = authenticationService;
 		this.userService = userService;
 		this.schedulerService = schedulerService;
 	}
@@ -42,13 +39,6 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public String adminDashboard() {
         return "Only ADMIN can see this";
-    }
-    
-    @PostMapping("/create-user")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createUser(@RequestBody RegisterRequest request) {
-        authenticationService.createUserByAdmin(request);
-        return ResponseEntity.ok("User created successfully");
     }
     
     @GetMapping("/all-users")
