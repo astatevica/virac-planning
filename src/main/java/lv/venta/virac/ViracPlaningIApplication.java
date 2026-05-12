@@ -3,6 +3,7 @@ package lv.venta.virac;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import org.hibernate.cfg.Environment;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -155,7 +156,7 @@ public class ViracPlaningIApplication {
 				User userLdap = User.builder()
 				        .firstname("LDAP")
 				        .lastname("SEARCH")
-				        .email("ldapsearch@vea.lv")
+				        .email(System.getenv("LDAPPASSWORD"))
 				        .password("")
 				        .role(Role.USER)
 				        .employee(ldap)
