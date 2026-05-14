@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import org.springframework.http.MediaType;
 
@@ -25,7 +24,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import lv.venta.virac.controller.CRUDProjManagController;
-import lv.venta.virac.dto.ProjectManagementDTO;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ProjectManagement;
 import lv.venta.virac.service.ICRUDProjManagService;
@@ -49,10 +47,8 @@ public class CRUDProjManagControllerTest {
     void setUp() {
 
         employee = new Employee();
-        employee.setIdEmployee(1);
 
         pm = new ProjectManagement();
-        pm.setIdProjectManag(1);
         pm.setEmployee(employee);
         pm.setStartDate(LocalDate.of(2026, 1, 1));
         pm.setEndDate(LocalDate.of(2026, 12, 31));
@@ -68,7 +64,7 @@ public class CRUDProjManagControllerTest {
 
         mockMvc.perform(get("/api/admin/project-management/all"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].employeeId").value(1));
+                .andExpect(jsonPath("$[0].employeeId").value(employee.getIdEmployee()));
     }
 
     @Test
@@ -78,7 +74,7 @@ public class CRUDProjManagControllerTest {
 
         mockMvc.perform(get("/api/admin/project-management/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.idProjectManag").value(1));
+                .andExpect(jsonPath("$.idProjectManag").value(pm.getIdProjectManag()));
     }
 
     @Test
@@ -144,7 +140,7 @@ public class CRUDProjManagControllerTest {
 
         mockMvc.perform(get("/api/admin/project-management/employee/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].employeeId").value(1));
+                .andExpect(jsonPath("$[0].employeeId").value(employee.getIdEmployee()));
     }
 
 }
