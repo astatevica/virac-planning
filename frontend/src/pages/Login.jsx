@@ -33,24 +33,26 @@ const Login = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
+      <h2 data-testid="cypress-title">Login</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <input
+        data-testid="cypress-email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
       />
 
       <input
+        data-testid="cypress-password"
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button type="submit">Login</button>
+      <button data-testid="cypress-submit" type="submit">Login</button>
     </form>
   );
 };

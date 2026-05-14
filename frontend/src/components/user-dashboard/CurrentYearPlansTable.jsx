@@ -10,7 +10,7 @@ export default function CurrentYearPlansTable({
 }) {
   return (
     <>
-      <h3>
+      <h3 data-testid="cypress-title-dashboard">
         Current Year Plans ({currentYear})
         {currentYearId && ` (ID: ${currentYearId})`}
       </h3>
@@ -43,12 +43,14 @@ export default function CurrentYearPlansTable({
                 <td className="user-dashboard-table-cell">{plan.numOfStudWork}</td>
                 <td className="user-dashboard-table-cell">
                   <button
+                    data-testid="cypress-open"
                     onClick={() => navigate(`/user/full-plan/${plan.idPlan}`)}
                     style={getButtonStyle("view")}
                   >
                     Open
                   </button>{" "}
                   <button
+                    data-testid="cypress-docx"
                     type="button"
                     onClick={() => handleExportPlan(plan.idPlan, "docx")}
                     style={getButtonStyle("view")}
