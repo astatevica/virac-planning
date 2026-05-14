@@ -18,7 +18,6 @@ import lv.venta.virac.errors.ErrorResponse;
 import lv.venta.virac.errors.FieldErrorDetail;
 import lv.venta.virac.scheduler.ICRUDPlanSchedulerService;
 import lv.venta.virac.scheduler.SchedulerDTO;
-import lv.venta.virac.user.CRUDUserServiceImpl;
 import lv.venta.virac.user.ICRUDUserService;
 import lv.venta.virac.user.User;
 
@@ -31,7 +30,7 @@ public class AdminController {
 	private ICRUDUserService userService;
 	private ICRUDPlanSchedulerService schedulerService;
 	
-	public AdminController(AuthenticationService authenticationService, CRUDUserServiceImpl userService,
+	public AdminController(AuthenticationService authenticationService, ICRUDUserService userService,
 			ICRUDPlanSchedulerService schedulerService) {
 		this.authenticationService = authenticationService;
 		this.userService = userService;

@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -55,6 +56,7 @@ public class ViracPlaningIApplication {
 	}
 	
 	@Bean
+	@Profile("!test")
 	public CommandLineRunner testModelLayer(IArticlePlanRepo artPlanRepo, 
 			ICoursePlanRepo courPlanRepo, ICourseRepo courseRepo,
 			IEmployeeRepo emploRepo, IYearRepo yearRepo, IJournalRepo jourRepo,
