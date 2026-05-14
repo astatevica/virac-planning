@@ -1,21 +1,89 @@
 describe('User Dashboard tests', () => {
-  it("opens plan and downloads DOCX", () => {
+  
+  beforeEach(() => {
     cy.login();
+    //cy.visit('/user/dashboard');
+  });
+
+   afterEach(() => {
+    cy.contains('button', 'Logout').should('be.visible').click();
+
+    // Pārbaude ka atgriezās login lapā
+    cy.url().should('include', '/login');
+  });
+
+  it("opens plan and downloads DOCX", () => {
     cy.get('[data-testid="cypress-title-dashboard"]').should("include.text", "2026");
 
-    // OPEN plan
+    // open plan
     cy.get('[data-testid="cypress-open"]').click();
     cy.url().should("include", "/user/full-plan/");
 
-    // back uz dashboard
+    // back to dashboard
     cy.go("back");
 
-    // DOWNLOAD DOCX
-    cy.get('[data-testid="cypress-docx"]').click();
-    cy.get('[data-testid="cypress-docx"]').should("exist");
+    // download DOCX 
+    //TODO: atkomentēt (aizkomentēju, lai nesūta visu aiku epastus un nespamo)
+    // cy.get('[data-testid="cypress-docx"]').click();
+    // cy.get('[data-testid="cypress-docx"]').should("exist");
 
-    // ja tev ir intercept:
-    // cy.wait("@download");
+    //View All Plans Button
+    cy.get('[data-testid="cypress-view-all-plans"]').click();
+    cy.url().should("include", "/user/plans");
+    cy.go("back");
   });
+
+  it('Should open modal and cancel project creation', () => {
+
+    cy.contains('button', 'Add Project').should('exist').click();
+
+    cy.contains('Add Project To Plan').should('be.visible');
+
+    cy.get('[data-testid="cypress-project-search"]').type('Pro');
+
+    // Wait for autocomplete results
+    cy.contains('div', 'Project 1').should('be.visible').click();
+
+    cy.get('[data-testid="cypress-tasks-project"]').type('Create Cypress automation tests');
+
+    cy.get('[data-testid="cypress-work-done-plan"]').type('Implemented modal tests');
+
+    cy.get('[data-testid="cypress-cancel-project"]').click();
+
+    cy.contains('Add Project To Plan').should('not.exist');
+
+    cy.contains('Project 1').should('not.exist');
+  });
+
+  it('Should save new project successfully', () => {
+
+    cy.contains('button', 'Add Project').click();
+
+    cy.contains('Add Project To Plan').should('be.visible');
+
+    cy.get('[data-testid="cypress-project-search"]').type('Pro');
+
+    cy.contains('div', 'Project 1').should('be.visible').click();
+
+    cy.get('[data-testid="cypress-tasks-project"]').type('Testing project creation');
+
+    cy.get('[data-testid="cypress-work-done-plan"]').type('Created Cypress E2E tests');
+
+    cy.get('[data-testid="cypress-save-project"]').should('be.enabled').click();
+
+    cy.contains('Add Project To Plan').should('not.exist');
+
+    cy.contains('Project 1').should('exist');
+  });
+
+  it('Should test Delete Project button', () => {
+
+    cy.contains('button', 'Delete Project').should('exist').click();
+    cy.contains('Delete Project From Plan').should('be.visible');
+    cy.get('[data-testid="cypress-delete-project-1"]').click();
+     cy.on('window:confirm', () => true);
+    cy.contains('Project 1').should('not.exist');
+  });
+  //TODO: vēl nepieciešams Edit
 
 })

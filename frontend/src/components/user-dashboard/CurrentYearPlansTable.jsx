@@ -66,6 +66,7 @@ export default function CurrentYearPlansTable({
 
       <div className="user-dashboard-actions-row">
         <button
+          data-testid="cypress-view-all-plans"
           onClick={() => navigate("/user/plans")}
           style={getButtonStyle("view")}
         >

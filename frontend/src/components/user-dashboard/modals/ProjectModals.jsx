@@ -66,6 +66,7 @@ export default function ProjectModals(props) {
         <div style={{ marginBottom: 10 }}>
           <label>Project autocomplete</label>
           <input
+            data-testid="cypress-project-search"
             type="text"
             value={projectSearch}
             onChange={(e) => {
@@ -118,6 +119,7 @@ export default function ProjectModals(props) {
         <div style={{ marginBottom: 10 }}>
           <label>Tasks</label>
           <textarea
+            data-testid="cypress-tasks-project"
             rows={3}
             value={projectTasks}
             onChange={(e) => setProjectTasks(e.target.value)}
@@ -133,6 +135,7 @@ export default function ProjectModals(props) {
         <div style={{ marginBottom: 10 }}>
           <label>Work done</label>
           <textarea
+            data-testid="cypress-work-done-plan"
             rows={3}
             value={projectWorkDone}
             onChange={(e) => setProjectWorkDone(e.target.value)}
@@ -149,10 +152,10 @@ export default function ProjectModals(props) {
           <div style={{ color: "red", marginBottom: 10 }}>{projectModalMessage}</div>
         )}
 
-        <button type="button" onClick={handleSaveProjectFromModal} disabled={isProjectSaving} style={getButtonStyle("add", isProjectSaving)}>
+        <button data-testid="cypress-save-project" type="button" onClick={handleSaveProjectFromModal} disabled={isProjectSaving} style={getButtonStyle("add", isProjectSaving)}>
           {isProjectSaving ? "Saving..." : "Save Project"}
         </button>{" "}
-        <button type="button" onClick={closeProjectModal} disabled={isProjectSaving} style={getButtonStyle("cancel", isProjectSaving)}>
+        <button data-testid="cypress-cancel-project" type="button" onClick={closeProjectModal} disabled={isProjectSaving} style={getButtonStyle("cancel", isProjectSaving)}>
           Cancel
         </button>
       </Modal>
@@ -168,6 +171,7 @@ export default function ProjectModals(props) {
               <div key={`${getProjectPlanId(project) || getProjectId(project) || idx}-${idx}`} style={{ marginBottom: 8 }}>
                 <div>{formatProjectText(project)}</div>
                 <button
+                  data-testid={`cypress-delete-project-${idx}`}
                   type="button"
                   onClick={() => handleDeleteProjectPlan(project)}
                   disabled={isProjectDeleting}
@@ -241,7 +245,7 @@ export default function ProjectModals(props) {
         <button type="button" onClick={handleEditProjectPlan} disabled={isProjectEditing} style={getButtonStyle("update", isProjectEditing)}>
           {isProjectEditing ? "Saving..." : "Save"}
         </button>{" "}
-        <button type="button" onClick={closeProjectEditModal} disabled={isProjectEditing} style={getButtonStyle("cancel", isProjectEditing)}>
+        <button data-testid="cypress-close-delete-project-modal" type="button" onClick={closeProjectEditModal} disabled={isProjectEditing} style={getButtonStyle("cancel", isProjectEditing)}>
           Cancel
         </button>
       </Modal>
