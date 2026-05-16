@@ -7,12 +7,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.Instant;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import lv.venta.virac.model.Employee;
+import lv.venta.virac.repo.IEmployeeRepo;
 import lv.venta.virac.token.IRefreshTokenRepo;
 import lv.venta.virac.token.RefreshToken;
 import lv.venta.virac.user.IUserRepo;
@@ -20,32 +22,40 @@ import lv.venta.virac.user.Role;
 import lv.venta.virac.user.User;
 
 @DataJpaTest
+@ActiveProfiles("test")
 public class IRefreshTokenRepoTest {
 	
 	@Autowired
     private IRefreshTokenRepo refreshTokenRepo;
+	
+	@Autowired
+    private IEmployeeRepo employeeRepo;
 
     @Autowired
     private IUserRepo userRepo;
     
-    private static User user;
-    private static Employee employee;
-    private static RefreshToken token;
+    private User user;
+    private Employee employee;
+    private RefreshToken token;
     
     
-    @BeforeAll
-	static void setUp() {
+    @BeforeEach
+	void setUp() {
     	employee = new Employee();
 		user = new User("Janis","Berzins","janis@test.lv","123",Role.ADMIN, employee);
 		token = new RefreshToken();
+		
+		employee.setPosition("Test position");
+		employeeRepo.save(employee);
+		userRepo.save(user);
+		token.setUser(user);
+		token.setToken("abc123");
+		token.setExpiryDate(Instant.now().plusSeconds(3600));
+		refreshTokenRepo.save(token);
 	}
 
     @Test
     void testFindByToken() {
-        userRepo.save(user);
-        token.setToken("abc123");
-        token.setUser(user);
-        token.setExpiryDate(Instant.now().plusSeconds(3600));
 
         refreshTokenRepo.save(token);
 
@@ -57,10 +67,7 @@ public class IRefreshTokenRepoTest {
 
     @Test
     void testDeleteByUserId() {
-        userRepo.save(user);
         token.setToken("delete-token");
-        token.setUser(user);
-        token.setExpiryDate(Instant.now().plusSeconds(3600));
 
         refreshTokenRepo.save(token);
         refreshTokenRepo.deleteByUser_IdUser(user.getIdUser());

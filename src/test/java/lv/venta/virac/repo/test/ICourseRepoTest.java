@@ -6,25 +6,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import lv.venta.virac.model.Course;
 import lv.venta.virac.repo.ICourseRepo;
 
 @DataJpaTest
+@ActiveProfiles("test")
 public class ICourseRepoTest {
 	
 	@Autowired
     private ICourseRepo courseRepo;
 	
-	private static Course c1;
-	private static Course c2;
+	private Course c1;
+	private Course c2;
 	
-	@BeforeAll
-	static void setUp() {
+	@BeforeEach
+	void setUp() {
 		c1 = new Course("Java Programming",2,"spring","ITF");
 		c2 = new Course("Python Basics",2,"spring","ITF");
 	}

@@ -6,39 +6,54 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.ArrayList;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import lv.venta.virac.model.ArticlePlan;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.ScientificArticles;
+import lv.venta.virac.model.enums.PlanStatus;
 import lv.venta.virac.repo.IArticlePlanRepo;
+import lv.venta.virac.repo.IPlanRepo;
+import lv.venta.virac.repo.IScientificArticlesRepo;
 
-@DataJpaTest(properties = {
-		"spring.jpa.hibernate.ddl-auto=create", 
-		"spring.datasource.url=jdbc:mysql:"
-})//TODO: Saprast kāpēc šie testi neaiziet
+@DataJpaTest
+@ActiveProfiles("test")
 public class IArticlePlanRepoTest {
 	
 	@Autowired
     private IArticlePlanRepo articlePlanRepo;
 	
-	private static Plan plan;
-	private static ScientificArticles article;
-	private static ArticlePlan ap;
+	@Autowired
+    private IPlanRepo planRepo;
 	
-	@BeforeAll
-	static void setUp() {
+	@Autowired
+    private IScientificArticlesRepo articleRepo;
+	
+	private Plan plan;
+	private ScientificArticles article;
+	private ArticlePlan ap;
+	
+	@BeforeEach
+	void setUp() {
 		plan = new Plan();
 		article = new ScientificArticles();
 		ap = new ArticlePlan();
+		
+		plan.setNumOfStudWork(1);
+		plan.setPlanStatus(PlanStatus.plan_open);
+		plan = planRepo.save(plan);
+		article.setName("Test name");
+		article.setCoAuthors("Test coAuthors");
+	    article = articleRepo.save(article);
 	}
 
     @Test
     void testFindByPlanIdPlan() {
-
+    	
         ap.setPlan(plan);
         ap.setScientificArticles(article);
 

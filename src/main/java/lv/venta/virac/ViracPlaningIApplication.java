@@ -56,7 +56,7 @@ public class ViracPlaningIApplication {
 	}
 	
 	@Bean
-	//@Profile("!test")
+	@Profile("!test")
 	public CommandLineRunner testModelLayer(IArticlePlanRepo artPlanRepo, 
 			ICoursePlanRepo courPlanRepo, ICourseRepo courseRepo,
 			IEmployeeRepo emploRepo, IYearRepo yearRepo, IJournalRepo jourRepo,
