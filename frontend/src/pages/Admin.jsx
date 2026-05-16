@@ -115,6 +115,7 @@ const SchedulerUpdateSection = () => {
               <td>{currentYearNumber}</td>
               <td>
                 <input
+                  data-testid="cypress-planned-date"
                   type="date"
                   value={schedulerRow.plannedFreezeDate}
                   onChange={(event) =>
@@ -124,6 +125,7 @@ const SchedulerUpdateSection = () => {
               </td>
               <td>
                 <input
+                  data-testid="cypress-done-date"
                   type="date"
                   value={schedulerRow.doneFreezeDate}
                   onChange={(event) =>
@@ -133,6 +135,7 @@ const SchedulerUpdateSection = () => {
               </td>
               <td>
                 <button
+                  data-testid="cypress-scheduler-save"
                   type="button"
                   onClick={() => handleSave(schedulerRow)}
                   disabled={isSaving}

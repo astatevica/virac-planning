@@ -19,7 +19,15 @@ Cypress.Commands.add('login', () => {
 
     cy.get('[data-testid="cypress-submit"]').click();
  })
-//
+//Admin login
+Cypress.Commands.add('loginAdmin', () => { 
+    cy.visit("http://localhost:3000/login");
+
+    cy.get('[data-testid="cypress-email"]').type("admin.a@venta.lv");
+    cy.get('[data-testid="cypress-password"]').type("admin123");
+
+    cy.get('[data-testid="cypress-submit"]').click();
+ })
 //
 // -- This is a child command --
 // Cypress.Commands.add('drag', { prevSubject: 'element'}, (subject, options) => { ... })

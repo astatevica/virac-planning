@@ -93,6 +93,7 @@ export default function OpenPlanActivities({
                             >
                               {formatProjectText(project)}{" "}
                               <button
+                                data-testid={`cypress-edit-project-${idx}`}
                                 type="button"
                                 onClick={() => openProjectEditModal(project)}
                                 style={getButtonStyle("edit")}
@@ -112,6 +113,7 @@ export default function OpenPlanActivities({
                             <li key={`${course.idCourse || idx}-${idx}`}>
                               {formatCourseText(course)}{" "}
                               <button
+                                data-testid="cypress-edit-course"
                                 type="button"
                                 onClick={() => openCourseEditModal(course)}
                                 style={getButtonStyle("edit")}
@@ -131,6 +133,7 @@ export default function OpenPlanActivities({
                             <li key={`${getStudentWorkId(work) || idx}-${idx}`}>
                               {`Name: ${work.name || ""} | Student: ${work.studentName || ""} ${work.studentSurname || ""} | Degree: ${work.degree || ""} | Work done: ${work.workDone || ""}`}{" "}
                               <button
+                                data-testid="cypress-edit-student-work"
                                 type="button"
                                 onClick={() => openStudentWorkEditModal(work)}
                                 style={getButtonStyle("edit")}
@@ -152,6 +155,7 @@ export default function OpenPlanActivities({
                             >
                               {formatArticleText(article)}{" "}
                               <button
+                                data-testid="cypress-edit-article"
                                 type="button"
                                 onClick={() => openArticleEditModal(article)}
                                 style={getButtonStyle("edit")}

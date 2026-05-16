@@ -231,18 +231,18 @@ export default function ProjectModals(props) {
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Tasks</label>
-          <textarea rows={3} value={projectEditTasks} onChange={(e) => setProjectEditTasks(e.target.value)} style={{ width: "100%", marginTop: 4 }} />
+          <textarea data-testid="cypress-edit-project-tasks" rows={3} value={projectEditTasks} onChange={(e) => setProjectEditTasks(e.target.value)} style={{ width: "100%", marginTop: 4 }} />
           {projectEditFieldErrors.tasks && <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.tasks}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Work done</label>
-          <textarea rows={3} value={projectEditWorkDone} onChange={(e) => setProjectEditWorkDone(e.target.value)} style={{ width: "100%", marginTop: 4 }} />
+          <textarea data-testid="cypress-edit-project-work-done" rows={3} value={projectEditWorkDone} onChange={(e) => setProjectEditWorkDone(e.target.value)} style={{ width: "100%", marginTop: 4 }} />
           {projectEditFieldErrors.workDone && <div style={{ color: "red", marginTop: 4 }}>{projectEditFieldErrors.workDone}</div>}
         </div>
 
         {projectEditMessage && <div style={{ color: "red", marginBottom: 10 }}>{projectEditMessage}</div>}
 
-        <button type="button" onClick={handleEditProjectPlan} disabled={isProjectEditing} style={getButtonStyle("update", isProjectEditing)}>
+        <button data-testid="cypress-edit-project-save" type="button" onClick={handleEditProjectPlan} disabled={isProjectEditing} style={getButtonStyle("update", isProjectEditing)}>
           {isProjectEditing ? "Saving..." : "Save"}
         </button>{" "}
         <button data-testid="cypress-close-delete-project-modal" type="button" onClick={closeProjectEditModal} disabled={isProjectEditing} style={getButtonStyle("cancel", isProjectEditing)}>
