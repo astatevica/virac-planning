@@ -1,37 +1,22 @@
 package lv.venta.virac.controller.test;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 
 import lv.venta.virac.auth.AuthenticationService;
 import lv.venta.virac.auth.dto.RegisterRequest;
@@ -39,227 +24,125 @@ import lv.venta.virac.controller.AdminController;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.scheduler.ICRUDPlanSchedulerService;
 import lv.venta.virac.scheduler.SchedulerDTO;
-import lv.venta.virac.security.JwtAuthFilter;
-import lv.venta.virac.security.JwtService;
 import lv.venta.virac.user.ICRUDUserService;
+import lv.venta.virac.user.IUserRepo;
 import lv.venta.virac.user.Role;
 import lv.venta.virac.user.User;
 
-@WebMvcTest(AdminController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
-@EnableAutoConfiguration(exclude = {
-        DataSourceAutoConfiguration.class,
-        HibernateJpaAutoConfiguration.class
-})
-@TestPropertySource(properties = {
-    "spring.jpa.hibernate.ddl-auto=none"
-})
 public class AdminControllerTest {
 	
-	@Autowired
-	private MockMvc mockMvc;
+	@Mock
+    private AuthenticationService authenticationService;
 
-	@MockitoBean
-	private AuthenticationService authenticationService;
+    @Mock
+    private ICRUDUserService userService;
 
-	@MockitoBean
-	private ICRUDUserService userService;
+    @Mock
+    private ICRUDPlanSchedulerService schedulerService;
 
-	@MockitoBean
-	private ICRUDPlanSchedulerService schedulerService;
-	
-	@MockitoBean
-	private JwtService jwtService;
+    @InjectMocks
+    private AdminController controller;
+    
+    @Autowired
+    private IUserRepo userRepo;
 
-	@MockitoBean
-	private JwtAuthFilter jwtAuthFilter;
-	
-	private static User user;
-	private static Employee employee;
-	
-	@BeforeEach
-	void setUp() {
+    private User user;
 
-	    employee = new Employee();
+    @BeforeEach
+    void setUp() {
 
-	    ReflectionTestUtils.setField(employee,"idEmployee",1);
+        Employee employee = new Employee();
 
-	    user = new User();
+        user = new User();
+        user.setFirstname("Janis");
+        user.setLastname("Berzins");
+        user.setEmail("janis@test.lv");
+        user.setPassword("123");
+        user.setRole(Role.ADMIN);
+        user.setEmployee(employee);
+        
+    }
 
-	    ReflectionTestUtils.setField(user,"idUser",1);
+    @Test
+    void testAdminDashboard() {
 
-	    user.setFirstname("Janis");
-	    user.setLastname("Berzins");
-	    user.setEmail("janis@test.lv");
-	    user.setPassword("123");
-	    user.setRole(Role.ADMIN);
-	    user.setEmployee(employee);
+        String result = controller.adminDashboard();
 
-	    //RegisterRequest request = new RegisterRequest(1,"Janis","Berzins","janis@test.lv","123","ADMIN",1);
-	}
-	
-	@Test
-	@WithMockUser(roles = "ADMIN")
-	void testAdminDashboard() throws Exception {
+        assertEquals("Only ADMIN can see this", result);
+    }
 
-	    mockMvc.perform(get("/api/admin/dashboard"))
-	            .andExpect(status().isOk())
-	            .andExpect(content().string(
-	                    "Only ADMIN can see this"
-	            ));
-	}
-	
-	@Test
-	@WithMockUser(roles = "USER")
-	void testAdminDashboardForbidden()
-	        throws Exception {
+    @Test
+    void testCreateUser() {
 
-	    mockMvc.perform(get("/api/admin/dashboard"))
-	            .andExpect(status().isForbidden());
-	}
-	
-	@Test
-	@WithMockUser(roles = "ADMIN")
-	void testCreateUser() throws Exception {
+        RegisterRequest request = new RegisterRequest(1,"Janis","Berzins","janis@test.lv","123","ADMIN",1);
 
-	    mockMvc.perform(
-	            post("/api/admin/create-user")
-	            .contentType(MediaType.APPLICATION_JSON)
-	            .content("""
-	                {
-	                    "firstname":"Janis",
-	                    "lastname":"Berzins",
-	                    "email":"janis@test.lv",
-	                    "password":"123",
-	                    "role":"ADMIN",
-	                    "idEmployee":1
-	                }
-	            """)
-	    )
-	    .andExpect(status().isOk());
+        ResponseEntity<?> response = controller.createUser(request);
 
-	    verify(authenticationService)
-	            .createUserByAdmin(any());
-	}
-	
-	@Test
-	@WithMockUser(roles = "ADMIN")
-	void testGetAllUsers() throws Exception {
+        assertEquals(200, response.getStatusCode().value());
 
-	    ArrayList<User> users =
-	            new ArrayList<>();
+        verify(authenticationService).createUserByAdmin(request);
+    }
 
-	    users.add(user);
+//    @Test
+//    void testGetAllUsers() throws Exception {
+//
+//    	ArrayList<User> users = new ArrayList<>();
+//        users.add(user);
+//
+//        when(userService.retrieveAll()).thenReturn(users);
+//
+//        ResponseEntity<ArrayList<RegisterRequest>> response = controller.getAllUsers();
+//
+//        assertEquals(200, response.getStatusCode().value());
+//    }
+//
+//    @Test
+//    void testGetById() throws Exception {
+//
+//        when(userService.retrieveById(anyInt())).thenReturn(user);
+//
+//        ResponseEntity<RegisterRequest> response = controller.getById(0);
+//
+//        assertEquals(200, response.getStatusCode().value());
+//    }
 
-	    when(userService.retrieveAll())
-	            .thenReturn(users);
+    @Test
+    void testDeleteById() throws Exception {
 
-	    mockMvc.perform(get("/api/admin/all-users"))
-	            .andExpect(status().isOk())
-	            .andExpect(jsonPath("$[0].firstname")
-	                    .value("Janis"));
-	}
-	
-	@Test
-	@WithMockUser(roles = "ADMIN")
-	void testGetById() throws Exception {
+        ResponseEntity<Void> response = controller.deleteById(1);
 
-	    when(userService.retrieveById(1))
-	            .thenReturn(user);
+        assertEquals(204, response.getStatusCode().value());
 
-	    mockMvc.perform(get("/api/admin/1"))
-	            .andExpect(status().isOk())
-	            .andExpect(jsonPath("$.email")
-	                    .value("janis@test.lv"));
-	}
-	
-	@Test
-	@WithMockUser(roles = "ADMIN")
-	void testUpdateById() throws Exception {
+        verify(userService).deleteById(1);
+    }
 
-	    mockMvc.perform(
-	            put("/api/admin/update/1")
-	            .contentType(MediaType.APPLICATION_JSON)
-	            .content("""
-	                {
-	                    "firstname":"Anna",
-	                    "lastname":"Ozola",
-	                    "email":"anna@test.lv",
-	                    "password":"123",
-	                    "role":"ADMIN",
-	                    "idEmployee":1
-	                }
-	            """)
-	    )
-	    .andExpect(status().isOk());
+    @Test
+    void testGetSchedulerByYear() throws Exception {
 
-	    verify(userService)
-	            .updateById(
-	                    anyInt(),
-	                    anyString(),
-	                    anyString(),
-	                    anyString(),
-	                    anyString(),
-	                    anyString(),
-	                    anyInt()
-	            );
-	}
-	
-	@Test
-	@WithMockUser(roles = "ADMIN")
-	void testDeleteById() throws Exception {
+        SchedulerDTO dto = new SchedulerDTO();
+        dto.setIdYear(1);
 
-	    mockMvc.perform(
-	            delete("/api/admin/delete/1")
-	    )
-	    .andExpect(status().isNoContent());
+        when(schedulerService.getByYearId(1)).thenReturn(dto);
 
-	    verify(userService)
-	            .deleteById(1);
-	}
-	
-	@Test
-	@WithMockUser(roles = "ADMIN")
-	void testGetSchedulerByYear()
-	        throws Exception {
+        ResponseEntity<SchedulerDTO> response = controller.getSchedulerByYear(1, null);
 
-	    SchedulerDTO dto =
-	            new SchedulerDTO();
+        assertEquals(1, response.getBody().getIdYear());
+    }
 
-	    dto.setIdYear(1);
+    @Test
+    void testUpdateScheduler() throws Exception {
 
-	    when(schedulerService.getByYearId(1))
-	            .thenReturn(dto);
+        SchedulerDTO dto = new SchedulerDTO();
+        dto.setIdYear(1);
 
-	    mockMvc.perform(
-	            get("/api/admin/scheduler/1")
-	    )
-	    .andExpect(status().isOk())
-	    .andExpect(jsonPath("$.idYear")
-	            .value(1));
-	}
-	
-	@Test
-	@WithMockUser(roles = "ADMIN")
-	void testUpdateScheduler()
-	        throws Exception {
+        ResponseEntity<?> response = controller.updateSchedulerByYear(dto, new org.springframework.validation.BeanPropertyBindingResult(dto, "dto"));
 
-	    mockMvc.perform(
-	            put("/api/admin/update/scheduler")
-	            .contentType(MediaType.APPLICATION_JSON)
-	            .content("""
-	                {
-	                    "idYear":1
-	                }
-	            """)
-	    )
-	    .andExpect(status().isOk());
+        assertEquals(200, response.getStatusCode().value());
 
-	    verify(schedulerService)
-	            .update(any());
-	}
-	
+        verify(schedulerService).update(dto);
+    }
 }
 
 

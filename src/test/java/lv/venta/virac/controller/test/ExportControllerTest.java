@@ -1,33 +1,26 @@
 package lv.venta.virac.controller.test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import java.security.Principal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import lv.venta.virac.user.User;
 import lv.venta.virac.user.Role;
@@ -36,117 +29,115 @@ import lv.venta.virac.model.ViracDepartment;
 import lv.venta.virac.service.ICRUDEmployeeService;
 import lv.venta.virac.service.ICRUDPlanService;
 import lv.venta.virac.dto.FullPlanDTO;
-import lv.venta.virac.email.EmailSendingService;
 import lv.venta.virac.export.ExportController;
 import lv.venta.virac.export.PlanExportService;
 
-@WebMvcTest(ExportController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 public class ExportControllerTest {
 	
-	@Autowired
-	private MockMvc mockMvc;
+	@Mock
+    private PlanExportService exportService;
 
-	@MockitoBean
-	private PlanExportService exportService;
+    @Mock
+    private ICRUDPlanService planService;
 
-	@MockitoBean
-	private ICRUDPlanService planService;
+    @Mock
+    private ICRUDEmployeeService employeeService;
 
-	@MockitoBean
-	private ICRUDEmployeeService employeeService;
+    @Mock
+    private lv.venta.virac.email.EmailSendingService emailService;
 
-	@MockitoBean
-	private EmailSendingService emailService;
+    @InjectMocks
+    private ExportController controller;
+
+    private User user;
+    private Employee employee;
+    private ViracDepartment dept;
+    private FullPlanDTO dto;
+
+    @BeforeEach
+    void setUp() {
+
+        dept = new ViracDepartment();
+
+        employee = new Employee();
+        employee.setViracDepartment(dept);
+
+        user = new User();
+        user.setRole(Role.ADMIN);
+        user.setEmployee(employee);
+        user.setEmail("test@test.lv");
+
+        dto = new FullPlanDTO();
+        dto.setIdEmployee(1);
+    }
 	
-	private static User user;
-	private static Employee employee;
-	private static ViracDepartment dept;
-	private static FullPlanDTO dto;
-	
-	@BeforeEach
-	void setUp() {
+    @Test
+    void exportDocx_success() throws Exception {
 
-	    dept = new ViracDepartment();
-	    ReflectionTestUtils.setField(dept, "idDepartment", 1);
+        byte[] file = "test-file".getBytes();
 
-	    employee = new Employee();
-	    ReflectionTestUtils.setField(employee, "idEmployee", 1);
-	    employee.setViracDepartment(dept);
+        when(planService.retrieveFullPlan(1)).thenReturn(dto);
+        when(employeeService.retrieveById(1)).thenReturn(employee);
+        when(exportService.generateDocx(dto)).thenReturn(file);
 
-	    user = new User();
-	    user.setRole(Role.ADMIN);
-	    user.setEmployee(employee);
-	    user.setEmail("test@test.lv");
+        Principal principal = () -> user.getEmail();
 
-	    dto = new FullPlanDTO();
-	    dto.setIdEmployee(1);
-	}
-	
-	private Authentication auth() {
-	    return new UsernamePasswordAuthenticationToken(
-	            user,
-	            null,
-	            user.getAuthorities()
-	    );
-	}
-	
-	@Test
-	void exportDocx_success() throws Exception {
+        ResponseEntity<byte[]> response =
+                controller.exportDocx(1, new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                        user, null, user.getAuthorities()
+                ));
 
-	    byte[] file = "test-file".getBytes();
+        assertEquals(200, response.getStatusCode().value());
+        assertArrayEquals(file, response.getBody());
+        assertEquals(true,response.getHeaders().containsKey(HttpHeaders.CONTENT_DISPOSITION));
 
-	    when(planService.retrieveFullPlan(1))
-	            .thenReturn(dto);
+        verify(exportService).generateDocx(dto);
+        verify(emailService).sendDocxEmailNotification(
+                any(),
+                anyString(),
+                anyString(),
+                anyString(),
+                any(byte[].class)
+        );
+    }
 
-	    when(employeeService.retrieveById(1))
-	            .thenReturn(employee);
+    @Test
+    void exportDocx_exception() throws Exception {
 
-	    when(exportService.generateDocx(dto))
-	            .thenReturn(file);
+        when(planService.retrieveFullPlan(1)).thenThrow(new RuntimeException("fail"));
 
-	    mockMvc.perform(get("/api/export/docx/1")
-	            .principal(auth()))
-	            .andExpect(status().isOk())
-	            .andExpect(header().exists(HttpHeaders.CONTENT_DISPOSITION))
-	            .andExpect(content().bytes(file));
+        ResponseEntity<byte[]> response =
+                controller.exportDocx(1,
+                        new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                                user, null, user.getAuthorities()
+                        ));
 
-	    verify(exportService).generateDocx(dto);
-	    verify(emailService).sendDocxEmailNotification(
-	            anyString(),
-	            anyString(),
-	            anyString(),
-	            anyString(),
-	            any(byte[].class)
-	    );
-	}
-	
-	@Test
-	void exportDocx_forbidden() throws Exception {
+        assertEquals(500, response.getStatusCode().value());
+    }
 
-	    User other = new User();
-	    other.setRole(Role.USER);
-	    other.setEmployee(employee);
+    @Test
+    void exportDocx_forbidden_logic() throws Exception {
 
-	    when(planService.retrieveFullPlan(1)).thenReturn(dto);
-	    when(employeeService.retrieveById(1)).thenReturn(employee);
+        User other = new User();
+        other.setRole(Role.USER);
+        other.setEmployee(employee);
 
-	    mockMvc.perform(get("/api/export/docx/1")
-	            .principal(new UsernamePasswordAuthenticationToken(other, null, other.getAuthorities())))
-	            .andExpect(status().isInternalServerError());
-	}
-	
-	@Test
-	void exportDocx_exception() throws Exception {
+        FullPlanDTO otherDto = new FullPlanDTO();
+        otherDto.setIdEmployee(1);
 
-	    when(planService.retrieveFullPlan(1))
-	            .thenThrow(new RuntimeException("fail"));
+        when(planService.retrieveFullPlan(1)).thenReturn(otherDto);
+        when(employeeService.retrieveById(1)).thenReturn(employee);
 
-	    mockMvc.perform(get("/api/export/docx/1")
-	            .principal(auth()))
-	            .andExpect(status().isInternalServerError());
-	}
-	
+        ResponseEntity<byte[]> response =
+                controller.exportDocx(1,
+                        new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                                other, null, other.getAuthorities()
+                        ));
+
+        assertEquals(500, response.getStatusCode().value());
+    }
 	
 
 }

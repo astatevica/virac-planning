@@ -1,44 +1,38 @@
 package lv.venta.virac.controller.test;
 
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.BeforeEach;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-
-import org.springframework.http.MediaType;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-
-import org.springframework.test.web.servlet.MockMvc;
 
 import lv.venta.virac.controller.CRUDProjManagController;
+import lv.venta.virac.dto.ProjectManagementDTO;
 import lv.venta.virac.model.Employee;
 import lv.venta.virac.model.ProjectManagement;
 import lv.venta.virac.service.ICRUDProjManagService;
 
 
-@WebMvcTest(CRUDProjManagController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 public class CRUDProjManagControllerTest {
 	
-	@Autowired
-    private MockMvc mockMvc;
-
-    @MockitoBean
+	@Mock
     private ICRUDProjManagService projService;
+
+    @InjectMocks
+    private CRUDProjManagController controller;
 
     private ProjectManagement pm;
     private Employee employee;
@@ -46,7 +40,7 @@ public class CRUDProjManagControllerTest {
     @BeforeEach
     void setUp() {
 
-        employee = new Employee();
+    	employee = new Employee();
 
         pm = new ProjectManagement();
         pm.setEmployee(employee);
@@ -57,39 +51,40 @@ public class CRUDProjManagControllerTest {
     @Test
     void testGetAll() throws Exception {
 
-        ArrayList<ProjectManagement> list = new ArrayList<>();
+    	ArrayList<ProjectManagement> list = new ArrayList<>();
         list.add(pm);
 
         when(projService.retrieveAll()).thenReturn(list);
 
-        mockMvc.perform(get("/api/admin/project-management/all"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].employeeId").value(employee.getIdEmployee()));
+        ResponseEntity<ArrayList<ProjectManagementDTO>> response = controller.getAll();
+
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(0, response.getBody().get(0).getEmployeeId());
     }
 
     @Test
     void testGetById() throws Exception {
 
-        when(projService.retrieveById(1)).thenReturn(pm);
+    	when(projService.retrieveById(1)).thenReturn(pm);
 
-        mockMvc.perform(get("/api/admin/project-management/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.idProjectManag").value(pm.getIdProjectManag()));
+        ResponseEntity<ProjectManagementDTO> response = controller.getById(1);
+
+        assertEquals(0, response.getBody().getIdProjectManag());
     }
 
     @Test
     void testCreate() throws Exception {
 
-        mockMvc.perform(post("/api/admin/project-management/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                        "employeeId":1,
-                        "startDate":"2026-01-01",
-                        "endDate":"2026-12-31"
-                    }
-                """))
-                .andExpect(status().isCreated());
+    	ProjectManagementDTO dto = new ProjectManagementDTO(
+                0,
+                1,
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31)
+        );
+
+        ResponseEntity<Void> response = controller.create(dto);
+
+        assertEquals(201, response.getStatusCode().value());
 
         verify(projService).create(
                 1,
@@ -101,16 +96,16 @@ public class CRUDProjManagControllerTest {
     @Test
     void testUpdate() throws Exception {
 
-        mockMvc.perform(put("/api/admin/project-management/update/1")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                        "employeeId":1,
-                        "startDate":"2026-01-01",
-                        "endDate":"2026-12-31"
-                    }
-                """))
-                .andExpect(status().isOk());
+    	ProjectManagementDTO dto = new ProjectManagementDTO(
+                0,
+                1,
+                LocalDate.of(2026, 1, 1),
+                LocalDate.of(2026, 12, 31)
+        );
+
+        ResponseEntity<Void> response = controller.update(1, dto);
+
+        assertEquals(200, response.getStatusCode().value());
 
         verify(projService).updateById(
                 1,
@@ -123,8 +118,9 @@ public class CRUDProjManagControllerTest {
     @Test
     void testDelete() throws Exception {
 
-        mockMvc.perform(delete("/api/admin/project-management/delete/1"))
-                .andExpect(status().isNoContent());
+    	ResponseEntity<Void> response = controller.delete(1);
+
+        assertEquals(204, response.getStatusCode().value());
 
         verify(projService).deleteById(1);
     }
@@ -132,15 +128,14 @@ public class CRUDProjManagControllerTest {
     @Test
     void testFilterByEmployee() throws Exception {
 
-        ArrayList<ProjectManagement> list = new ArrayList<>();
+    	ArrayList<ProjectManagement> list = new ArrayList<>();
         list.add(pm);
 
-        when(projService.selectAllProjectManagemetByEmployee(1))
-                .thenReturn(list);
+        when(projService.selectAllProjectManagemetByEmployee(1)).thenReturn(list);
 
-        mockMvc.perform(get("/api/admin/project-management/employee/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].employeeId").value(employee.getIdEmployee()));
+        ResponseEntity<ArrayList<ProjectManagementDTO>> response = controller.filterByEmployee(1);
+
+        assertEquals(0, response.getBody().get(0).getEmployeeId());
     }
 
 }
