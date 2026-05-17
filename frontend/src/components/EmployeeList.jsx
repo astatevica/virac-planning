@@ -121,24 +121,28 @@ const EmployeeList = () => {
       {/* ADD / UPDATE */}
       <div style={{ marginBottom: "20px" }}>
         <input
+          data-testid="cypress-employee-name"
           placeholder="Name"
           value={name}
           onChange={e => setName(e.target.value)}
         />
 
         <input
+          data-testid="cypress-employee-surname"
           placeholder="Surname"
           value={surname}
           onChange={e => setSurname(e.target.value)}
         />
 
         <input
+          data-testid="cypress-employee-position"
           placeholder="Position"
           value={position}
           onChange={e => setPosition(e.target.value)}
         />
 
         <select
+          data-testid="cypress-employee-department"
           value={nameDepartment}
           onChange={e => setIdDepartment(e.target.value)}
         >
@@ -152,17 +156,18 @@ const EmployeeList = () => {
 
         {editId ? (
           <>
-            <button onClick={saveEdit}>Save</button>
-            <button onClick={cancelEdit}>Cancel</button>
+            <button data-testid="cypress-employee-save" onClick={saveEdit}>Save</button>
+            <button data-testid="cypress-employee-edit" onClick={cancelEdit}>Cancel</button>
           </>
         ) : (
-          <button onClick={addEmployee}>Add</button>
+          <button data-testid="cypress-employee-add" onClick={addEmployee}>Add</button>
         )}
       </div>
 
       {/* FILTER */}
       <div style={{ marginBottom: "15px" }}>
         <select
+          data-testid="cypress-filter-department"
           value={filterIdDepartment}
           onChange={e => setFilterIdDeparment(e.target.value)}
         >
@@ -174,18 +179,18 @@ const EmployeeList = () => {
           ))}
         </select>
   
-        <button onClick={filterEmployees}>Filter</button>
+        <button data-testid="cypress-filter-button" onClick={filterEmployees}>Filter</button>
       </div>
 
       {/* LIST */}
       <ul>
         {employees.map(emp => (
-          <li key={emp.id}>
+          <li  data-testid={`employee-row-${emp.idEmployee}`} key={emp.id}>
             {emp.name} {emp.surname} |{" "}
             {emp.nameDepartment || "No department"} |{" "}
             {emp.position}
-            <button onClick={() => startEdit(emp)}>Update</button>
-            <button onClick={() => deleteEmployee(emp.id)}>
+            <button data-testid="cypress-employee-update" onClick={() => startEdit(emp)}>Update</button>
+            <button data-testid="cypress-employee-delete" onClick={() => deleteEmployee(emp.idEmployee)}>
               Delete
             </button>
           </li>

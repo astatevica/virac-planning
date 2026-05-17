@@ -46,7 +46,7 @@ const Navigation = () => {
         </li>
         <li>
           {isAdmin &&(
-          <NavLink to="admin/employee" style={styles.link}>
+          <NavLink to="admin/employee" style={styles.link} data-testid="cypress-employee-navigation">
             Employee
           </NavLink>
           )}
