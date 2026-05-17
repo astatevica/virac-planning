@@ -59,11 +59,11 @@ export default function CourseModals(props) {
 
         <div style={{ marginBottom: 10 }}>
           <label>
-            <input type="radio" name="courseMode" checked={courseMode === "existing"} onChange={() => setCourseMode("existing")} />{" "}
+            <input data-testid="course-existing" type="radio" name="courseMode" checked={courseMode === "existing"} onChange={() => setCourseMode("existing")} />{" "}
             Use existing course
           </label>{"  "}
           <label>
-            <input type="radio" name="courseMode" checked={courseMode === "new"} onChange={() => setCourseMode("new")} />{" "}
+            <input data-testid="course-new" type="radio" name="courseMode" checked={courseMode === "new"} onChange={() => setCourseMode("new")} />{" "}
             Create new course
           </label>
         </div>
@@ -72,6 +72,7 @@ export default function CourseModals(props) {
           <div style={{ marginBottom: 10 }}>
             <label>Course autocomplete</label>
             <input
+              data-testid="course-autocomplete-text"
               type="text"
               value={courseSearch}
               onChange={(e) => {
@@ -107,30 +108,30 @@ export default function CourseModals(props) {
         ) : (
           <div style={{ marginBottom: 10 }}>
             <label>Name</label>
-            <input type="text" value={newCourse.name} onChange={(e) => setNewCourse((prev) => ({ ...prev, name: e.target.value }))} style={{ width: "100%", marginBottom: 6 }} />
+            <input data-testid="course-name" type="text" value={newCourse.name} onChange={(e) => setNewCourse((prev) => ({ ...prev, name: e.target.value }))} style={{ width: "100%", marginBottom: 6 }} />
             {courseModalFieldErrors.name && <div style={{ color: "red", marginBottom: 6 }}>{courseModalFieldErrors.name}</div>}
             <label>ECTS</label>
-            <input type="number" value={newCourse.ectsCredits} onChange={(e) => setNewCourse((prev) => ({ ...prev, ectsCredits: e.target.value }))} style={{ width: "100%", marginBottom: 6 }} />
+            <input data-testid="course-ects" type="number" value={newCourse.ectsCredits} onChange={(e) => setNewCourse((prev) => ({ ...prev, ectsCredits: e.target.value }))} style={{ width: "100%", marginBottom: 6 }} />
             {courseModalFieldErrors.ectsCredits && <div style={{ color: "red", marginBottom: 6 }}>{courseModalFieldErrors.ectsCredits}</div>}
             <label>Semester</label>
-            <input type="text" value={newCourse.semester} onChange={(e) => setNewCourse((prev) => ({ ...prev, semester: e.target.value }))} style={{ width: "100%", marginBottom: 6 }} />
+            <input data-testid="course-semester" type="text" value={newCourse.semester} onChange={(e) => setNewCourse((prev) => ({ ...prev, semester: e.target.value }))} style={{ width: "100%", marginBottom: 6 }} />
             {courseModalFieldErrors.semester && <div style={{ color: "red", marginBottom: 6 }}>{courseModalFieldErrors.semester}</div>}
             <label>Faculty</label>
-            <input type="text" value={newCourse.faculty} onChange={(e) => setNewCourse((prev) => ({ ...prev, faculty: e.target.value }))} style={{ width: "100%" }} />
+            <input data-testid="course-faculty" type="text" value={newCourse.faculty} onChange={(e) => setNewCourse((prev) => ({ ...prev, faculty: e.target.value }))} style={{ width: "100%" }} />
             {courseModalFieldErrors.faculty && <div style={{ color: "red", marginTop: 6 }}>{courseModalFieldErrors.faculty}</div>}
           </div>
         )}
 
         <div style={{ marginBottom: 10 }}>
           <label>Work done</label>
-          <textarea rows={3} value={courseWorkDone} onChange={(e) => setCourseWorkDone(e.target.value)} style={{ width: "100%", marginTop: 4, resize: "vertical" }} />
+          <textarea data-testid="course-work-done" rows={3} value={courseWorkDone} onChange={(e) => setCourseWorkDone(e.target.value)} style={{ width: "100%", marginTop: 4, resize: "vertical" }} />
           {courseModalFieldErrors.workDone && <div style={{ color: "red", marginTop: 4 }}>{courseModalFieldErrors.workDone}</div>}
         </div>
 
-        <button type="button" onClick={handleSaveCourseFromModal} disabled={isCourseSaving} style={getButtonStyle("add", isCourseSaving)}>
+        <button data-testid="course-save-button" type="button" onClick={handleSaveCourseFromModal} disabled={isCourseSaving} style={getButtonStyle("add", isCourseSaving)}>
           {isCourseSaving ? "Saving..." : "Save Course"}
         </button>{" "}
-        <button type="button" onClick={closeCourseModal} disabled={isCourseSaving} style={getButtonStyle("cancel", isCourseSaving)}>
+        <button data-testid="course-cancel-button" type="button" onClick={closeCourseModal} disabled={isCourseSaving} style={getButtonStyle("cancel", isCourseSaving)}>
           Cancel
         </button>
         {courseModalMessage && <p style={{ color: "red", marginTop: 8 }}>{courseModalMessage}</p>}
@@ -145,14 +146,14 @@ export default function CourseModals(props) {
             {openPlanCourses.map((course, idx) => (
               <li key={`${getCoursePlanId(course) || idx}-${idx}`} style={{ marginBottom: 8 }}>
                 <div>{formatCourseText(course)}</div>
-                <button type="button" onClick={() => handleDeleteCoursePlan(course)} style={{ ...getButtonStyle("delete", isCourseDeleting), marginTop: 4 }}>
+                <button data-testid={`course-delete-${idx}`} type="button" onClick={() => handleDeleteCoursePlan(course)} style={{ ...getButtonStyle("delete", isCourseDeleting), marginTop: 4 }}>
                   {isCourseDeleting ? "Deleting..." : "Delete"}
                 </button>
               </li>
             ))}
           </ol>
         )}
-        <button type="button" onClick={closeCourseDeleteModal} disabled={isCourseDeleting}>Close</button>
+        <button data-testid="article-close-button" type="button" onClick={closeCourseDeleteModal} disabled={isCourseDeleting}>Close</button>
         {courseDeleteMessage && <p style={{ color: "red", marginTop: 8 }}>{courseDeleteMessage}</p>}
       </Modal>
 
@@ -161,30 +162,30 @@ export default function CourseModals(props) {
         <div style={{ marginBottom: 10 }}><div>{courseEditTarget ? formatCourseText(courseEditTarget) : ""}</div></div>
         <div style={{ marginBottom: 10 }}>
           <label>Name</label>
-          <input type="text" value={courseEditName} onChange={(e) => setCourseEditName(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
+          <input data-testid="article-edit-name" type="text" value={courseEditName} onChange={(e) => setCourseEditName(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
           {courseEditFieldErrors.name && <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.name}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>ECTS</label>
-          <input type="number" value={courseEditEcts} onChange={(e) => setCourseEditEcts(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
+          <input data-testid="article-edit-ects" type="number" value={courseEditEcts} onChange={(e) => setCourseEditEcts(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
           {courseEditFieldErrors.ectsCredits && <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.ectsCredits}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Semester</label>
-          <input type="text" value={courseEditSemester} onChange={(e) => setCourseEditSemester(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
+          <input data-testid="article-edit-semester" type="text" value={courseEditSemester} onChange={(e) => setCourseEditSemester(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
           {courseEditFieldErrors.semester && <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.semester}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Faculty</label>
-          <input type="text" value={courseEditFaculty} onChange={(e) => setCourseEditFaculty(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
+          <input data-testid="article-edit-faculty" type="text" value={courseEditFaculty} onChange={(e) => setCourseEditFaculty(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
           {courseEditFieldErrors.faculty && <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.faculty}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Work done</label>
-          <textarea rows={3} value={courseEditWorkDone} onChange={(e) => setCourseEditWorkDone(e.target.value)} style={{ width: "100%", marginTop: 4, resize: "vertical" }} />
+          <textarea data-testid="article-edit-work-done" rows={3} value={courseEditWorkDone} onChange={(e) => setCourseEditWorkDone(e.target.value)} style={{ width: "100%", marginTop: 4, resize: "vertical" }} />
           {courseEditFieldErrors.workDone && <div style={{ color: "red", marginTop: 4 }}>{courseEditFieldErrors.workDone}</div>}
         </div>
-        <button type="button" onClick={handleEditCoursePlan} disabled={isCourseEditing} style={getButtonStyle("update", isCourseEditing)}>
+        <button data-testid="course-edit-save-button" type="button" onClick={handleEditCoursePlan} disabled={isCourseEditing} style={getButtonStyle("update", isCourseEditing)}>
           {isCourseEditing ? "Saving..." : "Save"}
         </button>{" "}
         <button type="button" onClick={closeCourseEditModal} disabled={isCourseEditing} style={getButtonStyle("cancel", isCourseEditing)}>

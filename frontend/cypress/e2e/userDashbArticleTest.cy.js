@@ -9,7 +9,7 @@ describe('User Dashboard tests', () => {
         cy.url().should('include', '/login');
     });
 
-    it.skip('Creates new article with new journal', () => {
+    it('Creates new article with new journal', () => {
         cy.contains('button', 'Add Article').should('exist').click();
         cy.get('[data-testid="article-create-new-article"]').click();
 
@@ -32,7 +32,7 @@ describe('User Dashboard tests', () => {
         cy.contains('Cypress Article 1').should('exist');
     });
 
-    it.skip('Adds existing article', () => {
+    it('Adds existing article', () => {
         cy.contains('button', 'Add Article').should('exist').click();
         cy.get('[data-testid="article-use-existing-article"]').click();
 
@@ -48,7 +48,7 @@ describe('User Dashboard tests', () => {
         cy.get('[data-testid="article-save-button"]').click();
     });
 
-    it.skip('Edits article', () => {
+    it('Edits article', () => {
 
         cy.contains('li', 'Cypress Article 1').within(() => {
             cy.contains('Edit').click();
@@ -63,7 +63,7 @@ describe('User Dashboard tests', () => {
         cy.contains('Updated comment').should('exist');
     });
 
-    it.skip('Cancels article creation', () => {
+    it('Cancels article creation', () => {
 
         cy.contains('button', 'Add Article').should('exist').click();
 
@@ -76,7 +76,7 @@ describe('User Dashboard tests', () => {
         cy.contains('Should not be saved').should('not.exist');
     });
 
-    it.skip('Deletes article', () => {
+    it('Deletes article', () => {
         cy.contains('button', 'Delete Article').should('exist').click();
         cy.contains('Delete Article From Plan').should('be.visible');
         cy.get('[data-testid="article-delete-1"]').click();
