@@ -66,11 +66,11 @@ export default function ArticleModals(props) {
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>
-            <input type="radio" name="articleMode" checked={articleMode === "existing"} onChange={() => setArticleMode("existing")} />{" "}
+            <input data-testid="article-use-existing-article" type="radio" name="articleMode" checked={articleMode === "existing"} onChange={() => setArticleMode("existing")} />{" "}
             Use existing article
           </label>{"  "}
           <label>
-            <input type="radio" name="articleMode" checked={articleMode === "new"} onChange={() => setArticleMode("new")} />{" "}
+            <input data-testid="article-create-new-article" type="radio" name="articleMode" checked={articleMode === "new"} onChange={() => setArticleMode("new")} />{" "}
             Create new article
           </label>
         </div>
@@ -79,6 +79,7 @@ export default function ArticleModals(props) {
           <div style={{ marginBottom: 10 }}>
             <label>Article autocomplete</label>
             <input
+              data-testid="article-autocomplete-input"
               type="text"
               value={articleSearch}
               onChange={(e) => {
@@ -117,16 +118,16 @@ export default function ArticleModals(props) {
         ) : (
           <div style={{ marginBottom: 10 }}>
             <label>Name</label>
-            <input type="text" value={newArticle.name} onChange={(e) => setNewArticle((prev) => ({ ...prev, name: e.target.value }))} style={{ width: "100%", marginTop: 4 }} />
+            <input data-testid="article-name" type="text" value={newArticle.name} onChange={(e) => setNewArticle((prev) => ({ ...prev, name: e.target.value }))} style={{ width: "100%", marginTop: 4 }} />
             {articleModalFieldErrors.name && <div style={{ color: "red", marginTop: 4 }}>{articleModalFieldErrors.name}</div>}
             <div style={{ marginTop: 10 }}>
               <label>Co-authors</label>
-              <input type="text" value={newArticle.coAuthors} onChange={(e) => setNewArticle((prev) => ({ ...prev, coAuthors: e.target.value }))} style={{ width: "100%", marginTop: 4 }} />
+              <input data-testid="article-coauthors" type="text" value={newArticle.coAuthors} onChange={(e) => setNewArticle((prev) => ({ ...prev, coAuthors: e.target.value }))} style={{ width: "100%", marginTop: 4 }} />
               {articleModalFieldErrors.coAuthors && <div style={{ color: "red", marginTop: 4 }}>{articleModalFieldErrors.coAuthors}</div>}
             </div>
             <div style={{ marginTop: 10 }}>
               <label>Journal</label>
-              <select value={newArticle.idJournal} onChange={(e) => setNewArticle((prev) => ({ ...prev, idJournal: e.target.value }))} style={{ width: "100%", marginTop: 4 }}>
+              <select data-testid="article-journal-select" value={newArticle.idJournal} onChange={(e) => setNewArticle((prev) => ({ ...prev, idJournal: e.target.value }))} style={{ width: "100%", marginTop: 4 }}>
                 <option value="">Select journal</option>
                 {articleJournals.map((j) => (
                   <option key={j.idJournal} value={j.idJournal}>{j.name}</option>
@@ -136,8 +137,8 @@ export default function ArticleModals(props) {
               <div style={{ marginTop: 6 }}>
                 <label>Or create new journal</label>
                 <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                  <input type="text" value={newJournalName} onChange={(e) => setNewJournalName(e.target.value)} placeholder="New journal name" style={{ flex: 1 }} />
-                  <button type="button" onClick={handleCreateJournal}>
+                  <input data-testid="article-new-journal-name" type="text" value={newJournalName} onChange={(e) => setNewJournalName(e.target.value)} placeholder="New journal name" style={{ flex: 1 }} />
+                  <button data-testid="article-new-journal-create" type="button" onClick={handleCreateJournal}>
                     {isJournalCreating ? "Creating..." : "Add Journal"}
                   </button>
                 </div>
@@ -149,19 +150,19 @@ export default function ArticleModals(props) {
 
         <div style={{ marginBottom: 10 }}>
           <label>Article comments</label>
-          <textarea rows={2} value={articleComments} onChange={(e) => setArticleComments(e.target.value)} style={{ width: "100%", marginTop: 4, resize: "vertical" }} />
+          <textarea data-testid="article-comments" rows={2} value={articleComments} onChange={(e) => setArticleComments(e.target.value)} style={{ width: "100%", marginTop: 4, resize: "vertical" }} />
           {articleModalFieldErrors.articleComments && <div style={{ color: "red", marginTop: 4 }}>{articleModalFieldErrors.articleComments}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Publication link</label>
-          <input type="text" value={articleLink} onChange={(e) => setArticleLink(e.target.value)} style={{ width: "100%", marginTop: 4 }} />
+          <input data-testid="article-publication-link" type="text" value={articleLink} onChange={(e) => setArticleLink(e.target.value)} style={{ width: "100%", marginTop: 4 }} />
           {articleModalFieldErrors.publicationLink && <div style={{ color: "red", marginTop: 4 }}>{articleModalFieldErrors.publicationLink}</div>}
         </div>
 
-        <button type="button" onClick={handleSaveArticleFromModal} disabled={isArticleSaving} style={getButtonStyle("add", isArticleSaving)}>
+        <button data-testid="article-save-button" type="button" onClick={handleSaveArticleFromModal} disabled={isArticleSaving} style={getButtonStyle("add", isArticleSaving)}>
           {isArticleSaving ? "Saving..." : "Save Article"}
         </button>{" "}
-        <button type="button" onClick={closeArticleModal} disabled={isArticleSaving} style={getButtonStyle("cancel", isArticleSaving)}>
+        <button data-testid="article-cancel-button" type="button" onClick={closeArticleModal} disabled={isArticleSaving} style={getButtonStyle("cancel", isArticleSaving)}>
           Cancel
         </button>
         {articleModalMessage && <p style={{ color: "red", marginTop: 8 }}>{articleModalMessage}</p>}
@@ -174,16 +175,16 @@ export default function ArticleModals(props) {
         ) : (
           <ol style={{ paddingLeft: 20 }}>
             {openPlanArticles.map((article, idx) => (
-              <li key={`${getArticlePlanId(article) || getArticleId(article) || idx}-${idx}`} style={{ marginBottom: 8 }}>
+              <li data-testid="article-plan-list" key={`${getArticlePlanId(article) || getArticleId(article) || idx}-${idx}`} style={{ marginBottom: 8 }}>
                 <div>{formatArticleText(article)}</div>
-                <button type="button" onClick={() => handleDeleteArticlePlan(article)} style={{ ...getButtonStyle("delete", isArticleDeleting), marginTop: 4 }}>
+                <button data-testid={`article-delete-${idx}`} type="button" onClick={() => handleDeleteArticlePlan(article)} style={{ ...getButtonStyle("delete", isArticleDeleting), marginTop: 4 }}>
                   {isArticleDeleting ? "Deleting..." : "Delete"}
                 </button>
               </li>
             ))}
           </ol>
         )}
-        <button type="button" onClick={closeArticleDeleteModal} disabled={isArticleDeleting}>Close</button>
+        <button data-testid="article-close-button" type="button" onClick={closeArticleDeleteModal} disabled={isArticleDeleting}>Close</button>
         {articleDeleteMessage && <p style={{ color: "red", marginTop: 8 }}>{articleDeleteMessage}</p>}
       </Modal>
 
@@ -192,17 +193,17 @@ export default function ArticleModals(props) {
         <div style={{ marginBottom: 10 }}><div>{articleEditTarget ? formatArticleText(articleEditTarget) : ""}</div></div>
         <div style={{ marginBottom: 10 }}>
           <label>Name</label>
-          <input type="text" value={articleEditName} onChange={(e) => setArticleEditName(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
+          <input data-testid="article-edit-name" type="text" value={articleEditName} onChange={(e) => setArticleEditName(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
           {articleEditFieldErrors.name && <div style={{ color: "red", marginTop: 4 }}>{articleEditFieldErrors.name}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Co-authors</label>
-          <input type="text" value={articleEditCoAuthors} onChange={(e) => setArticleEditCoAuthors(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
+          <input data-testid="article-edit-coauthors" type="text" value={articleEditCoAuthors} onChange={(e) => setArticleEditCoAuthors(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }} />
           {articleEditFieldErrors.coAuthors && <div style={{ color: "red", marginTop: 4 }}>{articleEditFieldErrors.coAuthors}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Journal</label>
-          <select value={articleEditJournalId} onChange={(e) => setArticleEditJournalId(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }}>
+          <select data-testid="article-all-journals" value={articleEditJournalId} onChange={(e) => setArticleEditJournalId(e.target.value)} disabled style={{ width: "100%", marginTop: 4 }}>
             <option value="">Select journal</option>
             {articleJournals.map((j) => (
               <option key={j.idJournal} value={j.idJournal}>{j.name}</option>
@@ -222,18 +223,18 @@ export default function ArticleModals(props) {
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Article comments</label>
-          <textarea rows={2} value={articleEditComments} onChange={(e) => setArticleEditComments(e.target.value)} style={{ width: "100%", marginTop: 4, resize: "vertical" }} />
+          <textarea data-testid="article-edit-comments" rows={2} value={articleEditComments} onChange={(e) => setArticleEditComments(e.target.value)} style={{ width: "100%", marginTop: 4, resize: "vertical" }} />
           {articleEditFieldErrors.articleComments && <div style={{ color: "red", marginTop: 4 }}>{articleEditFieldErrors.articleComments}</div>}
         </div>
         <div style={{ marginBottom: 10 }}>
           <label>Publication link</label>
-          <input type="text" value={articleEditLink} onChange={(e) => setArticleEditLink(e.target.value)} style={{ width: "100%", marginTop: 4 }} />
+          <input data-testid="article-edit-publication-link" type="text" value={articleEditLink} onChange={(e) => setArticleEditLink(e.target.value)} style={{ width: "100%", marginTop: 4 }} />
           {articleEditFieldErrors.publicationLink && <div style={{ color: "red", marginTop: 4 }}>{articleEditFieldErrors.publicationLink}</div>}
         </div>
-        <button type="button" onClick={handleEditArticlePlan} disabled={isArticleEditing} style={getButtonStyle("update", isArticleEditing)}>
+        <button data-testid="article-edit-save-button" type="button" onClick={handleEditArticlePlan} disabled={isArticleEditing} style={getButtonStyle("update", isArticleEditing)}>
           {isArticleEditing ? "Saving..." : "Save"}
         </button>{" "}
-        <button type="button" onClick={closeArticleEditModal} disabled={isArticleEditing} style={getButtonStyle("cancel", isArticleEditing)}>
+        <button data-testid="article-edit-cancel-button" type="button" onClick={closeArticleEditModal} disabled={isArticleEditing} style={getButtonStyle("cancel", isArticleEditing)}>
           Cancel
         </button>
         {articleEditMessage && <p style={{ color: "red", marginTop: 8 }}>{articleEditMessage}</p>}
