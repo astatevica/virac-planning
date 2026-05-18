@@ -36,7 +36,6 @@ public class AuthenticationService {
                         request.getPassword()
                 )
         );
-
         User user = userRepo.findByEmail(request.getEmail())
                 .orElseThrow() ;
 
