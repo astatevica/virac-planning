@@ -50,9 +50,9 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/year/**").hasAnyRole("ADMIN","USER","USER_DEPART")
                 
                 //TEST ADMIN
-                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
-                .requestMatchers("/api/admin/plan/{id}").hasRole("ADMIN")
-                .requestMatchers("/api/admin/plan/all").hasRole("ADMIN")
+//                .requestMatchers("/api/admin/**").hasAnyRole("ADMIN")
+//                .requestMatchers("/api/admin/plan/{id}").hasRole("ADMIN")
+//                .requestMatchers("/api/admin/plan/all").hasRole("ADMIN")
                 
                 //USER_DEPART
                 .requestMatchers("/api/admin/employee/filter/department").hasRole("USER_DEPART") //all employees by department
@@ -63,9 +63,9 @@ public class SecurityConfiguration {
                 .requestMatchers("/api/admin/department/credentials").hasRole("USER_DEPART")//Credentials for Department
                 
                 //ADMIN
-//                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                .requestMatchers("/api/admin/plan/{id}").hasRole("ADMIN")
-//                .requestMatchers("/api/admin/plan/all").hasRole("ADMIN")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/admin/plan/{id}").hasRole("ADMIN")
+                .requestMatchers("/api/admin/plan/all").hasRole("ADMIN")
                 
                 //USER
                 .requestMatchers("/api/user/**").hasRole("USER")                            
