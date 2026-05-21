@@ -2,7 +2,6 @@ package lv.venta.virac.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +44,7 @@ public class AdminController {
     
     @PostMapping("/create-user")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> createUser(@RequestBody RegisterRequest request) {
+    public ResponseEntity<Object> createUser(@RequestBody RegisterRequest request) {
         authenticationService.createUserByAdmin(request);
         return ResponseEntity.ok("User created successfully");
     }
@@ -106,7 +105,7 @@ public class AdminController {
             	us.getLastname(),
             	us.getEmail(),
             	us.getPassword(),
-            	us.getRole().toString(),
+            	us.getRole(),
             	us.getIdEmployee());
         return ResponseEntity.ok().build();
     }
@@ -122,7 +121,7 @@ public class AdminController {
     //Scheduler endpoint
     @PutMapping("/update/scheduler")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateSchedulerByYear(@Valid @RequestBody SchedulerDTO dto,
+    public ResponseEntity<Object> updateSchedulerByYear(@Valid @RequestBody SchedulerDTO dto,
             BindingResult result){
     	try {
 	
@@ -134,7 +133,7 @@ public class AdminController {
 	                            error.getDefaultMessage(),
 	                            error.getRejectedValue()
 	                    ))
-	                    .collect(Collectors.toList());
+	            		.toList();
 	 
 	            // Create ErrorResponse
 	            ErrorResponse errorResponse = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Validation failed", errors);

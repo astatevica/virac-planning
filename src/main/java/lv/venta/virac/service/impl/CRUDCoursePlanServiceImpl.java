@@ -48,7 +48,7 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
 	@Override
 	public CoursePlan retrieveById(int id) throws Exception {
 		if (id < 1) throw new Exception("Invalid ID");
-        CoursePlan foundCoursePlan = coursePlanRepo.findById(id).get();
+		CoursePlan foundCoursePlan = coursePlanRepo.findById(id).orElseThrow(() -> new RuntimeException("CoursePlan not found with id: " + id));
         if (foundCoursePlan == null) throw new Exception("Course-Plan with the id: (" + id + ") does not exist!");
         
         return foundCoursePlan;
@@ -184,7 +184,7 @@ public class CRUDCoursePlanServiceImpl implements ICRUDCoursePlanService{
         
         //verifies that course already is not made
         for (Course co : courses) {
-            if (co.getName().equals(name) & co.getEctsCredits()==ectsCredits & co.getSemester().equals(semester) & co.getFaculty().equals(faculty) & co.isDeleted( )== false) {
+            if (co.getName().equals(name) && co.getEctsCredits()==ectsCredits && co.getSemester().equals(semester) && co.getFaculty().equals(faculty) && co.isDeleted( )== false) {
                 throw new Exception("Course: " + co.getName() + " already exists");
             }
         }

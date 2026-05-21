@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lv.venta.virac.auth.dto.AuthenticationRequest;
 import lv.venta.virac.auth.dto.AuthenticationResponse;
 import lv.venta.virac.auth.dto.RegisterRequest;
+import lv.venta.virac.model.Employee;
 import lv.venta.virac.repo.IEmployeeRepo;
 import lv.venta.virac.security.JwtService;
 import lv.venta.virac.token.RefreshToken;
@@ -41,25 +42,30 @@ public class AuthenticationService {
 
         String accessToken = jwtService.generateToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-        System.out.println(user.getRole().name());
 
         return new AuthenticationResponse(accessToken, refreshToken.getToken(), user.getRole().name());
     }
 	
 	public AuthenticationResponse register(RegisterRequest request) {
+		
+		Employee employee = employeeRepo.findById(request.getIdEmployee())
+		        .orElseThrow(() -> new RuntimeException(
+		                "Employee not found with id: " + request.getIdEmployee()
+		        ));
+		
 		var user = User.builder()
 				.firstname(request.getFirstname())
 				.lastname(request.getLastname())
 				.email(request.getEmail())
 				.password(passwordEncoder.encode(request.getPassword()))
 				.role(Role.valueOf(request.getRole()))
-				.employee(employeeRepo.findById(request.getIdEmployee()).get())
+				.employee(employee)
 				.build();
 		
-		User new_user = userRepo.save(user);
+		User newUser = userRepo.save(user);
 		String accessToken = jwtService.generateToken(user); 
 		RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
-		return new AuthenticationResponse(accessToken, refreshToken.getToken(), new_user.getRole().name());
+		return new AuthenticationResponse(accessToken, refreshToken.getToken(), newUser.getRole().name());
 	}
 	
 	public void createUserByAdmin(RegisterRequest request) {

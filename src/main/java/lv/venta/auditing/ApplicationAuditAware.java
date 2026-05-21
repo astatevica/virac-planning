@@ -19,13 +19,12 @@ public class ApplicationAuditAware implements AuditorAware<Integer>{
 		//retrieves the Authentication object. Gets details about current user
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if (authentication == null || authentication instanceof AnonymousAuthenticationToken){
+		if (authentication instanceof AnonymousAuthenticationToken){
 			return Optional.empty();
 		}
 
 		//checking if the user is authenticated
-	    if (authentication == null //no authentication information is available, so the user is considered unauthenticated
-	    		|| !authentication.isAuthenticated() //user isn't fully authenticated
+	    if ( !authentication.isAuthenticated() //user isn't fully authenticated
 	            || authentication instanceof AnonymousAuthenticationToken) { //user is anonymous
 	        return Optional.empty();
 	    }

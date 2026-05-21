@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 import org.hibernate.Filter;
 import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -13,6 +14,7 @@ import lv.venta.virac.dto.ArticlePlanCommentsDTO;
 import lv.venta.virac.dto.ArticlePlanReponseDTO;
 import lv.venta.virac.dto.ScientificArticlesCommentsDTO;
 import lv.venta.virac.model.ArticlePlan;
+import lv.venta.virac.model.Journal;
 import lv.venta.virac.model.Plan;
 import lv.venta.virac.model.ScientificArticles;
 import lv.venta.virac.repo.IArticlePlanRepo;
@@ -24,20 +26,24 @@ import lv.venta.virac.service.ICRUDArticlePlanService;
 @Service
 public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 
-	@Autowired
-	private IArticlePlanRepo artPlanRepo;
+	private final IArticlePlanRepo artPlanRepo;
 	
-	@Autowired
-	private IPlanRepo planRepo;
-	
-	@Autowired
-	private IScientificArticlesRepo artRepo;
-	
-	@Autowired
-	private IJournalRepo journalRepo;
+	private final IPlanRepo planRepo;
+
+	private final IScientificArticlesRepo artRepo;
+
+	private final IJournalRepo journalRepo;
 	
 	@PersistenceContext
     private EntityManager entityManager;
+	
+	public CRUDArticlePlanServiceImpl(IArticlePlanRepo artPlanRepo, IPlanRepo planRepo, 
+			IScientificArticlesRepo artRepo, IJournalRepo journalRepo) {
+		this.artPlanRepo = artPlanRepo;
+		this.planRepo = planRepo;
+		this.artRepo = artRepo;
+		this.journalRepo = journalRepo;
+	}
 	
 	@Override
 	public ArrayList<ArticlePlan> retrieveAll() throws Exception {
@@ -45,24 +51,35 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
         Filter filter = session.enableFilter("deletedArticlePlanFilter");
         filter.setParameter("isDeleted", false);
         ArrayList<ArticlePlan> articlePlans = (ArrayList<ArticlePlan>) artPlanRepo.findAll();
-        if (articlePlans.isEmpty()) throw new Exception("There is no article-plans");
+        if (articlePlans.isEmpty()) {throw new ResponseStatusException(HttpStatus.NOT_FOUND,"There is no article-plans");}
         session.disableFilter("deletedArticlePlanFilter");
         return articlePlans;
 	}
 
 	@Override
-	public ArticlePlan retrieveById(int id) throws Exception {
-		if (id < 1) throw new Exception("Invalid ID");
-        ArticlePlan foundArtPlan = artPlanRepo.findById(id).get();
-        if (foundArtPlan == null) throw new Exception("Article-Plan with the id: (" + id + ") does not exist!");
-        
-        return foundArtPlan;
+	public ArticlePlan retrieveById(int id) {
+
+	    if (id < 1) {
+	        throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "Invalid ID"
+	        );
+	    }
+
+	    return artPlanRepo.findById(id)
+	            .orElseThrow(() -> new ResponseStatusException(
+	                    HttpStatus.NOT_FOUND,
+	                    "ArticlePlan not found with id: " + id
+	            ));
 	}
 
 	@Override
 	public void deleteById(int id) throws Exception {
-		ArticlePlan artPlan = artPlanRepo.findById(id).get();
-    	if (artPlan == null) throw new Exception("Article with id:"+ id +" does not exist");
+		
+		ArticlePlan artPlan = artPlanRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "ArticlePlan not found with id: " + id
+        ));
     	artPlan.setDeleted(true); // SOFT DELETE
     	artPlanRepo.save(artPlan);  // SAVE, NOT DELETE
 	}
@@ -73,23 +90,30 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 		ArrayList<ArticlePlan> artPlan = (ArrayList<ArticlePlan>) artPlanRepo.findAll();
         
         if(idPlan == 0 || idScientificArticles == 0){
-			throw new Exception("The input parameters are incorrect");
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The input parameters are incorrect"
+            );
 		}
         
-        Plan plan = planRepo.findById(idPlan).get();
-        if(plan == null) {
-        	throw new Exception("Plan not found");
-        }
+        Plan plan = planRepo.findById(idPlan).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Plan not found with id " + idPlan 
+        ));
         
-        ScientificArticles article = artRepo.findById(idScientificArticles).get();
-        if(article == null) {
-        	throw new Exception("Article not found");
-        }
+        ScientificArticles article = artRepo.findById(idScientificArticles).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Article not found with id " + idScientificArticles 
+        ));
+     
         
         for (ArticlePlan art : artPlan) {
-            if (art.getPlan().getIdPlan() == idPlan & art.getScientificArticles().getIdArticle() == idScientificArticles & art.isDeleted( )== false) {
-                throw new Exception("Scientific article-plan with paln id: " + art.getPlan().getIdPlan() + " and artticle id: " 
-            + art.getScientificArticles().getIdArticle() + " already exists");
+            if (art.getPlan().getIdPlan() == idPlan && art.getScientificArticles().getIdArticle() == idScientificArticles && art.isDeleted( )) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Scientific article-plan with paln id: " + art.getPlan().getIdPlan() + " and artticle id: " 
+                                + art.getScientificArticles().getIdArticle() + " already exists"
+                );
             }
         }
 
@@ -101,18 +125,21 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 	public void updateById(int id, int idPlan, int idScientificArticles, String articleComments, String publicationLink)
 			throws Exception {
 		ArticlePlan articlePlan = retrieveById(id);
-    	if (articlePlan == null) throw new 
-    		Exception("Article-plan with (id:" + id + ") does not exist");    	
+    	if (articlePlan == null) throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Article-plan with (id:" + id + ") does not exist"
+        );
     	
-    	Plan plan = planRepo.findById(idPlan).get();
-        if(plan == null) {
-        	throw new Exception("Plan not found");
-        }
+    	
+    	Plan plan = planRepo.findById(idPlan).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Plan not found with idPlan " + idPlan 
+        ));
         
-        ScientificArticles article = artRepo.findById(idScientificArticles).get();
-        if(article == null) {
-        	throw new Exception("Article not found");
-        }
+        ScientificArticles article = artRepo.findById(idScientificArticles).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Article not found with idArticle " + idScientificArticles
+        ));
     	
         articlePlan.setPlan(plan);
         articlePlan.setScientificArticles(article);
@@ -126,7 +153,10 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 	public ArrayList<ArticlePlan> selectAllArticlePlanByPlan(int idPlan) throws Exception {
 		ArrayList<ArticlePlan> result = artPlanRepo.findByPlan_IdPlan(idPlan);
 		if(result.isEmpty()) {
-			throw new Exception("Article-plan with plan ID: " + idPlan + " does not exist");
+			throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Article-plan with plan ID: " + idPlan + " does not exist"
+            );
 		}
 		
 		return result;
@@ -137,26 +167,35 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 		ArticlePlan ap = artPlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(idPlan,idArticle);
         
         if(idPlan == 0 || idArticle == 0){
-			throw new Exception("The input parameters are incorrect");
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The input parameters are incorrect"
+            );
 		}
         
-        Plan plan = planRepo.findById(idPlan).get();
-        if(plan == null) {
-        	throw new Exception("Plan not found");
-        }
+        Plan plan = planRepo.findById(idPlan).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Plan not found"
+        ));
         
         if(employeeId != plan.getEmployee().getIdEmployee()) {
-        	throw new Exception("This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan");
-        }
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan"
+            );
+        	}
         
-        ScientificArticles article = artRepo.findById(idArticle).get();
-        if(article == null) {
-        	throw new Exception("Article not found");
-        }
+        ScientificArticles article = artRepo.findById(idArticle).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Article not found"
+        ));
         
         if(ap != null) {
             if(!ap.isDeleted()){
-                throw new Exception("Article already attached to this plan");
+            	throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Article already attached to this plan"
+                );
             }
             ap.setDeleted(false);
             ap.setArticleComments(dto.getArticleComments());
@@ -183,37 +222,48 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
         
 		//verifies that article and idPlan input parameters are not empty
         if(name == null || coAuthors == null || idJournal == 0 || idPlan == 0){
-			throw new Exception("The input parameters are incorrect");
+			throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The input parameters are incorrect"
+            );
 		}
         
         //verifies that article already is not made
         for (ScientificArticles art : articles) {
-            if (art.getName().equals(name) & art.getCoAuthors()==coAuthors & art.getJournal().getIdJournal() == idJournal & art.isDeleted( )== false) {
-                throw new Exception("Article: " + art.getName() + " already exists");
+            if (art.getName().equals(name) && art.getCoAuthors().equals(coAuthors) && art.getJournal().getIdJournal() == idJournal && art.isDeleted( )) {
+                throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Article: " + art.getName() + " already exists"
+                );
             }
         }
         
         //verifies that plan is correct
-        Plan plan = planRepo.findById(idPlan).get();
-        if(plan == null) {
-        	throw new Exception("Plan not found");
-        }    
+        Plan plan = planRepo.findById(idPlan).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Plan not found"
+        ));
         
         //verifies that plan is connected to right user
         if(employeeId != plan.getEmployee().getIdEmployee()) {
-        	throw new Exception("This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan");
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "This user: "+ plan.getEmployee().getName() + " " + plan.getEmployee().getSurname() +" can't edit current plan"
+            );
         }
 	    
         //Makes new Article after veryfing
 		ScientificArticles a = new ScientificArticles();
 	    a.setName(name);
 	    a.setCoAuthors(coAuthors);
-	    a.setJournal(journalRepo.findById(idJournal).get());
+	    Journal journal = journalRepo.findById(idJournal).orElseThrow(() -> new RuntimeException("Journal not found with id: " + idJournal));
+	    a.setJournal(journal);
 	    ScientificArticles newArticle = artRepo.save(a);
 	    
 	    //Creates new Plan-Article relation
 	    ArticlePlan ap = new ArticlePlan();
-	    ap.setPlan(planRepo.findById(idPlan).get());
+	    Plan planArticle = planRepo.findById(idPlan).orElseThrow(() -> new RuntimeException("Journal not found with id: " + idJournal));
+	    ap.setPlan(planArticle);
 	    ap.setScientificArticles(newArticle);
 	    ap.setDeleted(false);
 	    ap.setArticleComments(comments);
@@ -236,10 +286,18 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 	@Override
 	public void deleteByArticleIdAndPlanId(int idPlan, int idArticle, int employeeId) throws Exception {
 		ArticlePlan articlePlan = artPlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(idPlan,idArticle);
-    	if (articlePlan == null) throw new Exception("Article-Plan with Plan id:"+ idPlan +" and Article id: "+idArticle+" does not exist");
+    	if (articlePlan == null) throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Article-Plan with Plan id:"+ idPlan +" and Article id: "+idArticle+" does not exist"
+        );
+    	
     	if(employeeId != articlePlan.getCreatedBy()) {
-        	throw new Exception("This user: "+ articlePlan.getPlan().getEmployee().getName() + " " 
-    	+ articlePlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
+    		
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "This user: "+ articlePlan.getPlan().getEmployee().getName() + " " 
+                        	+ articlePlan.getPlan().getEmployee().getSurname() +" can't edit current plan"
+            );
         }
     	articlePlan.setDeleted(true); // SOFT DELETE
     	artPlanRepo.save(articlePlan);  // SAVE, NOT DELETE
@@ -249,10 +307,17 @@ public class CRUDArticlePlanServiceImpl implements ICRUDArticlePlanService{
 	public void updateByArticleIdAndPlanId(int idPlan, int idArticle, String articleComments, String publicationLink,
 			int employeeId) throws Exception {
 		ArticlePlan articlePlan = artPlanRepo.findByPlan_IdPlanAndScientificArticles_IdArticle(idPlan,idArticle);
-    	if (articlePlan == null) throw new Exception("Article-Plan with Plan id:"+ idPlan +" and Article id: "+idArticle+" does not exist");
+    	if (articlePlan == null) 
+    		throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Article-Plan with Plan id:"+ idPlan +" and Article id: "+idArticle+" does not exist"
+            );
     	if(employeeId != articlePlan.getCreatedBy()) {
-        	throw new Exception("This user: "+ articlePlan.getPlan().getEmployee().getName() + " " 
-    	+ articlePlan.getPlan().getEmployee().getSurname() +" can't edit current plan");
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "This user: "+ articlePlan.getPlan().getEmployee().getName() + " " 
+                        	+ articlePlan.getPlan().getEmployee().getSurname() +" can't edit current plan"
+            );
         }
         articlePlan.setArticleComments(articleComments);
         articlePlan.setPublicationLink(publicationLink);

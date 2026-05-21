@@ -81,29 +81,6 @@ public class AdminControllerTest {
         verify(authenticationService).createUserByAdmin(request);
     }
 
-//    @Test
-//    void testGetAllUsers() throws Exception {
-//
-//    	ArrayList<User> users = new ArrayList<>();
-//        users.add(user);
-//
-//        when(userService.retrieveAll()).thenReturn(users);
-//
-//        ResponseEntity<ArrayList<RegisterRequest>> response = controller.getAllUsers();
-//
-//        assertEquals(200, response.getStatusCode().value());
-//    }
-//
-//    @Test
-//    void testGetById() throws Exception {
-//
-//        when(userService.retrieveById(anyInt())).thenReturn(user);
-//
-//        ResponseEntity<RegisterRequest> response = controller.getById(0);
-//
-//        assertEquals(200, response.getStatusCode().value());
-//    }
-
     @Test
     void testDeleteById() throws Exception {
 
