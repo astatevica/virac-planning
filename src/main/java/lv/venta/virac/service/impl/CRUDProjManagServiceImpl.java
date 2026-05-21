@@ -71,8 +71,8 @@ public class CRUDProjManagServiceImpl implements ICRUDProjManagService{
                 .orElseThrow(() -> new Exception("Employee not found"));
         
         for (ProjectManagement manag : managements) {
-            if (manag.getEmployee().equals(foundEmployee) & manag.getStartDate().equals(startDate)
-            		& manag.getEndDate().equals(endDate) & manag.isDeleted( )== false ) {
+            if (manag.getEmployee().equals(foundEmployee) && manag.getStartDate().equals(startDate)
+            		&& manag.getEndDate().equals(endDate) && manag.isDeleted( )) {
                 throw new Exception("Management: " + manag.getEmployee().getIdEmployee()+ " with start date: " + manag.getStartDate() + 
                 		" and end date : " + manag.getEndDate() + " already exists");
             }
