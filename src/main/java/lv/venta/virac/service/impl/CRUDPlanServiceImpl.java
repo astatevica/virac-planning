@@ -7,9 +7,10 @@ import java.util.stream.Collectors;
 import org.hibernate.Filter;
 import org.hibernate.Session;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -38,38 +39,52 @@ import lv.venta.virac.service.ICRUDPlanService;
 @Service
 public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	
-	@Autowired
 	private IPlanRepo planRepo;
 	
-	@Autowired
 	private IEmployeeRepo employeeRepo;
 	
-	@Autowired
 	private IYearRepo yearRepo;
 	
-	@Autowired
 	private IViracDepartmentRepo depRepo;
 	
 	@PersistenceContext
     private EntityManager entityManager;
 	
-	@Autowired
 	private ModelMapper modelMapper;
 
-	@Autowired
 	private IProjectPlanRepo projectPlanRepo;
 
-	@Autowired
 	private ICoursePlanRepo coursePlanRepo;
 
-	@Autowired
 	private IArticlePlanRepo articlePlanRepo;
 
-	@Autowired
 	private IWorkPlanRepo studentWorkPlanRepo;
 	
-	@Autowired
 	private IPlanScheduleRepo planScheduleRepo;
+	
+	public CRUDPlanServiceImpl(
+	        IPlanRepo planRepo,
+	        IEmployeeRepo employeeRepo,
+	        IYearRepo yearRepo,
+	        IViracDepartmentRepo depRepo,
+	        ModelMapper modelMapper,
+	        IProjectPlanRepo projectPlanRepo,
+	        ICoursePlanRepo coursePlanRepo,
+	        IArticlePlanRepo articlePlanRepo,
+	        IWorkPlanRepo studentWorkPlanRepo,
+	        IPlanScheduleRepo planScheduleRepo
+	) {
+	    this.planRepo = planRepo;
+	    this.employeeRepo = employeeRepo;
+	    this.yearRepo = yearRepo;
+	    this.depRepo = depRepo;
+	    this.modelMapper = modelMapper;
+	    this.projectPlanRepo = projectPlanRepo;
+	    this.coursePlanRepo = coursePlanRepo;
+	    this.articlePlanRepo = articlePlanRepo;
+	    this.studentWorkPlanRepo = studentWorkPlanRepo;
+	    this.planScheduleRepo = planScheduleRepo;
+	}
 
 	@Override
 	public ArrayList<Plan> retrieveAll() throws Exception {
@@ -77,25 +92,35 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
         Filter filter = session.enableFilter("deletedPlanFilter");
         filter.setParameter("isDeleted", false);
         ArrayList<Plan> plans = (ArrayList<Plan>) planRepo.findAll();
-        if (plans.isEmpty()) throw new Exception("There is no plans");
+        if (plans.isEmpty()) 
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "There is no plans"
+            );
         session.disableFilter("deletedPlanFilter");
         return plans;
 	}
 
 	@Override
 	public Plan retrieveById(int id) throws Exception {
-		if (id < 1) throw new Exception("Invalid ID");
-        Plan foundPlan = planRepo.findById(id).get();
-        if (foundPlan == null) throw new Exception("Plan with the id: (" + id + ") does not exist!");
-        
-        return foundPlan;
+		if (id < 1) {throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Invalid ID"
+        );}
+        return planRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Plan with the id: (" + id + ") does not exist!"
+        ));
 	}
 	
 	@Override
 	public FullPlanDTO retrieveFullPlan(int idPlan) throws Exception {
 		Plan plan = retrieveById(idPlan);
 	    if(plan == null) {
-	    	throw new Exception("All plans currently is closed");
+	    	throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "All plans currently is closed"
+	        );
 	    }
 	    
 	    FullPlanDTO dto = modelMapper.map(plan, FullPlanDTO.class);
@@ -161,8 +186,10 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 
 	@Override
 	public void deleteById(int id) throws Exception {
-		Plan plan = planRepo.findById(id).get();
-    	if (plan == null) throw new Exception("Plan with id:"+ id +" does not exist");
+		Plan plan = planRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Plan with id:"+ id +" does not exist"
+        ));
     	plan.setDeleted(true); // SOFT DELETE
     	planRepo.save(plan);  // SAVE, NOT DELETE
 	}
@@ -177,30 +204,35 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 		ArrayList<Plan> plans = (ArrayList<Plan>) planRepo.findAll();
         
         if(idEmployee == 0 || idYear == 0){
-			throw new Exception("The input parameters are incorrect");
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "The input parameters are incorrect"
+            );
 		}
         
-        Employee employee = employeeRepo.findById(idEmployee).get();
-        if(employee == null) {
-        	throw new Exception("Employee not found");
-        }
+        Employee employee = employeeRepo.findById(idEmployee).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Employee not found"
+        ));
         
-        Year year = yearRepo.findById(idYear).get();
-        if(year == null) {
-        	throw new Exception("Year not found");
-        }
+        Year year = yearRepo.findById(idYear).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Year not found"
+        ));
         
         for (Plan pl : plans) {
-            if (pl.getEmployee().getIdEmployee() == idEmployee & pl.getYear().getIdYear() == idYear & pl.isDeleted( )== false) {
-                throw new Exception("Plan with paln Employee ID: " + pl.getEmployee().getIdEmployee() + " and Year ID: " 
-            + pl.getYear().getIdYear() + " already exists");
-            }
+            if (pl.getEmployee().getIdEmployee() == idEmployee && pl.getYear().getIdYear() == idYear && pl.isDeleted( )) {
+            	throw new ResponseStatusException(
+                        HttpStatus.BAD_REQUEST,
+                        "Plan with paln Employee ID: " + pl.getEmployee().getIdEmployee() + " and Year ID: " 
+                                + pl.getYear().getIdYear() + " already exists"
+                );
         }
 
         Plan plan = new Plan(employee, year, numOfProjects, numOfArticles, partInConf,partInConfEnd, comAbConf, comAbConfEnd, numOfCourses, 
         		numOfStudWork, promoOfResearch, promoOfResearchEnd, adminWork, adminWorkEnd, projApplicSub, projApplicSubEnd, skillsDevelopment,
         		skillsDevelopmentEnd, participationInSeminars, participationInSeminarsEnd, otherJobs, otherJobsEnd,PlanStatus.plan_open);
-        planRepo.save(plan);
+        planRepo.save(plan);}
 		
 	}
 
@@ -212,18 +244,20 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 			String participationInSeminars, String participationInSeminarsEnd, String otherJobs, String otherJobsEnd) throws Exception {
 		
 		Plan plan = retrieveById(id);
-    	if (plan == null) throw new 
-    		Exception("Plan with (id:" + id + ") does not exist");    	
+    	if (plan == null) throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Plan with (id:" + id + ") does not exist"
+        );  	
     	
-    	Employee employee = employeeRepo.findById(idEmployee).get();
-        if(employee == null) {
-        	throw new Exception("Employee not found");
-        }
+    	Employee employee = employeeRepo.findById(idEmployee).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Employee not found"
+        ));
         
-        Year year = yearRepo.findById(idYear).get();
-        if(year == null) {
-        	throw new Exception("Year not found");
-        }
+        Year year = yearRepo.findById(idYear).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Year not found"
+        ));
     	
         plan.setEmployee(employee);
         plan.setYear(year);
@@ -255,7 +289,10 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	public ArrayList<Plan> selectAllPlansByEmployee(int idEmployee) throws Exception {
 		ArrayList<Plan> result = planRepo.findByEmployee_IdEmployeeOrderByYear_YearNumberDesc(idEmployee);
 		if(result.isEmpty()) {
-			throw new Exception("Plan with Employee ID: " + idEmployee + " does not exist");
+			throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "Plan with Employee ID: " + idEmployee + " does not exist"
+	        );
 		}
 		return result;
 	}
@@ -264,7 +301,10 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	public ArrayList<Plan> selectAllPlansByYear(int idYear) throws Exception {
 		ArrayList<Plan> result = planRepo.findByYear_IdYear(idYear);
 		if(result.isEmpty()) {
-			throw new Exception("Plan with Year ID: " + idYear + " does not exist");
+			throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "Plan with Year ID: " + idYear + " does not exist"
+	        );
 		}
 		
 		return result;
@@ -274,7 +314,10 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	public ArrayList<Plan> selectAllPlansByDepartment(String nameDepartment) throws Exception {
 		ArrayList<Plan> result = planRepo.findByEmployee_ViracDepartment_IdDepartmentOrderByYear_YearNumberDesc(depRepo.findByName(nameDepartment).getIdDepartment());
 		if(result.isEmpty()) {
-			throw new Exception("Plan with in Department: " + nameDepartment + " does not exist");
+			throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "Plan with in Department: " + nameDepartment + " does not exist"
+	        );
 		}
 		
 		return result;
@@ -284,9 +327,11 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	public ArrayList<Plan> selectAllPlansByEmployeeAndYear(int idEmployee, int idYear) throws Exception {
 		ArrayList<Plan> result = planRepo.findByEmployee_IdEmployeeAndYear_IdYear(idEmployee, idYear);
 		if(result.isEmpty()) {
-			throw new Exception("Plan with ID Emplyee: " + idEmployee + " and ID Year: "+ idYear + " does not exist");
-		}
-		System.out.println(result);
+			throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "Plan with ID Emplyee: " + idEmployee + " and ID Year: "+ idYear + " does not exist"
+	        );
+			}
 		return result;
 	}
 
@@ -294,8 +339,11 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	public ArrayList<Plan> selectAllPlansByEmployeeAndProject(int idEmployee, int idProject) throws Exception {
 		ArrayList<Plan> result = planRepo.findByEmployeeAndProject(idEmployee, idProject);
 		if(result.isEmpty()) {
-			throw new Exception("Plan with ID Emplyee: " + idEmployee + " and ID Project: "+ idProject + " does not exist");
-		}
+			throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "Plan with ID Emplyee: " + idEmployee + " and ID Project: "+ idProject + " does not exist"
+	        );
+			}
 		return result;
 	}
 
@@ -303,7 +351,10 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	public FullPlanDTO getFullPlanForUser(int idEmployee, int idPlan) throws Exception {
 		Plan plan = planRepo.findByEmployee_IdEmployeeAndIdPlan(idEmployee,idPlan);
 	    if(plan == null) {
-	    	throw new Exception("All plans currently is closed");
+	    	throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "All plans currently is closed"
+	        );
 	    }
 	    
 	    FullPlanDTO dto = modelMapper.map(plan, FullPlanDTO.class);
@@ -382,21 +433,20 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 		//Find plan by year and idEmployee
 		Plan plan = planRepo.findFirstByEmployee_IdEmployeeAndYear_IdYear(idEmployee,year.getIdYear());
 	
-    	if (plan == null) throw new 
-    		Exception("Plan with (Year:" + currentYear + ") does not exist for current user");    	
-    	
-    	Employee employee = employeeRepo.findById(idEmployee).get();
-        if(employee == null) {
-        	throw new Exception("Employee not found");
-        }
+    	if (plan == null) { throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Plan with (Year:" + currentYear + ") does not exist for current user"
+        );  }
         
         if(year.getIdYear() == 0) {
-        	throw new Exception("Year not found");
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Year not found"
+            );
         }
         
         PlanStatus status = plan.getPlanStatus();
         
-        //TODO: paskatīties optimizāciju
         if(status == PlanStatus.plan_open) {
             plan.setNumOfProjects(numOfProjects);
             plan.setNumOfArticles(numOfArticles);
@@ -430,7 +480,10 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
             plan.setOtherJobsEnd(otherJobsEnd);
             planRepo.save(plan);
         }else {
-        	throw new Exception("Current plan is closed");
+        	throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Current plan is closed"
+            );
         }
 	
 		
@@ -508,8 +561,11 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	public ArrayList<Plan> selectAllPlansByDepartmentAndYear(int idDepartment, int idYear) throws Exception {
 		ArrayList<Plan> result = planRepo.findByEmployee_ViracDepartment_IdDepartmentAndYear_IdYear(idDepartment, idYear);
 		if(result.isEmpty()) {
-			throw new Exception("Plan with ID Department: " + idDepartment + " and ID Year: "+ idYear + " does not exist");
-		}
+			throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "Plan with ID Department: " + idDepartment + " and ID Year: "+ idYear + " does not exist"
+	        );
+			}
 		return result;
 	}
 
