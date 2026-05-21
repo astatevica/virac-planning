@@ -4,8 +4,9 @@ import java.util.ArrayList;
 
 import org.hibernate.Filter;
 import org.hibernate.Session;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,14 +19,17 @@ import lv.venta.virac.service.ICRUDEmployeeService;
 @Service
 public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 	
-	@Autowired
 	private IEmployeeRepo emplRepo;
 	
-	@Autowired
 	private IViracDepartmentRepo depRepo;
 	
 	@PersistenceContext
     private EntityManager entityManager;
+	
+	public CRUDEmployeeServiceImpl(IEmployeeRepo emplRepo, IViracDepartmentRepo depRepo) {
+		this.emplRepo = emplRepo;
+		this.depRepo = depRepo;
+	}
 	
 	@Override
     public ArrayList<Employee> retrieveAll() throws Exception {
@@ -34,18 +38,24 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
         Filter filter = session.enableFilter("deletedEmployeeFilter");
         filter.setParameter("isDeleted", false);
         ArrayList<Employee> employees = (ArrayList<Employee>) emplRepo.findAll();
-        if (employees.isEmpty()) throw new Exception("There is no employee");
+        if (employees.isEmpty()) throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "There is no employee"
+        );
         session.disableFilter("deletedEmployeeFilter");
         return employees;
     }
 
     @Override
     public Employee retrieveById(int id) throws Exception {
-        if (id < 1) throw new Exception("Invalid ID");
-        Employee foundEmployees = emplRepo.findById(id).get();
-        if (foundEmployees == null) throw new Exception("Employee with the id: (" + id + ") does not exist!");
-        
-        return foundEmployees;
+        if (id < 1)  throw new ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Invalid ID"
+        );
+        return emplRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Employee with the id: (" + id + ") does not exist!"
+        ));
     }
 
     @Override
@@ -54,17 +64,26 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
         ArrayList<Employee> employees = (ArrayList<Employee>) emplRepo.findAll();
         
         if(name == null || surname == null || nameDepartment == null || position == null){
-			throw new Exception("The input parameters are incorrect");
+			throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "The input parameters are incorrect"
+	        );
 		}
         
         ViracDepartment dep = depRepo.findByName(nameDepartment);
         if(dep == null) {
-        	throw new Exception("Department not found");
+        	throw new ResponseStatusException(
+	                HttpStatus.NOT_FOUND,
+	                "Department not found"
+	        );
         }
         
         for (Employee emp : employees) {
-            if (emp.getName().equals(name) & emp.getSurname().equals(surname) & emp.isDeleted( )== false) {
-                throw new Exception("Employee: " + emp.getName()+ emp.getSurname() + " already exists");
+            if (emp.getName().equals(name) && emp.getSurname().equals(surname) && emp.isDeleted( )) {
+                throw new ResponseStatusException(
+    	                HttpStatus.BAD_REQUEST,
+    	                "Employee: " + emp.getName()+ emp.getSurname() + " already exists"
+    	        );
             }
         }
 
@@ -76,13 +95,12 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
     public void updateById(int id, String name, String surname,
 			String nameDepartment, String position) throws Exception {
     	Employee employee = retrieveById(id);
-    	if (employee == null) throw new 
-    		Exception("Employee with (id:" + id + ") does not exist");    	
+    	if (employee == null) throw new ResponseStatusException(
+	                HttpStatus.BAD_REQUEST,
+	                "Employee with (id:" + id + ") does not exist"
+	        );  	
     	
     	ViracDepartment dep = depRepo.findByName(nameDepartment);
-        if(dep == null) {
-        	throw new Exception("Department not found");
-        }
     	
         employee.setName(name);
         employee.setSurname(surname);
@@ -94,8 +112,10 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 
     @Override
     public void deleteById(int id) throws Exception {
-    	Employee employee = emplRepo.findById(id).get();
-    	if (employee == null) throw new Exception("Employee with id:"+ id +" does not exist");
+    	Employee employee = emplRepo.findById(id).orElseThrow(() -> new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "Employee with id:"+ id +" does not exist"
+        ));
     	employee.setDeleted(true); // SOFT DELETE
     	emplRepo.save(employee);  // SAVE, NOT DELETE
     }
@@ -104,7 +124,10 @@ public class CRUDEmployeeServiceImpl implements ICRUDEmployeeService{
 	public ArrayList<Employee> selectAllEmployeesByDepartment(String nameDepartment) throws Exception {
 		ArrayList<Employee> result = emplRepo.findByViracDepartment_IdDepartment(depRepo.findByName(nameDepartment).getIdDepartment());
 		if(result.isEmpty()) {
-			throw new Exception("Employees with department name: " + nameDepartment + " does not exist");
+			throw new ResponseStatusException(
+	                HttpStatus.NOT_FOUND,
+	                "Employees with department name: " + nameDepartment + " does not exist"
+	        );  	
 		}
 		
 		return result;
