@@ -468,36 +468,50 @@ public class CRUDPlanServiceImpl implements ICRUDPlanService{
 	        }
 	    }
 	    
-	    // Create next year plans
 	    if (!today.isBefore(doneFreezeDate)) {
 
-	    	//If today is after DoneFreezeDate need to open new plan and create new year entity
-	        int targetYear = today.getYear() + 1;
+	        int currentYearNumber = today.getYear();
+	        int nextYearNumber = currentYearNumber + 1;
 
-	        //Find if target Year already exists
-	        Year year = yearRepo.findByYearNumber(targetYear);
+	        //check if next year already exists
+	        Year nextYear = yearRepo.findByYearNumber(nextYearNumber);
 
-	        if (year == null) {
+	        //create next year only once
+	        if (nextYear == null) {
+
+	            //deactivate current year
+	            Year currentYear = yearRepo.findByYearNumber(currentYearNumber);
+
+	            if (currentYear != null) {
+	                currentYear.setActiveYear(false);
+	                yearRepo.save(currentYear);
+	            }
+
+	            //create next year
 	            Year newYear = new Year();
-	            newYear.setYearNumber(targetYear);
+	            newYear.setYearNumber(nextYearNumber);
+	            newYear.setActiveYear(true);
 
-	            year = yearRepo.save(newYear);
-	            
-	            //Sets automatical date, that should be updated if needed
+	            nextYear = yearRepo.save(newYear);
+
+	            //create schedule for next year
 	            PlanSchedule newSchedule = new PlanSchedule();
-	            newSchedule.setYear(newYear);
-	            newSchedule.setPlannedFreezeDate(LocalDate.of(targetYear, 2, 1));
-	            newSchedule.setDoneFreezeDate(LocalDate.of(targetYear, 12, 25));
+	            newSchedule.setYear(nextYear);
+
+	            newSchedule.setPlannedFreezeDate(LocalDate.of(nextYearNumber, 2, 1));
+
+	            newSchedule.setDoneFreezeDate(LocalDate.of(nextYearNumber, 12, 25));
+
 	            planScheduleRepo.save(newSchedule);
 	            
 	        }
 
-	      //Create next year plans 
+	        //Create next year plans 
 		    for(Employee employee : employeeRepo.findAll()) {
-		    	boolean exists = planRepo.findFirstByEmployee_IdEmployeeAndYear_IdYear(employee.getIdEmployee(), year.getIdYear()) != null;
+		    	boolean exists = planRepo.findFirstByEmployee_IdEmployeeAndYear_IdYear(employee.getIdEmployee(), nextYear.getIdYear()) != null;
 	        	if(!exists){
 		            create(employee.getIdEmployee(),
-		            		year.getIdYear(), 
+		            		nextYear.getIdYear(), 
 		            		0, 0, null, null, null, null, 0, 0, null, null, null, null, null, null, null, null, null, null, null, null);
 		            }
 	        }

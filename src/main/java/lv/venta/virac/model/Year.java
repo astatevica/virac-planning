@@ -55,6 +55,9 @@ public class Year extends Auditable{
 	@Column(name = "deleted")
 	private boolean deleted = Boolean.FALSE;
 	
+	@Column(name = "activeYear")
+	private boolean activeYear = Boolean.FALSE;
+	
 	public Year(Integer yearNumber) {
 		setYearNumber(yearNumber);
 	}
